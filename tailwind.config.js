@@ -65,11 +65,16 @@ module.exports = {
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' }
+        },
+        progress: {
+          '0%': { left: '2px' },
+          '100%': { left: 'calc(100% - 50px)' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        progress: 'progress 3s linear infinite alternate'
       }
     }
   },
