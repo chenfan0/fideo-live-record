@@ -26,7 +26,19 @@ export default {
         filename_placeholder: 'Please enter filename',
         directory: 'Directory',
         directory_placeholder: 'Please select directory',
-        select: 'Select'
+        select: 'Select',
+        title_can_not_be_empty: 'Title can not be empty',
+        room_url_can_not_be_empty: 'Room URL can not be empty',
+        room_url_invalid: 'Room URL is invalid',
+        filename_can_not_be_empty: 'Filename can not be empty',
+        directory_can_not_be_empty: 'Directory can not be empty',
+        interval_can_not_be_empty: 'Monitor interval can not be empty',
+        interval_invalid: 'Monitor interval is invalid, please enter number',
+        proxy_invalid: 'Proxy is invalid',
+        not_started: 'Not Started',
+        preparing_to_record: 'Preparing to Record',
+        monitoring: 'Monitoring',
+        recording: 'Recording'
       }
     }
   },
@@ -57,7 +69,20 @@ export default {
         filename_placeholder: '请输入存储文件名',
         directory: '存储目录',
         directory_placeholder: '请选择存储目录',
-        select: '选择'
+        select: '选择',
+        title_can_not_be_empty: '标题不能为空',
+        room_url_can_not_be_empty: '直播间地址不能为空',
+        room_url_invalid: '直播间地址不合法',
+        filename_can_not_be_empty: '文件名不能为空',
+        directory_can_not_be_empty: '存储目录不能为空',
+        interval_can_not_be_empty: '监控间隔不能为空',
+        interval_invalid: '监控间隔不合法, 请输入数字',
+        proxy_invalid: '代理地址不合法',
+        not_started: '未开始',
+        preparing_to_record: '准备录制中',
+        monitoring: '监控中',
+        recording: '录制中',
+        video_format_conversion: '视频格式转换中'
       }
     }
   }

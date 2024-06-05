@@ -1,23 +1,38 @@
+import { useTranslation } from 'react-i18next'
+
 import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/shadcn/ui/card'
-
 import { Badge } from '@/shadcn/ui/badge'
-
 import Progress from '@/components/StreamConfigList/components/Progress'
-
 import OperationBar from '@/components/StreamConfigList/components/OperationBar'
 
-export default function StreamConfigCard() {
+interface StreamConfigCardProps {
+  streamConfig: IStreamConfig
+}
+
+const streamStatusToLocaleMap = {
+  0: 'stream_config.not_started',
+  1: 'stream_config.preparing_to_record',
+  2: 'stream_config.monitoring',
+  3: 'stream_config.recording',
+  4: 'stream_config.video_format_conversion'
+}
+
+export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps) {
+  const { t } = useTranslation()
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center relative">
           <div className="flex gap-2">
-            <h1>Card Title</h1>
-            <Badge variant="outline">Badge</Badge>
+            <h1>{streamConfig.title}</h1>
+            <Badge variant="outline">{t(streamStatusToLocaleMap[streamConfig.status])}</Badge>
           </div>
           <OperationBar />
         </CardTitle>
-        <CardDescription>Card Description: https:www/xmind.app</CardDescription>
+        <CardDescription>
+          {t('stream_config.room_url')}:{' '}
+          <span className=" underline cursor-pointer">{streamConfig.roomUrl}</span>
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Progress />

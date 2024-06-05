@@ -1,7 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { SELECT_DIR } from '../const'
 
 function createWindow(): void {
   // Create the browser window.
@@ -51,8 +52,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle(SELECT_DIR, async () => {
+    const dir = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })
+    return dir
+  })
 
   createWindow()
 

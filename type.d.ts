@@ -2,13 +2,12 @@ interface IStreamConfig {
   title: string
   roomUrl: string
   filename: string
-  saveDirectoryPath: string
+  directory: string
   proxy?: string
-  cookie?: string
+  cookies?: string
   interval: number
-  liveUrlObj?: Record<string, string[]>
-  segmentTime?: number | ''
+  roomLines?: string[]
+  segmentTime?: string | ''
   line: string // '0' '1' eg
-  alreadyTryLine?: number[]
   status: number
 }
