@@ -11,10 +11,12 @@ import darkSettingIcon from '@/assets/images/dark/setting.svg'
 import lightSettingIcon from '@/assets/images/light/setting.svg'
 import darkLogo from '@/assets/images/dark/logo.png'
 import lightLogo from '@/assets/images/light/logo.png'
+import DefaultSettingSheet from './components/DefaultSettingSheet'
 
 export default function NavBar() {
   const { t } = useTranslation()
   const [createSheetOpen, setCreateSheetOpen] = useState(false)
+  const [settingSheetOpen, setSettingSheetOpen] = useState(false)
 
   return (
     <div className="flex items-center justify-between px-[24px]">
@@ -34,15 +36,19 @@ export default function NavBar() {
           light={lightSettingIcon}
           className="w-[24px] h-[24px] cursor-pointer"
           tooltipContent={t('nav_bar.setting')}
+          handleClick={() => setSettingSheetOpen(true)}
         />
         <Theme />
-
-        <StreamConfigSheet
-          sheetOpen={createSheetOpen}
-          setSheetOpen={setCreateSheetOpen}
-          type="create"
-        />
       </div>
+
+      <StreamConfigSheet
+        sheetOpen={createSheetOpen}
+        setSheetOpen={setCreateSheetOpen}
+        type="create"
+        streamConfig={null}
+      />
+
+      <DefaultSettingSheet setSheetOpen={setSettingSheetOpen} sheetOpen={settingSheetOpen} />
     </div>
   )
 }

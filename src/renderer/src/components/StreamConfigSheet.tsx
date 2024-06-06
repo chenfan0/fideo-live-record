@@ -244,7 +244,7 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="3">m@example.com</SelectItem>
+                          <SelectItem value="0">m@example.com</SelectItem>
                           <SelectItem value="1">m@google.com</SelectItem>
                           <SelectItem value="2">m@support.com</SelectItem>
                         </SelectContent>
