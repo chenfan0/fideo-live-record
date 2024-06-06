@@ -1,15 +1,15 @@
-import StreamConfigSheet from '../StreamConfigSheet'
+// import StreamConfigSheet from '../StreamConfigSheet'
 import StreamConfigCard from './components/StreamConfigCard'
 
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 
 export default function StreamConfigList() {
   const {
-    activeStreamConfigIndex,
-    streamConfigList,
-    streamConfigSheetOpen,
-    activeStreamConfig,
-    setStreamConfigSheetOpen
+    // activeStreamConfigIndex,
+    streamConfigList
+    // streamConfigSheetOpen,
+    // activeStreamConfig,
+    // setStreamConfigSheetOpen
   } = useStreamConfigStore((state) => state)
 
   return (
@@ -22,13 +22,13 @@ export default function StreamConfigList() {
         </div>
       }
 
-      <StreamConfigSheet
+      {/* <StreamConfigSheet
         type="edit"
         sheetOpen={streamConfigSheetOpen}
         setSheetOpen={setStreamConfigSheetOpen}
         streamConfig={activeStreamConfig}
         index={activeStreamConfigIndex}
-      />
+      /> */}
     </>
   )
 }

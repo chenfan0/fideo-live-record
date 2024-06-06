@@ -39,7 +39,11 @@ export default {
         not_started: 'Not Started',
         preparing_to_record: 'Preparing to Record',
         monitoring: 'Monitoring',
-        recording: 'Recording'
+        recording: 'Recording',
+        preview: 'Preview',
+        edit_record: 'Edit Record',
+        confirm_delete: 'Are you sure you want to delete this record?',
+        delete: 'Delete'
       }
     }
   },

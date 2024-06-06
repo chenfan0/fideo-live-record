@@ -136,16 +136,14 @@ interface StreamConfigSheetProps {
 
 export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const { t } = useTranslation()
-  const { streamConfigList, activeStreamConfig, addStreamConfig, updateStreamConfig } =
-    useStreamConfigStore((state) => state)
-  const { sheetOpen, setSheetOpen, type, index } = props
+  const { streamConfigList, addStreamConfig, updateStreamConfig } = useStreamConfigStore(
+    (state) => state
+  )
+  const { sheetOpen, setSheetOpen, type, index, streamConfig } = props
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ...({ ...defaultStreamConfig, ...activeStreamConfig } as unknown as Record<
-        string,
-        string | number
-      >)
+      ...({ ...defaultStreamConfig, ...streamConfig } as unknown as Record<string, string | number>)
     }
   })
   useEffect(() => {
@@ -153,24 +151,14 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       form.register(key, {
         onBlur: () => {
           const formValues = form.getValues()
-          const [valid] = validStreamConfigData(formValues, streamConfigList, activeStreamConfig, [
-            key
-          ])
+          const [valid] = validStreamConfigData(formValues, streamConfigList, streamConfig, [key])
           if (valid) {
             form.clearErrors(key)
           }
         }
       })
     )
-  }, [activeStreamConfig])
-
-  useEffect(() => {
-    if (activeStreamConfig) {
-      form.reset(activeStreamConfig)
-    } else {
-      form.reset(defaultStreamConfig)
-    }
-  }, [activeStreamConfig])
+  }, [])
 
   const handleSelectDir = async () => {
     const { canceled, filePaths } = await window.api.selectDir()
@@ -186,7 +174,7 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       const [valid, field, message] = validStreamConfigData(
         formValues,
         streamConfigList,
-        activeStreamConfig
+        streamConfig
       )
       if (!valid) {
         form.clearErrors()

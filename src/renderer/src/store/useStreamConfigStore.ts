@@ -4,14 +4,10 @@ import localForage from 'localforage'
 
 interface IStreamConfigStore {
   streamConfigList: IStreamConfig[]
-  activeStreamConfig: IStreamConfig | null
-  activeStreamConfigIndex: number
-  streamConfigSheetOpen: boolean
   initialData: () => void
-  setActiveStreamConfigIndex: (index: number) => void
-  setStreamConfigSheetOpen: (status: boolean) => void
   addStreamConfig: (streamConfig: IStreamConfig) => void
   updateStreamConfig: (streamConfig: IStreamConfig, index: number) => void
+  removeStreamConfig: (index: number) => void
 }
 
 export const useStreamConfigStore = create<IStreamConfigStore>((set) => ({
@@ -25,18 +21,6 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set) => ({
       set(() => ({ streamConfigList }))
     }
   },
-  setActiveStreamConfigIndex: (index: number) =>
-    set((state) => ({
-      activeStreamConfigIndex: index,
-      activeStreamConfig: state.streamConfigList[index]
-    })),
-  setStreamConfigSheetOpen: (status: boolean) =>
-    set((state) => {
-      if (!status) {
-        return { ...state, streamConfigSheetOpen: status, activeStreamConfig: null }
-      }
-      return { streamConfigSheetOpen: status }
-    }),
   addStreamConfig: (streamConfig: IStreamConfig) =>
     set((state) => {
       const streamConfigList = [streamConfig, ...state.streamConfigList]
@@ -48,6 +32,12 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set) => ({
       const streamConfigList = state.streamConfigList.map((item, i) =>
         i === index ? streamConfig : item
       )
+      localForage.setItem('streamConfigList', streamConfigList)
+      return { streamConfigList }
+    }),
+  removeStreamConfig: (index: number) =>
+    set((state) => {
+      const streamConfigList = state.streamConfigList.filter((_, i) => i !== index)
       localForage.setItem('streamConfigList', streamConfigList)
       return { streamConfigList }
     })
