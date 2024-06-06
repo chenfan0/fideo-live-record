@@ -159,6 +159,9 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       })
     )
   }, [])
+  useEffect(() => {
+    form.reset({ ...defaultStreamConfig, ...streamConfig })
+  }, [streamConfig])
 
   const handleSelectDir = async () => {
     const { canceled, filePaths } = await window.api.selectDir()

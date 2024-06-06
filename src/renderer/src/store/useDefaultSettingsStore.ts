@@ -1,13 +1,6 @@
 import { create } from 'zustand'
 import localForage from 'localforage'
 
-type Lang = 'en' | 'cn'
-
-interface IDefaultDefaultSettingsConfig {
-  directory: string
-  lang: Lang
-}
-
 interface IDefaultSettingsStore {
   defaultSettingsConfig: IDefaultDefaultSettingsConfig
   setDefaultSettingsConfig: (config: IDefaultDefaultSettingsConfig) => void

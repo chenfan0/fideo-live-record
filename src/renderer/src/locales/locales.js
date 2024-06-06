@@ -6,6 +6,13 @@ export default {
         setting: 'Default Setting',
         toggle_theme: 'Toggle Theme'
       },
+      default_settings: {
+        title: 'Default Settings',
+        language: 'Language',
+        language_placeholder: 'Please select language',
+        directory: 'Directory',
+        directory_placeholder: 'Please select directory'
+      },
       stream_config: {
         create: 'Create Record',
         edit: 'Edit Record',
@@ -53,6 +60,13 @@ export default {
         create: '新建录制项',
         setting: '默认配置',
         toggle_theme: '切换主题'
+      },
+      default_settings: {
+        title: '默认配置',
+        language: '语言',
+        language_placeholder: '请选择语言',
+        directory: '存储目录',
+        directory_placeholder: '请选择存储目录'
       },
       stream_config: {
         confirm: '确认',

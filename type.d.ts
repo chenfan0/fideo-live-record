@@ -11,3 +11,8 @@ interface IStreamConfig {
   line: string // '0' '1' eg
   status: number
 }
+type Lang = 'en' | 'cn'
+interface IDefaultDefaultSettingsConfig {
+  directory: string
+  lang: Lang
+}
