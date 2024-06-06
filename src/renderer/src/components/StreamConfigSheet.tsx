@@ -27,14 +27,6 @@ const formSchema = z.object({
   roomLines: z.array(z.string())
 })
 
-interface StreamConfigSheetProps {
-  sheetOpen: boolean
-  setSheetOpen: (status: boolean) => void
-  streamConfig?: IStreamConfig
-  type: 'create' | 'edit'
-  index?: number
-}
-
 const defaultStreamConfig: IStreamConfig = {
   title: '',
   roomUrl: '',
@@ -52,6 +44,7 @@ const defaultStreamConfig: IStreamConfig = {
 function validStreamConfigData(
   streamConfigData: IStreamConfig,
   streamConfigList: IStreamConfig[],
+  defaultStreamConfigData: IStreamConfig | null,
   validFields = Object.keys(streamConfigData) as (keyof IStreamConfig)[]
 ): [true] | [false, keyof IStreamConfig, string] {
   const { title, roomUrl, filename, directory, interval, proxy } = streamConfigData
@@ -60,7 +53,10 @@ function validStreamConfigData(
     if (!title) {
       return [false, 'title', 'stream_config.title_can_not_be_empty']
     }
-    if (streamConfigList.some((item) => item.title === title)) {
+    if (
+      defaultStreamConfigData?.title !== title &&
+      streamConfigList.some((item) => item.title === title)
+    ) {
       return [false, 'title', 'stream_config.title_already_exists']
     }
     return [true]
@@ -130,32 +126,51 @@ function validStreamConfigData(
   return [true]
 }
 
+interface StreamConfigSheetProps {
+  sheetOpen: boolean
+  setSheetOpen: (status: boolean) => void
+  streamConfig: IStreamConfig | null
+  type: 'create' | 'edit'
+  index?: number
+}
+
 export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const { t } = useTranslation()
-  const { streamConfigList, addStreamConfig, updateStreamConfig } = useStreamConfigStore(
-    (state) => state
-  )
-  const { sheetOpen, setSheetOpen, streamConfig = { ...defaultStreamConfig }, type, index } = props
+  const { streamConfigList, activeStreamConfig, addStreamConfig, updateStreamConfig } =
+    useStreamConfigStore((state) => state)
+  const { sheetOpen, setSheetOpen, type, index } = props
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ...(streamConfig as unknown as Record<string, string | number>)
+      ...({ ...defaultStreamConfig, ...activeStreamConfig } as unknown as Record<
+        string,
+        string | number
+      >)
     }
   })
-
   useEffect(() => {
     ;(Object.keys(defaultStreamConfig) as (keyof IStreamConfig)[]).forEach((key) =>
       form.register(key, {
         onBlur: () => {
           const formValues = form.getValues()
-          const [valid] = validStreamConfigData(formValues, streamConfigList, [key])
+          const [valid] = validStreamConfigData(formValues, streamConfigList, activeStreamConfig, [
+            key
+          ])
           if (valid) {
             form.clearErrors(key)
           }
         }
       })
     )
-  }, [])
+  }, [activeStreamConfig])
+
+  useEffect(() => {
+    if (activeStreamConfig) {
+      form.reset(activeStreamConfig)
+    } else {
+      form.reset(defaultStreamConfig)
+    }
+  }, [activeStreamConfig])
 
   const handleSelectDir = async () => {
     const { canceled, filePaths } = await window.api.selectDir()
@@ -168,7 +183,11 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const handleSetSheetOpen = async (status: boolean, trigger = false) => {
     const formValues = form.getValues()
     if (trigger) {
-      const [valid, field, message] = validStreamConfigData(formValues, streamConfigList)
+      const [valid, field, message] = validStreamConfigData(
+        formValues,
+        streamConfigList,
+        activeStreamConfig
+      )
       if (!valid) {
         form.clearErrors()
         form.setError(field, { type: 'manual', message: t(message) })
@@ -193,7 +212,7 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
           <SheetTitle>
             {type === 'create' ? t('stream_config.create') : t('stream_config.edit')}
           </SheetTitle>
-        </SheetHeader>{' '}
+        </SheetHeader>
         <div className="show-scrollbar overflow-y-auto mr-[-14px]">
           <div className=" pl-1 pr-4 pb-2">
             <Form {...form}>

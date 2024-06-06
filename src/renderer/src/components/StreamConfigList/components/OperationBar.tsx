@@ -1,19 +1,6 @@
-import { useState } from 'react'
-
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from '@/shadcn/ui/sheet'
-import { Button } from '@/shadcn/ui/button'
-import { Label } from '@/shadcn/ui/label'
-import { Input } from '@/shadcn/ui/input'
-
 import UseThemeIcon from '@/components/UseThemeIcon'
+
+import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 
 import darkPreviewIcon from '@/assets/images/dark/preview.svg'
 import lightPreviewIcon from '@/assets/images/light/preview.svg'
@@ -26,17 +13,27 @@ import lightSettingIcon from '@/assets/images/light/setting.svg'
 import darkDeleteIcon from '@/assets/images/dark/close.svg'
 import lightDeleteIcon from '@/assets/images/light/close.svg'
 
-export default function OperationBar() {
-  const [sheetOpen, setSheetOpen] = useState(false)
+interface OperationBarProps {
+  index: number
+}
 
-  const handleSheetOpen = (status: boolean) => setSheetOpen(status)
+export default function OperationBar(props: OperationBarProps) {
+  const { index } = props
+  const { setActiveStreamConfigIndex, setStreamConfigSheetOpen } = useStreamConfigStore(
+    (state) => state
+  )
+
+  const handleEditSettingClick = () => {
+    setActiveStreamConfigIndex(index)
+    setStreamConfigSheetOpen(true)
+  }
+
   return (
     <div className="flex absolute right-0 gap-2">
       <UseThemeIcon
         className="w-[21px] cursor-pointer"
         dark={darkPreviewIcon}
         light={lightPreviewIcon}
-        handleClick={() => setSheetOpen(!sheetOpen)}
       />
       <UseThemeIcon className="w-[20px] cursor-pointer" dark={darkPlayIcon} light={lightPlayIcon} />
       <UseThemeIcon
@@ -44,38 +41,12 @@ export default function OperationBar() {
         dark={darkPauseIcon}
         light={lightPauseIcon}
       />
-      <Sheet open={sheetOpen} onOpenChange={handleSheetOpen}>
-        <SheetTrigger>
-          <UseThemeIcon
-            className="w-[20px] cursor-pointer"
-            dark={darkSettingIcon}
-            light={lightSettingIcon}
-          />
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Edit profile</SheetTitle>
-            <SheetDescription>1111</SheetDescription>
-          </SheetHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Username
-              </Label>
-              <Input id="username" value="@peduarte" className="col-span-3" />
-            </div>
-          </div>
-          <SheetFooter>
-            <Button>Save changes</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+      <UseThemeIcon
+        className="w-[20px] cursor-pointer"
+        dark={darkSettingIcon}
+        light={lightSettingIcon}
+        handleClick={handleEditSettingClick}
+      />
       <UseThemeIcon
         className="w-[20px] cursor-pointer"
         dark={darkDeleteIcon}

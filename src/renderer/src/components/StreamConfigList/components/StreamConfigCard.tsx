@@ -7,6 +7,7 @@ import OperationBar from '@/components/StreamConfigList/components/OperationBar'
 
 interface StreamConfigCardProps {
   streamConfig: IStreamConfig
+  index: number
 }
 
 const streamStatusToLocaleMap = {
@@ -17,7 +18,7 @@ const streamStatusToLocaleMap = {
   4: 'stream_config.video_format_conversion'
 }
 
-export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps) {
+export default function StreamConfigCard({ streamConfig, index }: StreamConfigCardProps) {
   const { t } = useTranslation()
   return (
     <Card>
@@ -27,10 +28,10 @@ export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps
             <h1>{streamConfig.title}</h1>
             <Badge variant="outline">{t(streamStatusToLocaleMap[streamConfig.status])}</Badge>
           </div>
-          <OperationBar />
+          <OperationBar index={index} />
         </CardTitle>
         <CardDescription>
-          {t('stream_config.room_url')}:{' '}
+          {t('stream_config.room_url')}:&nbsp;
           <span className=" underline cursor-pointer">{streamConfig.roomUrl}</span>
         </CardDescription>
       </CardHeader>
