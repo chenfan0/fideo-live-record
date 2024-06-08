@@ -6,7 +6,7 @@ interface IStreamConfig {
   proxy?: string
   cookies?: string
   interval: number
-  roomLines?: string[]
+  liveUrls?: string[]
   segmentTime?: string | ''
   line: string // '0' '1' eg
   status: number

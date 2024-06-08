@@ -2,7 +2,8 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { SELECT_DIR } from '../const'
+import { GET_LIVE_URLS, SELECT_DIR } from '../const'
+import { getLiveUrls } from './crawler/index'
 
 function createWindow(): void {
   // Create the browser window.
@@ -58,6 +59,14 @@ app.whenReady().then(() => {
     })
     return dir
   })
+
+  ipcMain.handle(
+    GET_LIVE_URLS,
+    async (_, info: { roomUrl: string; proxy?: string; cookies?: string }) => {
+      const { roomUrl, proxy, cookies } = info
+      return getLiveUrls({ roomUrl, proxy, cookies })
+    }
+  )
 
   createWindow()
 

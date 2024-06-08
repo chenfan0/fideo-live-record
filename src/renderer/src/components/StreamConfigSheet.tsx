@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -24,7 +24,7 @@ const formSchema = z.object({
   segmentTime: z.string(),
   cookies: z.string(),
   proxy: z.string(),
-  roomLines: z.array(z.string())
+  liveUrls: z.array(z.string())
 })
 
 const defaultStreamConfig: IStreamConfig = {
@@ -37,7 +37,7 @@ const defaultStreamConfig: IStreamConfig = {
   interval: 30,
   cookies: '',
   proxy: '',
-  roomLines: [],
+  liveUrls: [],
   segmentTime: ''
 }
 
@@ -146,6 +146,8 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       ...({ ...defaultStreamConfig, ...streamConfig } as unknown as Record<string, string | number>)
     }
   })
+  const [liveUrls, setLiveUrls] = useState(form.getValues('liveUrls'))
+
   useEffect(() => {
     ;(Object.keys(defaultStreamConfig) as (keyof IStreamConfig)[]).forEach((key) =>
       form.register(key, {
@@ -169,6 +171,18 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       return
     }
     form.setValue('directory', filePaths[0])
+  }
+
+  const handleGetLiveUrls = async (openStatus: boolean) => {
+    if (!openStatus) return
+    console.log('get live urls', form.getValues('roomUrl'))
+    const { code, liveUrls } = await window.api.getLiveUrls({ roomUrl: form.getValues('roomUrl') })
+
+    if (code !== 200) {
+      return
+    }
+    form.setValue('liveUrls', liveUrls)
+    setLiveUrls(liveUrls)
   }
 
   const handleSetSheetOpen = async (status: boolean, trigger = false) => {
@@ -240,16 +254,26 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('stream_config.line')}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onOpenChange={handleGetLiveUrls}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t('stream_config.line_placeholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="0">m@example.com</SelectItem>
-                          <SelectItem value="1">m@google.com</SelectItem>
-                          <SelectItem value="2">m@support.com</SelectItem>
+                          {liveUrls.length > 0 ? (
+                            liveUrls.map((_, index) => (
+                              <SelectItem key={index} value={String(index)}>
+                                {t('stream_config.line')} {index + 1}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <div>loading</div>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormItem>

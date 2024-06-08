@@ -4,7 +4,9 @@ import { SELECT_DIR } from '../const'
 
 // Custom APIs for renderer
 const api = {
-  selectDir: () => ipcRenderer.invoke(SELECT_DIR)
+  selectDir: () => ipcRenderer.invoke(SELECT_DIR),
+  getLiveUrls: (info: { roomUrl: string; proxy?: string; cookies?: string }) =>
+    ipcRenderer.invoke('GET_LIVE_URLS', info)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

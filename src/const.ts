@@ -1,2 +1,3 @@
 export const NAV_BY_DEFAULT_BROWSER = 'NAV_BY_DEFAULT_BROWSER'
 export const SELECT_DIR = 'SELECT_DIR'
+export const GET_LIVE_URLS = 'GET_LIVE_URLS'

@@ -5,6 +5,11 @@ declare global {
     electron: ElectronAPI
     api: {
       selectDir: () => Promise<{ canceled: boolean; filePaths: string[] }>
+      getLiveUrls: (info: {
+        roomUrl: string
+        proxy?: string
+        cookies?: string
+      }) => Promise<{ code: number; liveUrls: string[] }>
     }
   }
 }
