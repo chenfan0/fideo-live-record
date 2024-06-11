@@ -4,7 +4,7 @@ interface IStreamConfig {
   filename: string
   directory: string
   proxy?: string
-  cookies?: string
+  cookie?: string
   interval: number
   liveUrls?: string[]
   segmentTime?: string | ''

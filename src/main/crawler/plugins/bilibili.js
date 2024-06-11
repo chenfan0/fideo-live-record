@@ -1,15 +1,17 @@
 import debug from 'debug'
 
 import { request } from '../base-request.js'
+import { captureError } from '../capture-error.js'
 
 import { SUCCESS_CODE } from '../../../code'
-import { captureError } from '../capture-error'
 
-const log = debug('fideo-live-stream-getBilibiliLiveUrl')
+const log = debug('fideo-crawler-bilibili')
 
 async function baseGetBilibiliLiveUrlsPlugin(roomId, others = {}) {
   const { cookie, proxy } = others
-  log('getBilibiliLiveUrl start: ', roomId, cookie, proxy)
+
+  log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
+
   const liveInfoJson = (
     await request(
       `https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id=${roomId}&no_playurl=0&mask=1&qn=0&platform=web&protocol=0,1&format=0,1,2&codec=0,1,2&dolby=5&panorama=1`,
@@ -47,7 +49,6 @@ async function baseGetBilibiliLiveUrlsPlugin(roomId, others = {}) {
       }
     }
   }
-  console.log('liveUrls', liveUrls)
   return {
     code: SUCCESS_CODE,
     liveUrls

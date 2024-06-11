@@ -8,7 +8,7 @@ declare global {
       getLiveUrls: (info: {
         roomUrl: string
         proxy?: string
-        cookies?: string
+        cookie?: string
       }) => Promise<{ code: number; liveUrls: string[] }>
     }
   }

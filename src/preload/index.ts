@@ -5,7 +5,7 @@ import { SELECT_DIR } from '../const'
 // Custom APIs for renderer
 const api = {
   selectDir: () => ipcRenderer.invoke(SELECT_DIR),
-  getLiveUrls: (info: { roomUrl: string; proxy?: string; cookies?: string }) =>
+  getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string }) =>
     ipcRenderer.invoke('GET_LIVE_URLS', info)
 }
 

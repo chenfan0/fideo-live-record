@@ -1,4 +1,7 @@
 import { CRAWLER_ERROR_CODE, ERROR_MESSAGE } from '../../code'
+import debug from 'debug'
+
+const log = debug('fideo-crawler-capture-error')
 
 /**
  *
@@ -11,6 +14,8 @@ export function captureError(fn) {
       return await fn.apply(this, args)
     } catch (e) {
       const message = e.message
+
+      log('error:', message)
 
       if (message.includes('timeout')) {
         return {
@@ -31,7 +36,7 @@ export function captureError(fn) {
       }
 
       return {
-        code: CRAWLER_ERROR_CODE.UNKNOWN
+        code: CRAWLER_ERROR_CODE.NOT_URLS
       }
     }
   }

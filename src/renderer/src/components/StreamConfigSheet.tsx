@@ -22,7 +22,7 @@ const formSchema = z.object({
   line: z.string(),
   status: z.number(),
   segmentTime: z.string(),
-  cookies: z.string(),
+  cookie: z.string(),
   proxy: z.string(),
   liveUrls: z.array(z.string())
 })
@@ -35,7 +35,7 @@ const defaultStreamConfig: IStreamConfig = {
   status: 0,
   line: '0',
   interval: 30,
-  cookies: '',
+  cookie: '',
   proxy: '',
   liveUrls: [],
   segmentTime: ''
@@ -105,7 +105,7 @@ function validStreamConfigData(
     directory: validDirectoryFn,
     interval: validIntervalFn,
     proxy: validProxyFn
-    // cookies: () => [true],
+    // cookie: () => [true],
     // line: () => [true],
     // status: () => [true],
     // segmentTime: () => [true], // todo
@@ -175,13 +175,17 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
 
   const handleGetLiveUrls = async (openStatus: boolean) => {
     if (!openStatus) return
-    console.log('get live urls', form.getValues('roomUrl'))
-    const { code, liveUrls } = await window.api.getLiveUrls({ roomUrl: form.getValues('roomUrl') })
+    const { code, liveUrls } = await window.api.getLiveUrls({
+      roomUrl: form.getValues('roomUrl'),
+      cookie: form.getValues('cookie'),
+      proxy: form.getValues('proxy')
+    })
 
+    console.log(code, liveUrls)
     if (code !== 200) {
       return
     }
-    form.setValue('liveUrls', liveUrls)
+    console.log(liveUrls)
     setLiveUrls(liveUrls)
   }
 
@@ -199,6 +203,7 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
         form.setFocus(field)
         return
       }
+      formValues.liveUrls = liveUrls
       if (type === 'edit') {
         updateStreamConfig(formValues, index!)
       } else {
@@ -208,6 +213,7 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
 
     setSheetOpen(status)
     form.reset()
+    setLiveUrls([])
   }
 
   return (
@@ -347,12 +353,12 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
 
                 <FormField
                   control={form.control}
-                  name="cookies"
+                  name="cookie"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('stream_config.cookies')}</FormLabel>
+                      <FormLabel>{t('stream_config.cookie')}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t('stream_config.cookies_placeholder')} {...field} />
+                        <Input placeholder={t('stream_config.cookie_placeholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

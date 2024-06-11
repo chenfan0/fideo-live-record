@@ -1,18 +1,20 @@
-import { getBilibiliLiveUrlsPlugin } from './plugins/bilibili'
-// import { getCCLiveUrl } from './liveUrl/cc.js'
-// import { getDouYinLiveUrl } from './liveUrl/douyin.js'
-// import { getDouyuLiveUrl } from './liveUrl/douyu.js'
-// import { getHuyaLiveUrl } from './liveUrl/huya.js'
-// import { getKuaishouUrl } from './liveUrl/kuaishou.js'
-// import { getYoutubeUrl } from './liveUrl/youtube.js'
-// import { getTwitchLiveUrl } from './liveUrl/twitch.js'
-// import { getTiktokLiveUrl } from './liveUrl/tiktok.js'
-// import { ERROR_CODE } from '../../error'
-// import { NOT_SUPPORT } from './const.js'
-// import { getWeiboLiveUrl } from './liveUrl/weibo.js'
-// import { getHuaJiaoLiveUrl } from './liveUrl/huajiao.js'
+import debug from 'debug'
 
-import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../code'
+import { getBilibiliLiveUrlsPlugin } from './plugins/bilibili'
+import { getCCLiveUrlsPlugin } from './plugins/cc'
+import { getDouYinLiveUrlsPlugin } from './plugins/douyin'
+import { getDouyuLiveUrlsPlugin } from './plugins/douyu'
+// import { getHuyaLiveUrlPlugin } from './plugins/huya'
+import { getKuaishouLiveUrlsPlugin } from './plugins/kuaishou'
+import { getYoutubeLiveUrlsPlugin } from './plugins/youtube'
+import { getTwitchLiveUrlsPlugin } from './plugins/twitch'
+import { getTiktokLiveUrlsPlugin } from './plugins/tiktok'
+import { getWeiboLiveUrlsPlugin } from './plugins/weibo'
+import { getHuaJiaoLiveUrlsPlugin } from './plugins/huajiao'
+
+import { CRAWLER_ERROR_CODE } from '../../code'
+
+const log = debug('fideo-crawler')
 
 const getPathnameItem = (url, index = 1) => {
   const { pathname } = new URL(url)
@@ -38,59 +40,59 @@ const supportPlatform = [
   'huajiao'
 ]
 const platformToFnMap = {
-  // douyin: {
-  //   getLiveUrlFn: getDouYinLiveUrl,
-  //   getRoomIdByUrl: getPathnameItem
-  // },
-  bilibili: {
-    getLiveUrlFn: getBilibiliLiveUrlsPlugin,
+  douyin: {
+    getLiveUrlsFn: getDouYinLiveUrlsPlugin,
     getRoomIdByUrl: getPathnameItem
+  },
+  bilibili: {
+    getLiveUrlsFn: getBilibiliLiveUrlsPlugin,
+    getRoomIdByUrl: getPathnameItem
+  },
+  cc: {
+    getLiveUrlsFn: getCCLiveUrlsPlugin,
+    getRoomIdByUrl: getPathnameItem
+  },
+  huya: {
+    // getLiveUrlFn: getHuyaLiveUrlPlugin,
+    getRoomIdByUrl: getPathnameItem
+  },
+  douyu: {
+    getLiveUrlsFn: getDouyuLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      const { searchParams } = new URL(url)
+      return searchParams.get('rid') || getPathnameItem(url)
+    }
+  },
+  kuaishou: {
+    getLiveUrlsFn: getKuaishouLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      return getPathnameItem(url, 2)
+    }
+  },
+  youtube: {
+    getLiveUrlsFn: getYoutubeLiveUrlsPlugin,
+    getRoomIdByUrl: getYoutubeRoomId
+  },
+  twitch: {
+    getLiveUrlsFn: getTwitchLiveUrlsPlugin,
+    getRoomIdByUrl: getPathnameItem
+  },
+  tiktok: {
+    getLiveUrlsFn: getTiktokLiveUrlsPlugin,
+    getRoomIdByUrl: getPathnameItem
+  },
+  weibo: {
+    getLiveUrlsFn: getWeiboLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      return getPathnameItem(url, 5)
+    }
+  },
+  huajiao: {
+    getLiveUrlsFn: getHuaJiaoLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      return getPathnameItem(url, 2)
+    }
   }
-  // cc: {
-  //   getLiveUrlFn: getCCLiveUrl,
-  //   getRoomIdByUrl: getPathnameItem
-  // },
-  // huya: {
-  //   getLiveUrlFn: getHuyaLiveUrl,
-  //   getRoomIdByUrl: getPathnameItem
-  // },
-  // douyu: {
-  //   getLiveUrlFn: getDouyuLiveUrl,
-  //   getRoomIdByUrl(url) {
-  //     const { searchParams } = new URL(url)
-  //     return searchParams.get('rid') || getPathnameItem(url)
-  //   }
-  // },
-  // kuaishou: {
-  //   getLiveUrlFn: getKuaishouUrl,
-  //   getRoomIdByUrl(url) {
-  //     return getPathnameItem(url, 2)
-  //   }
-  // },
-  // youtube: {
-  //   getLiveUrlFn: getYoutubeUrl,
-  //   getRoomIdByUrl: getYoutubeRoomId
-  // },
-  // twitch: {
-  //   getLiveUrlFn: getTwitchLiveUrl,
-  //   getRoomIdByUrl: getPathnameItem
-  // },
-  // tiktok: {
-  //   getLiveUrlFn: getTiktokLiveUrl,
-  //   getRoomIdByUrl: getPathnameItem
-  // },
-  // weibo: {
-  //   getLiveUrlFn: getWeiboLiveUrl,
-  //   getRoomIdByUrl(url) {
-  //     return getPathnameItem(url, 5)
-  //   }
-  // },
-  // huajiao: {
-  //   getLiveUrlFn: getHuaJiaoLiveUrl,
-  //   getRoomIdByUrl(url) {
-  //     return getPathnameItem(url, 2)
-  //   }
-  // }
 }
 /**
  *
@@ -99,7 +101,6 @@ const platformToFnMap = {
  */
 export async function getLiveUrls(info) {
   const { roomUrl, proxy, cookie } = info
-  console.log('getLiveUrls', info)
   let host
   try {
     host = new URL(roomUrl).host
@@ -111,6 +112,7 @@ export async function getLiveUrls(info) {
   }
 
   const platform = supportPlatform.find((p) => host.includes(p))
+  log('platform:', platform)
 
   if (!platform) {
     return {
@@ -118,8 +120,11 @@ export async function getLiveUrls(info) {
     }
   }
 
-  const { getLiveUrlFn, getRoomIdByUrl } = platformToFnMap[platform]
+  const { getLiveUrlsFn, getRoomIdByUrl } = platformToFnMap[platform]
   const roomId = getRoomIdByUrl(roomUrl)
+  log('roomId:', roomId)
 
-  return await getLiveUrlFn(roomId, { proxy, cookie })
+  const res = await getLiveUrlsFn(roomId, { proxy, cookie })
+  log('res:', res)
+  return res
 }
