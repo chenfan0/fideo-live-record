@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { Toaster } from '@/shadcn/ui/toaster'
 import TitleBar from '@/components/TitleBar/TitleBar'
 import NavBar from '@/components/NavBar/NavBar'
 import StreamConfigList from '@/components/StreamConfigList/StreamConfigList'
@@ -33,6 +34,8 @@ function App(): JSX.Element {
       <NavBar />
 
       <StreamConfigList />
+
+      <Toaster />
     </>
   )
 }

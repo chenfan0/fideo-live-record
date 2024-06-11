@@ -15,3 +15,34 @@ export const CRAWLER_ERROR_CODE = {
 }
 
 export const SUCCESS_CODE = 200
+
+export const errorCodeToI18nMessage = (code: number) => {
+  let message = 'error_code.'
+  switch (code) {
+    case CRAWLER_ERROR_CODE.NOT_URLS:
+      message += 'not_urls'
+      break
+    case CRAWLER_ERROR_CODE.NOT_SUPPORT:
+      message += 'not_support'
+      break
+    case CRAWLER_ERROR_CODE.INVALID_PROXY:
+      message += 'invalid_proxy'
+      break
+    case CRAWLER_ERROR_CODE.INVALID_URL:
+      message += 'invalid_url'
+      break
+    case CRAWLER_ERROR_CODE.TIME_OUT:
+      message += 'time_out'
+      break
+    case CRAWLER_ERROR_CODE.FORBIDDEN:
+      message += 'forbidden'
+      break
+    case CRAWLER_ERROR_CODE.CURRENT_LINE_ERROR:
+      message += 'current_line_error'
+      break
+    default:
+      message += 'unknown_error'
+      break
+  }
+  return message
+}

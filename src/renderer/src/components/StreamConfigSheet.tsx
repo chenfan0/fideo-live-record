@@ -5,6 +5,9 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 
+import { errorCodeToI18nMessage, SUCCESS_CODE } from '../../../code'
+
+import { useToast } from '@/shadcn/ui/use-toast'
 import { Button } from '@/shadcn/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shadcn/ui/form'
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/shadcn/ui/sheet'
@@ -136,6 +139,7 @@ interface StreamConfigSheetProps {
 
 export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const { streamConfigList, addStreamConfig, updateStreamConfig } = useStreamConfigStore(
     (state) => state
   )
@@ -175,17 +179,21 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
 
   const handleGetLiveUrls = async (openStatus: boolean) => {
     if (!openStatus) return
+    setLiveUrls([])
     const { code, liveUrls } = await window.api.getLiveUrls({
       roomUrl: form.getValues('roomUrl'),
       cookie: form.getValues('cookie'),
       proxy: form.getValues('proxy')
     })
 
-    console.log(code, liveUrls)
-    if (code !== 200) {
+    if (code !== SUCCESS_CODE) {
+      toast({
+        title: t('error_code.title'),
+        description: t(errorCodeToI18nMessage(code)),
+        variant: 'destructive'
+      })
       return
     }
-    console.log(liveUrls)
     setLiveUrls(liveUrls)
   }
 

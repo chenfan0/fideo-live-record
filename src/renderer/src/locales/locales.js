@@ -51,6 +51,17 @@ export default {
         edit_record: 'Edit Record',
         confirm_delete: 'Are you sure you want to delete this record?',
         delete: 'Delete'
+      },
+      error_code: {
+        title: 'Error',
+        not_urls: 'Room does not exist or not live',
+        not_support: 'The current live platform is not supported',
+        invalid_proxy: 'Proxy is invalid',
+        invalid_url: 'Room URL is invalid',
+        time_out: 'Request timed out, try using or changing the proxy',
+        forbidden: 'Request denied, try using or changing the proxy',
+        current_line_error: 'Current line error, try using other lines',
+        unknown_error: 'Unknown error'
       }
     }
   },
@@ -103,6 +114,17 @@ export default {
         monitoring: '监控中',
         recording: '录制中',
         video_format_conversion: '视频格式转换中'
+      },
+      error_code: {
+        title: '发生错误',
+        not_urls: '直播间不存在或者未开播',
+        not_support: '当前不支持该直播平台',
+        invalid_proxy: '代理地址不合法',
+        invalid_url: '直播间地址不合法',
+        time_out: '请求超时, 尝试使用或者更换代理',
+        forbidden: '请求被拒绝, 尝试使用或者更换代理',
+        current_line_error: '当前线路错误, 尝试使用其他线路',
+        unknown_error: '未知错误'
       }
     }
   }
