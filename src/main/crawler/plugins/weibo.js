@@ -1,52 +1,44 @@
 import debug from 'debug'
 
-import { request } from '../request'
-import { handleErrMsg } from '../handleErrMsg'
-import { SUCCESS_CODE } from '../../../error'
-import { NOT_URLS } from '../const'
+import { request } from '../base-request.js'
+import { captureError } from '../capture-error.js'
 
-const log = debug('fideo-live-stream-getWeiboLiveUrl')
+import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
-export async function getWeiboLiveUrl(roomId, others = {}) {
+const log = debug('fideo-crawler-weibo')
+
+async function baseGetWeiboLiveUrlsPlugin(roomId, others = {}) {
   const { proxy, cookie } = others
-  log('getWeiboLiveUrl start: ', roomId, cookie, proxy)
 
-  try {
-    const referer = `https://weibo.com/l/wblive/p/show/${roomId}`
-    const json = (
-      await request(`https://weibo.com/l/!/2/wblive/room/show_pc_live.json?live_id=${roomId}`, {
-        proxy,
-        headers: {
-          cookie,
-          referer
-        }
-      })
-    ).data
+  log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
 
-    const data = json.data
-    const status = data.status
+  const referer = `https://weibo.com/l/wblive/p/show/${roomId}`
+  const json = (
+    await request(`https://weibo.com/l/!/2/wblive/room/show_pc_live.json?live_id=${roomId}`, {
+      proxy,
+      headers: {
+        cookie,
+        referer
+      }
+    })
+  ).data
 
-    if (status !== 1) {
-      return NOT_URLS
-    }
+  const data = json.data
+  const status = data.status
 
-    const hls = data.live_origin_hls_url
-    const flv = data.live_origin_flv_url
-
-    const liveUrlObj = {
-      best: [flv, hls],
-      origin: [flv, hls]
-    }
-
+  if (status !== 1) {
     return {
-      liveUrlObj,
-      code: SUCCESS_CODE
+      code: CRAWLER_ERROR_CODE.NOT_URLS
     }
-  } catch (e) {
-    const errMsg = e.message
+  }
 
-    log('getWeiboLiveUrl error: ', errMsg)
+  const hls = data.live_origin_hls_url
+  const flv = data.live_origin_flv_url
 
-    return handleErrMsg(errMsg)
+  return {
+    liveUrls: [flv, hls],
+    code: SUCCESS_CODE
   }
 }
+
+export const getWeiboLiveUrlsPlugin = captureError(baseGetWeiboLiveUrlsPlugin)
