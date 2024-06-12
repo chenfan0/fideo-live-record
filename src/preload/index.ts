@@ -1,12 +1,13 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { SELECT_DIR } from '../const'
+import { NAV_BY_DEFAULT_BROWSER, SELECT_DIR } from '../const'
 
 // Custom APIs for renderer
 const api = {
   selectDir: () => ipcRenderer.invoke(SELECT_DIR),
   getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string }) =>
-    ipcRenderer.invoke('GET_LIVE_URLS', info)
+    ipcRenderer.invoke('GET_LIVE_URLS', info),
+  navByDefaultBrowser: (url: string) => ipcRenderer.invoke(NAV_BY_DEFAULT_BROWSER, url)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

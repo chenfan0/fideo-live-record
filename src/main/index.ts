@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { GET_LIVE_URLS, SELECT_DIR } from '../const'
+import { GET_LIVE_URLS, NAV_BY_DEFAULT_BROWSER, SELECT_DIR } from '../const'
 import { getLiveUrls } from './crawler/index'
 
 function createWindow(): void {
@@ -67,6 +67,10 @@ app.whenReady().then(() => {
       return getLiveUrls({ roomUrl, proxy, cookie })
     }
   )
+
+  ipcMain.handle(NAV_BY_DEFAULT_BROWSER, (_, url: string) => {
+    shell.openExternal(url)
+  })
 
   createWindow()
 

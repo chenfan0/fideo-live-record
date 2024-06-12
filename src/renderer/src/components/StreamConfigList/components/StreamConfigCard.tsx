@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/sha
 import { Badge } from '@/shadcn/ui/badge'
 import Progress from '@/components/StreamConfigList/components/Progress'
 import OperationBar from '@/components/StreamConfigList/components/OperationBar'
+import { StreamStatus } from '@renderer/lib/utils'
 
 interface StreamConfigCardProps {
   streamConfig: IStreamConfig
@@ -20,6 +21,11 @@ const streamStatusToLocaleMap = {
 
 export default function StreamConfigCard({ streamConfig, index }: StreamConfigCardProps) {
   const { t } = useTranslation()
+
+  const handleRoomUrlClick = () => {
+    window.api.navByDefaultBrowser(streamConfig.roomUrl)
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -28,13 +34,17 @@ export default function StreamConfigCard({ streamConfig, index }: StreamConfigCa
             <h1 className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[30%]">
               {streamConfig.title}
             </h1>
-            <Badge variant="outline">{t(streamStatusToLocaleMap[streamConfig.status])}</Badge>
+            {streamConfig.status !== StreamStatus.NOT_STARTED && (
+              <Badge variant="outline">{t(streamStatusToLocaleMap[streamConfig.status])}</Badge>
+            )}
           </div>
           <OperationBar index={index} />
         </CardTitle>
         <CardDescription className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[95%]">
           {t('stream_config.room_url')}:&nbsp;
-          <span className=" underline cursor-pointer">{streamConfig.roomUrl}</span>
+          <span className=" underline cursor-pointer" onClick={handleRoomUrlClick}>
+            {streamConfig.roomUrl}
+          </span>
         </CardDescription>
       </CardHeader>
       <CardContent>

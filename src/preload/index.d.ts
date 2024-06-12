@@ -10,6 +10,7 @@ declare global {
         proxy?: string
         cookie?: string
       }) => Promise<{ code: number; liveUrls: string[] }>
+      navByDefaultBrowser: (url: string) => void
     }
   }
 }

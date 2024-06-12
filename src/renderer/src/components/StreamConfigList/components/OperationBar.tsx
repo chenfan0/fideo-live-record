@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import UseThemeIcon from '@/components/UseThemeIcon'
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 
-import darkPreviewIcon from '@/assets/images/dark/preview.svg'
-import lightPreviewIcon from '@/assets/images/light/preview.svg'
+// import darkPreviewIcon from '@/assets/images/dark/preview.svg'
+// import lightPreviewIcon from '@/assets/images/light/preview.svg'
 import darkPlayIcon from '@/assets/images/dark/play.svg'
 import lightPlayIcon from '@/assets/images/light/play.svg'
 import darkPauseIcon from '@/assets/images/dark/pause.svg'
@@ -42,16 +42,16 @@ export default function OperationBar(props: OperationBarProps) {
   return (
     <>
       <div className="flex absolute right-0 gap-2">
-        <UseThemeIcon
+        {/* <UseThemeIcon
           className="w-[21px] cursor-pointer"
           dark={darkPreviewIcon}
           light={lightPreviewIcon}
           tooltipContent={t('stream_config.preview')}
-        />
+        /> */}
 
         {streamConfig.status === StreamStatus.NOT_STARTED ? (
           <UseThemeIcon
-            className="w-[20px] cursor-pointer"
+            className="w-[18px] cursor-pointer"
             dark={darkPlayIcon}
             light={lightPlayIcon}
           />
