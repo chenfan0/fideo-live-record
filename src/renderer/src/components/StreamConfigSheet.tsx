@@ -7,13 +7,14 @@ import { useTranslation } from 'react-i18next'
 
 import { errorCodeToI18nMessage, SUCCESS_CODE } from '../../../code'
 
-import { useToast } from '@/shadcn/ui/use-toast'
+import { useToast } from '@/hooks/useToast'
 import { Button } from '@/shadcn/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shadcn/ui/form'
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/shadcn/ui/sheet'
 import { Input } from '@/shadcn/ui/input'
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from '@/shadcn/ui/select'
 import { useStreamConfigStore } from '@renderer/store/useStreamConfigStore'
+import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { checkUrlValid } from '@renderer/lib/utils'
 
 const formSchema = z.object({
@@ -50,7 +51,7 @@ function validStreamConfigData(
   defaultStreamConfigData: IStreamConfig | null,
   validFields = Object.keys(streamConfigData) as (keyof IStreamConfig)[]
 ): [true] | [false, keyof IStreamConfig, string] {
-  const { title, roomUrl, filename, directory, interval, proxy } = streamConfigData
+  const { title, roomUrl, filename, directory, interval, proxy, segmentTime } = streamConfigData
 
   const validTitleFn = () => {
     if (!title) {
@@ -92,11 +93,27 @@ function validStreamConfigData(
     if (Number.isNaN(Number(interval))) {
       return [false, 'interval', 'stream_config.interval_must_be_number']
     }
+    if (Number(interval) < 20) {
+      return [false, 'interval', 'stream_config.interval_must_be_greater_than_20']
+    }
     return [true]
   }
   const validProxyFn = () => {
     if (proxy && !checkUrlValid(proxy)) {
       return [false, 'proxy', 'stream_config.proxy_url_invalid']
+    }
+    return [true]
+  }
+
+  const validSegmentTimeFn = () => {
+    if (segmentTime === '') {
+      return [true]
+    }
+    if (Number.isNaN(Number(segmentTime))) {
+      return [false, 'segmentTime', 'stream_config.segment_time_must_be_number']
+    }
+    if (Number(segmentTime) <= 0) {
+      return [false, 'segmentTime', 'stream_config.segment_time_must_be_greater_than_0']
     }
     return [true]
   }
@@ -107,12 +124,11 @@ function validStreamConfigData(
     filename: validFilenameFn,
     directory: validDirectoryFn,
     interval: validIntervalFn,
-    proxy: validProxyFn
+    proxy: validProxyFn,
+    segmentTime: validSegmentTimeFn
     // cookie: () => [true],
     // line: () => [true],
     // status: () => [true],
-    // segmentTime: () => [true], // todo
-    // roomLines: () => [true]
   }
 
   for (const validField of validFields) {
@@ -140,6 +156,8 @@ interface StreamConfigSheetProps {
 export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const { t } = useTranslation()
   const { toast } = useToast()
+
+  const defaultSettingsConfig = useDefaultSettingsStore((state) => state.defaultSettingsConfig)
   const { streamConfigList, addStreamConfig, updateStreamConfig } = useStreamConfigStore(
     (state) => state
   )
@@ -147,7 +165,11 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ...({ ...defaultStreamConfig, ...streamConfig } as unknown as Record<string, string | number>)
+      ...({
+        ...defaultStreamConfig,
+        directory: defaultSettingsConfig.directory,
+        ...streamConfig
+      } as unknown as Record<string, string | number>)
     }
   })
   const [liveUrls, setLiveUrls] = useState(form.getValues('liveUrls'))
@@ -166,8 +188,12 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
     )
   }, [])
   useEffect(() => {
-    form.reset({ ...defaultStreamConfig, ...streamConfig })
-  }, [streamConfig])
+    form.reset({
+      ...defaultStreamConfig,
+      directory: defaultSettingsConfig.directory,
+      ...streamConfig
+    })
+  }, [streamConfig, defaultSettingsConfig.directory])
 
   const handleSelectDir = async () => {
     const { canceled, filePaths } = await window.api.selectDir()
@@ -188,8 +214,8 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
 
     if (code !== SUCCESS_CODE) {
       toast({
-        title: t('error_code.title'),
-        description: t(errorCodeToI18nMessage(code)),
+        title: form.getValues('title'),
+        description: t(errorCodeToI18nMessage(code, 'error.get_line.')),
         variant: 'destructive'
       })
       return
@@ -286,7 +312,9 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                               </SelectItem>
                             ))
                           ) : (
-                            <div>loading</div>
+                            <SelectItem disabled value="loading">
+                              loading
+                            </SelectItem>
                           )}
                         </SelectContent>
                       </Select>
@@ -339,6 +367,23 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                       <FormLabel>{t('stream_config.interval')}</FormLabel>
                       <FormControl>
                         <Input placeholder={t('stream_config.interval_placeholder')} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="segmentTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('stream_config.segment_time')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('stream_config.segment_time_placeholder')}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -20,13 +20,17 @@ export default function NavBar() {
 
   return (
     <div className="flex items-center justify-between px-[24px]">
-      <UseThemeIcon dark={darkLogo} light={lightLogo} className="w-[64px] cursor-pointer" />
+      <UseThemeIcon
+        dark={darkLogo}
+        light={lightLogo}
+        className="w-[64px] cursor-pointer select-none"
+      />
 
       <div className="flex items-center gap-[12px]">
         <UseThemeIcon
           dark={darkAddIcon}
           light={lightAddIcon}
-          className="w-[22px] h-[22px] cursor-pointer"
+          className="w-[22px] h-[22px] cursor-pointer select-none"
           tooltipContent={t('nav_bar.create')}
           handleClick={() => setCreateSheetOpen(true)}
         />
@@ -34,7 +38,7 @@ export default function NavBar() {
         <UseThemeIcon
           dark={darkSettingIcon}
           light={lightSettingIcon}
-          className="w-[24px] h-[24px] cursor-pointer"
+          className="w-[24px] h-[24px] cursor-pointer select-none"
           tooltipContent={t('nav_bar.setting')}
           handleClick={() => setSettingSheetOpen(true)}
         />

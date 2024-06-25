@@ -23,7 +23,7 @@ export default function UseThemeIcon(props: UseThemeIconProps) {
         <TooltipTrigger>
           <img
             src={theme === 'dark' ? dark : light}
-            className={className ? className : 'w-[24px] h-[24px] cursor-pointer'}
+            className={className ? className : 'w-[24px] h-[24px] cursor-pointer select-none'}
             onClick={handleClick}
           />
         </TooltipTrigger>
@@ -33,7 +33,7 @@ export default function UseThemeIcon(props: UseThemeIconProps) {
   ) : (
     <img
       src={theme === 'dark' ? dark : light}
-      className={className ? className : 'w-[24px] h-[24px] cursor-pointer'}
+      className={className ? className : 'w-[24px] h-[24px] cursor-pointer select-none'}
       onClick={handleClick}
     />
   )

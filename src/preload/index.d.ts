@@ -11,6 +11,11 @@ declare global {
         cookie?: string
       }) => Promise<{ code: number; liveUrls: string[] }>
       navByDefaultBrowser: (url: string) => void
+      startStreamRecord: (streamConfig: string) => Promise<{ code: number }>
+      stopStreamRecord: (title: string) => Promise<{ code: number }>
+      showNotification: (title: string, body: string) => void
+
+      onStreamRecordEnd: (callback: (title: string, code: number) => void) => void
     }
   }
 }

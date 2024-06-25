@@ -14,10 +14,16 @@ export const CRAWLER_ERROR_CODE = {
   CURRENT_LINE_ERROR: 6 // current line error
 }
 
+export const FFMPEG_ERROR_CODE = {
+  USER_KILL_PROCESS: 100,
+  CURRENT_LINE_ERROR: 101,
+  TIME_OUT: 102
+}
+
 export const SUCCESS_CODE = 200
 
-export const errorCodeToI18nMessage = (code: number) => {
-  let message = 'error_code.'
+export const errorCodeToI18nMessage = (code: number, prefix: string) => {
+  let message = prefix
   switch (code) {
     case CRAWLER_ERROR_CODE.NOT_URLS:
       message += 'not_urls'

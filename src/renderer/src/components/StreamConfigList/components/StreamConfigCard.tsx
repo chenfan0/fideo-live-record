@@ -48,7 +48,7 @@ export default function StreamConfigCard({ streamConfig, index }: StreamConfigCa
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Progress />
+        <Progress animate={streamConfig.status !== StreamStatus.NOT_STARTED} />
       </CardContent>
     </Card>
   )

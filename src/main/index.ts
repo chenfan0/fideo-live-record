@@ -1,10 +1,57 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Notification } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
-import { GET_LIVE_URLS, NAV_BY_DEFAULT_BROWSER, SELECT_DIR } from '../const'
+import {
+  FFMPEG_PROGRESS_INFO,
+  GET_LIVE_URLS,
+  NAV_BY_DEFAULT_BROWSER,
+  RECORD_DUMMY_PROCESS,
+  SELECT_DIR,
+  SHOW_NOTIFICATION,
+  START_STREAM_RECORD,
+  STOP_STREAM_RECORD,
+  STREAM_RECORD_END
+} from '../const'
 import { getLiveUrls } from './crawler/index'
+import { FFMPEG_ERROR_CODE, SUCCESS_CODE } from '../code'
+import {
+  recordStream,
+  recordStreamFfmpegProgressInfo,
+  recordStreamFfmpegProcessMap,
+  resetRecordStreamFfmpeg,
+  setRecordStreamFfmpegProcessMap
+} from './ffmpeg/record'
 
+let timer: NodeJS.Timeout | undefined
+const startTimerWhenFirstFfmpegProcessStart = () => {
+  if (timer === undefined) {
+    timer = setInterval(() => {
+      win?.webContents.send(FFMPEG_PROGRESS_INFO, recordStreamFfmpegProgressInfo)
+    }, 1000)
+  }
+}
+const isAllFfmpegProcessEnd = () =>
+  Object.keys(recordStreamFfmpegProcessMap).every(
+    (key) =>
+      Object.keys(recordStreamFfmpegProcessMap[key as keyof typeof recordStreamFfmpegProcessMap])
+        .length === 0
+  ) &&
+  Object.keys(recordStreamFfmpegProgressInfo).every(
+    (key) =>
+      Object.keys(
+        recordStreamFfmpegProgressInfo[key as keyof typeof recordStreamFfmpegProgressInfo]
+      ).length === 0
+  )
+export const clearTimerWhenAllFfmpegProcessEnd = () => {
+  if (isAllFfmpegProcessEnd()) {
+    win?.webContents.send(FFMPEG_PROGRESS_INFO, recordStreamFfmpegProgressInfo)
+
+    clearInterval(timer)
+    timer = undefined
+  }
+}
+
+let win: BrowserWindow | null
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -14,12 +61,13 @@ function createWindow(): void {
     titleBarStyle: 'hiddenInset',
     title: 'Fideo',
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
+  win = mainWindow
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -37,6 +85,14 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+}
+
+function showNotification(title: string, body: string) {
+  const notification = new Notification({
+    title,
+    body
+  })
+  notification.show()
 }
 
 // This method will be called when Electron has finished
@@ -70,6 +126,47 @@ app.whenReady().then(() => {
 
   ipcMain.handle(NAV_BY_DEFAULT_BROWSER, (_, url: string) => {
     shell.openExternal(url)
+  })
+
+  ipcMain.handle(START_STREAM_RECORD, async (_, streamConfigStr: string) => {
+    const streamConfig = JSON.parse(streamConfigStr) as IStreamConfig
+    const { roomUrl, proxy, cookie, title } = streamConfig
+
+    setRecordStreamFfmpegProcessMap(title, RECORD_DUMMY_PROCESS)
+
+    const { code: liveUrlsCode, liveUrls } = await getLiveUrls({ roomUrl, proxy, cookie })
+    if (liveUrlsCode !== SUCCESS_CODE) {
+      return {
+        code: liveUrlsCode
+      }
+    }
+    streamConfig.liveUrls = liveUrls
+
+    const { code: recordStreamCode } = await recordStream(streamConfig, (code: number) => {
+      win?.webContents.send(STREAM_RECORD_END, title, code)
+      clearTimerWhenAllFfmpegProcessEnd()
+    })
+
+    startTimerWhenFirstFfmpegProcessStart()
+
+    return {
+      code: recordStreamCode
+    }
+  })
+
+  ipcMain.handle(STOP_STREAM_RECORD, async (_, title: string) => {
+    const shouldSend = resetRecordStreamFfmpeg(title)
+    shouldSend &&
+      win?.webContents.send(STREAM_RECORD_END, title, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
+    clearTimerWhenAllFfmpegProcessEnd()
+
+    return {
+      code: SUCCESS_CODE
+    }
+  })
+
+  ipcMain.handle(SHOW_NOTIFICATION, (_, title: string, body: string) => {
+    showNotification(title, body)
   })
 
   createWindow()

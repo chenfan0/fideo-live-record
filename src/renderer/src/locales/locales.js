@@ -41,7 +41,8 @@ export default {
         filename_can_not_be_empty: 'Filename can not be empty',
         directory_can_not_be_empty: 'Directory can not be empty',
         interval_can_not_be_empty: 'Monitor interval can not be empty',
-        interval_invalid: 'Monitor interval is invalid, please enter number',
+        interval_must_be_number: 'Monitor interval is invalid, please enter a number',
+        interval_must_be_greater_than_20: 'Monitor interval is invalid, at least 20 seconds',
         proxy_invalid: 'Proxy is invalid',
         not_started: 'Not Started',
         preparing_to_record: 'Preparing to Record',
@@ -91,6 +92,8 @@ export default {
         line_placeholder: '请选择线路',
         interval: '监控间隔(秒)',
         interval_placeholder: '请输入监控间隔, 默认30s',
+        segment_time: '分段时长(分钟)',
+        segment_time_placeholder: '请输入分段时长, 默认不分段',
         proxy: '代理(可选)',
         proxy_placeholder: '请输入代理',
         cookie: 'Cookie(可选)',
@@ -107,7 +110,10 @@ export default {
         filename_can_not_be_empty: '文件名不能为空',
         directory_can_not_be_empty: '存储目录不能为空',
         interval_can_not_be_empty: '监控间隔不能为空',
-        interval_invalid: '监控间隔不合法, 请输入数字',
+        interval_must_be_number: '监控间隔不合法, 请输入数字',
+        interval_must_be_greater_than_20: '监控间隔不合法, 至少20秒',
+        segment_time_must_be_number: '分段时长不合法, 请输入数字或者不填',
+        segment_time_must_be_greater_than_0: '分段时长不合法, 必须大于0',
         proxy_invalid: '代理地址不合法',
         not_started: '未开始',
         preparing_to_record: '准备录制中',
@@ -115,6 +121,7 @@ export default {
         recording: '录制中',
         video_format_conversion: '视频格式转换中'
       },
+      start_record: '开始录制',
       error_code: {
         title: '发生错误',
         not_urls: '直播间不存在或者未开播',
@@ -125,6 +132,25 @@ export default {
         forbidden: '请求被拒绝, 尝试使用或者更换代理',
         current_line_error: '当前线路错误, 尝试使用其他线路',
         unknown_error: '未知错误'
+      },
+      error: {
+        get_line: {
+          not_urls: '直播间不存在或者未开播',
+          not_support: '当前不支持该直播平台',
+          invalid_proxy: '代理地址不合法',
+          invalid_url: '直播间地址不合法',
+          time_out: '请求超时, 尝试使用或者更换代理',
+          forbidden: '请求被拒绝, 尝试使用或者更换代理',
+          unknown_error: '未知错误'
+        },
+        record: {
+          not_urls: '直播间未开播，开启监控录制功能',
+          timeout: '请求超时，尝试使用或者更换代理',
+          forbidden: '请求被拒绝，尝试使用或者更换代理',
+          invalid_proxy: '代理地址不合法， 请检查代理地址',
+          not_support: '当前不支持该直播平台',
+          invalid_url: '直播间地址不合法'
+        }
       }
     }
   }

@@ -97,7 +97,7 @@ const platformToFnMap = {
 /**
  *
  * @param {{ url: string, proxy?: string, cookie?: string }} info
- * @returns {Promise<{code: 0 | 1 | 200}>}
+ * @returns {Promise<{code: number, liveUrls?: string[]}>}
  */
 export async function getLiveUrls(info) {
   const { roomUrl, proxy, cookie } = info

@@ -16,3 +16,15 @@ interface IDefaultDefaultSettingsConfig {
   directory: string
   lang: Lang
 }
+
+type IFfmpegProgressInfo = Record<
+  string,
+  {
+    frames: number
+    currentFps: number
+    currentKbps: number
+    targetSize: number
+    timemark: string
+    percent?: number
+  }
+>
