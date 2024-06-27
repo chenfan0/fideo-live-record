@@ -132,6 +132,13 @@ app.whenReady().then(() => {
     const streamConfig = JSON.parse(streamConfigStr) as IStreamConfig
     const { roomUrl, proxy, cookie, title } = streamConfig
 
+    /**
+     * When requesting the live stream address,
+     * first set the ffmpeg process of the live stream to RECORD_DUMMY_PROCESS
+     *
+     * Prevent clicking the stop recording button while requesting the live stream address,
+     * causing the page to display that the recording has stopped, but the ffmpeg process is still running
+     */
     setRecordStreamFfmpegProcessMap(title, RECORD_DUMMY_PROCESS)
 
     const { code: liveUrlsCode, liveUrls } = await getLiveUrls({ roomUrl, proxy, cookie })
@@ -155,6 +162,14 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle(STOP_STREAM_RECORD, async (_, title: string) => {
+    /**
+     * If the ffmpeg process is RECORD_DUMMY_PROCESS when stopping recording,
+     * need to send the STREAM_RECORD_END event to display the information that the recording has stopped on the page.
+     *
+     * If it is not RECORD_DUMMY_PROCESS, it means that the ffmpeg process is running.
+     * At this time, you do not need to send the STREAM_RECORD_END event,
+     * because the ffmpeg process will send the STREAM_RECORD_END event when it is finished running.
+     */
     const shouldSend = resetRecordStreamFfmpeg(title)
     shouldSend &&
       win?.webContents.send(STREAM_RECORD_END, title, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)

@@ -122,17 +122,8 @@ export default {
         video_format_conversion: '视频格式转换中'
       },
       start_record: '开始录制',
-      error_code: {
-        title: '发生错误',
-        not_urls: '直播间不存在或者未开播',
-        not_support: '当前不支持该直播平台',
-        invalid_proxy: '代理地址不合法',
-        invalid_url: '直播间地址不合法',
-        time_out: '请求超时, 尝试使用或者更换代理',
-        forbidden: '请求被拒绝, 尝试使用或者更换代理',
-        current_line_error: '当前线路错误, 尝试使用其他线路',
-        unknown_error: '未知错误'
-      },
+      user_stop_record: '停止录制(用户手动停止)',
+      stream_end_stop_record: '停止录制(主播已停止直播)',
       error: {
         get_line: {
           not_urls: '直播间不存在或者未开播',
@@ -143,13 +134,17 @@ export default {
           forbidden: '请求被拒绝, 尝试使用或者更换代理',
           unknown_error: '未知错误'
         },
-        record: {
+        start_record: {
           not_urls: '直播间未开播，开启监控录制功能',
           timeout: '请求超时，尝试使用或者更换代理',
           forbidden: '请求被拒绝，尝试使用或者更换代理',
           invalid_proxy: '代理地址不合法， 请检查代理地址',
           not_support: '当前不支持该直播平台',
           invalid_url: '直播间地址不合法'
+        },
+        stop_record: {
+          current_line_error: '停止录制(当前线路错误，尝试使用其他线路)',
+          timeout: '停止录制(请求超时，尝试使用或者更换代理)'
         }
       }
     }

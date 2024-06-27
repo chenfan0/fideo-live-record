@@ -137,6 +137,12 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
   ffmpegProcess
     .videoCodec('copy')
     .audioCodec('copy')
+    .on('start', () => {
+      log('record live start')
+      _resolve({
+        code: SUCCESS_CODE
+      })
+    })
     .on('progress', (progress) => {
       setRecordStreamFfmpegProgressInfo(title, progress)
     })
@@ -149,7 +155,6 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
 
       cb?.(SUCCESS_CODE)
       await convert(isSegmentMode ? baseOutput : output + FLV_FLAG)
-
       cb?.(SUCCESS_CODE)
     })
     .on('error', async (error) => {

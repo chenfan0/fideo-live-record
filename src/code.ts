@@ -46,6 +46,15 @@ export const errorCodeToI18nMessage = (code: number, prefix: string) => {
     case CRAWLER_ERROR_CODE.CURRENT_LINE_ERROR:
       message += 'current_line_error'
       break
+    case FFMPEG_ERROR_CODE.USER_KILL_PROCESS:
+      message += 'user_stop_record'
+      break
+    case FFMPEG_ERROR_CODE.CURRENT_LINE_ERROR:
+      message += 'current_line_error'
+      break
+    case FFMPEG_ERROR_CODE.TIME_OUT:
+      message += 'time_out'
+      break
     default:
       message += 'unknown_error'
       break

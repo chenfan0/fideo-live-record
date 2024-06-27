@@ -17,7 +17,7 @@ import { StreamStatus } from '@renderer/lib/utils'
 import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
 import { useState } from 'react'
 import DeleteRecordDialog from './DeleteRecordDialog'
-import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../../../code'
+import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
 import { useToast } from '@renderer/hooks/useToast'
 
 interface OperationBarProps {
@@ -69,72 +69,30 @@ export default function OperationBar(props: OperationBarProps) {
         handleStartRecord(false)
       }, 1000 * streamConfig.interval)
 
-      toast({
-        title: streamConfig.title,
-        description: t('record.not_urls')
-      })
-
+      isFirst &&
+        toast({
+          title: streamConfig.title,
+          description: t('error.start_record.not_urls')
+        })
       updateStreamConfig({ ...streamConfig, status: StreamStatus.MONITORING }, index)
-
       return
     }
 
-    if (code === CRAWLER_ERROR_CODE.TIME_OUT) {
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
-      toast({
-        title: streamConfig.title,
-        description: t('record.timeout'),
-        variant: 'destructive'
-      })
-      return
-    }
-
-    if (code === CRAWLER_ERROR_CODE.FORBIDDEN) {
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
-      toast({
-        title: streamConfig.title,
-        description: t('record.forbidden'),
-        variant: 'destructive'
-      })
-      return
-    }
-
-    if (code === CRAWLER_ERROR_CODE.INVALID_PROXY) {
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
-      toast({
-        title: streamConfig.title,
-        description: t('record.invalid_proxy'),
-        variant: 'destructive'
-      })
-      return
-    }
-
-    if (code === CRAWLER_ERROR_CODE.NOT_SUPPORT) {
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
-      toast({
-        title: streamConfig.title,
-        description: t('record.not_support'),
-        variant: 'destructive'
-      })
-      return
-    }
-
-    if (code === CRAWLER_ERROR_CODE.INVALID_URL) {
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
-      toast({
-        title: streamConfig.title,
-        description: t('record.invalid_url'),
-        variant: 'destructive'
-      })
-      return
-    }
+    const errMessage = errorCodeToI18nMessage(code, 'error.start_record.')
 
     updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
     toast({
       title: streamConfig.title,
-      description: t('record.start_failed'),
+      description: errMessage,
       variant: 'destructive'
     })
+
+    // updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
+    // toast({
+    //   title: streamConfig.title,
+    //   description: t('record.start_failed'),
+    //   variant: 'destructive'
+    // })
   }
 
   const handlePlayClick = () => {
