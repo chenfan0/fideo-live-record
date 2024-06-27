@@ -1,0 +1,42 @@
+name: Build and Release fideo
+
+on:
+  push:
+    branches:
+      - release
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+
+    - name: Install PNPM
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build Electron App
+      run: |
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          pnpm build:win
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          pnpm build:mac
+        fi
+      shell: bash
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: electron-app-${{ runner.os }}
+        path: |
+          dist/*.exe
+          dist/*.dmg
