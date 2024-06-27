@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: live-record
+productName: fideo
 directories:
   buildResources: build
 files:
@@ -12,34 +12,37 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: live-record
+  executableName: fideo
+  extraFiles:
+  - from: "./resources/ffmpeg/ffmpeg.exe"
+    to: "Resources"
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  oneClick: false
+  artifactName: ${name}-${version}.${ext}
+  perMachine: true
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
+  createDesktopShortcut: true
 mac:
+  target:
+    - target: "dmg"
+      arch:
+        - "x64"
+        - "arm64"
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  identity: null
+  extraFiles:
+    - from: "./resources/ffmpeg/ffmpeg"
+      to: "Resources"
 dmg:
-  artifactName: ${name}-${version}.${ext}
-linux:
-  target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
 publish:
   provider: generic
   url: https://example.com/auto-updates
-electronDownload:
-  mirror: https://npmmirror.com/mirrors/electron/

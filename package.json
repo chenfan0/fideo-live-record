@@ -1,7 +1,7 @@
 {
-  "name": "live-record",
+  "name": "fideo",
   "version": "0.1.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "this is a easy live record app",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
