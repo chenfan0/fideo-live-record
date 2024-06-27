@@ -1,34 +1,32 @@
-# live-record
+<div align=center>
+<img  src="https://raw.githubusercontent.com/chenfan0/fideo-live-record/main/src/renderer/src/assets/images/light/logo.png" />
+</div>
 
-An Electron application with React and TypeScript
+[中文文档](https://github.com/chenfan0/fideo-live-record/blob/main/README-CN.md)
 
-## Recommended IDE Setup
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+> 🚧 **Work in Progress**
 
-## Project Setup
+## ✋🏻Introduction
+This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`. It supports monitoring live streams, making it simple and convenient for users to record live streams and save them as MP4 videos.
 
-### Install
+#### Supported Platforms
+- [x] YouTube
+- [x] Twitch
+- [x] TikTok
+- [x] Douyin
+- [x] Kuaishou
+- [x] Bilibili
+- [x] 网易 CC
+- [x] Huajiao
+- [x] Weibo
+- [ ] Huya
+- [ ] Douyu
 
-```bash
-$ npm install
+#### ❓How to Run Locally?
+```shell
+pnpm install
 ```
-
-### Development
-
-```bash
-$ npm run dev
-```
-
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
+```shell
+pnpm debug
 ```
