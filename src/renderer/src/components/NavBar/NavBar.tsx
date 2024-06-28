@@ -18,12 +18,17 @@ export default function NavBar() {
   const [createSheetOpen, setCreateSheetOpen] = useState(false)
   const [settingSheetOpen, setSettingSheetOpen] = useState(false)
 
+  const handleLogoClick = () => {
+    window.api.navByDefaultBrowser('https://github.com/chenfan0/fideo-live-record')
+  }
+
   return (
     <div className="flex items-center justify-between px-[24px]">
       <UseThemeIcon
         dark={darkLogo}
         light={lightLogo}
         className="w-[64px] cursor-pointer select-none"
+        handleClick={handleLogoClick}
       />
 
       <div className="flex items-center gap-[12px]">
