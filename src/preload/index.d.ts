@@ -20,6 +20,7 @@ declare global {
       closeWindow: () => void
 
       onStreamRecordEnd: (callback: (title: string, code: number) => void) => void
+      onFFmpegProgressInfo: (callback: (info: IFfmpegProgressInfo) => void) => void
     }
   }
 }

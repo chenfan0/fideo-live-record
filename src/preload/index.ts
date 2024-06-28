@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
   CLOSE_WINDOW,
+  FFMPEG_PROGRESS_INFO,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -32,6 +33,11 @@ const api = {
   onStreamRecordEnd: (callback: (title: string, code: number) => void) => {
     ipcRenderer.on(STREAM_RECORD_END, (_, title, code) => {
       callback(title, code)
+    })
+  },
+  onFFmpegProgressInfo: (callback: (info: Record<string, IFfmpegProgressInfo>) => void) => {
+    ipcRenderer.on(FFMPEG_PROGRESS_INFO, (_, info) => {
+      callback(info)
     })
   }
 }

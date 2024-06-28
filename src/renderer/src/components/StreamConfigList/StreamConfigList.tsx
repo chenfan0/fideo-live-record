@@ -4,16 +4,23 @@ import StreamConfigCard from './components/StreamConfigCard'
 import { SUCCESS_CODE, FFMPEG_ERROR_CODE, errorCodeToI18nMessage } from '../../../../code'
 
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
+import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
 import { StreamStatus } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 import { useTranslation } from 'react-i18next'
 
 export default function StreamConfigList() {
   const { streamConfigList } = useStreamConfigStore((state) => state)
+  const { updateFfmpegProgressInfo } = useFfmpegProgressInfoStore((state) => state)
   const { toast } = useToast()
   const { t } = useTranslation()
 
   useMount(() => {
+    window.api.onFFmpegProgressInfo((progressInfo) => {
+      console.log('onFFmpegProgressInfo', progressInfo)
+      updateFfmpegProgressInfo(progressInfo)
+    })
+
     window.api.onStreamRecordEnd(async (title, code) => {
       const { streamConfigList, updateStreamConfig } = useStreamConfigStore.getState()
       const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)

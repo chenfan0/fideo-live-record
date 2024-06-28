@@ -133,6 +133,13 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
   if (cookie) {
     ffmpegProcess.outputOptions('-headers', `Cookie: ${cookie}`)
   }
+  if (secondSegmentTime > 0) {
+    ffmpegProcess.outputOptions([
+      '-f segment',
+      `-segment_time ${secondSegmentTime}`,
+      '-reset_timestamps 1'
+    ])
+  }
 
   ffmpegProcess
     .videoCodec('copy')

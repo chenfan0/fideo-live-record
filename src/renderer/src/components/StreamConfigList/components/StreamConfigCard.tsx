@@ -5,6 +5,7 @@ import { Badge } from '@/shadcn/ui/badge'
 import Progress from '@/components/StreamConfigList/components/Progress'
 import OperationBar from '@/components/StreamConfigList/components/OperationBar'
 import { StreamStatus } from '@renderer/lib/utils'
+import { useFfmpegProgressInfoStore } from '@renderer/store/useFfmpegProgressInfoStore'
 
 interface StreamConfigCardProps {
   streamConfig: IStreamConfig
@@ -21,6 +22,7 @@ const streamStatusToLocaleMap = {
 
 export default function StreamConfigCard({ streamConfig, index }: StreamConfigCardProps) {
   const { t } = useTranslation()
+  const ffmpegProgressInfo = useFfmpegProgressInfoStore((state) => state.ffmpegProgressInfo)
 
   const handleRoomUrlClick = () => {
     window.api.navByDefaultBrowser(streamConfig.roomUrl)
@@ -49,6 +51,17 @@ export default function StreamConfigCard({ streamConfig, index }: StreamConfigCa
       </CardHeader>
       <CardContent>
         <Progress animate={streamConfig.status !== StreamStatus.NOT_STARTED} />
+        <div className="mt-2 h-[20px] flex gap-16">
+          {ffmpegProgressInfo[streamConfig.title] && (
+            <>
+              <div>{ffmpegProgressInfo[streamConfig.title]?.timemark}</div>
+              <div>
+                {(streamConfig.segmentTime === '0' || streamConfig.segmentTime === '') &&
+                  ffmpegProgressInfo[streamConfig.title].targetSize / 1024 + 'M'}
+              </div>
+            </>
+          )}
+        </div>
       </CardContent>
     </Card>
   )
