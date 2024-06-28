@@ -2,8 +2,11 @@ import { app, shell, BrowserWindow, ipcMain, dialog, Notification } from 'electr
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import {
+  CLOSE_WINDOW,
   FFMPEG_PROGRESS_INFO,
   GET_LIVE_URLS,
+  MAXIMIZE_RESTORE_WINDOW,
+  MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
   RECORD_DUMMY_PROCESS,
   SELECT_DIR,
@@ -182,6 +185,22 @@ app.whenReady().then(() => {
 
   ipcMain.handle(SHOW_NOTIFICATION, (_, title: string, body: string) => {
     showNotification(title, body)
+  })
+
+  ipcMain.handle(MINIMIZE_WINDOW, () => {
+    win?.minimize()
+  })
+
+  ipcMain.handle(MAXIMIZE_RESTORE_WINDOW, () => {
+    if (win?.isFullScreen()) {
+      win?.setFullScreen(false)
+    } else {
+      win?.setFullScreen(true)
+    }
+  })
+
+  ipcMain.handle(CLOSE_WINDOW, () => {
+    win?.close()
   })
 
   createWindow()

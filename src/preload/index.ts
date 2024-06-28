@@ -1,6 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
+  CLOSE_WINDOW,
+  MAXIMIZE_RESTORE_WINDOW,
+  MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
   SELECT_DIR,
   SHOW_NOTIFICATION,
@@ -11,6 +14,7 @@ import {
 
 // Custom APIs for renderer
 const api = {
+  isDarwin: process.platform === 'darwin',
   selectDir: () => ipcRenderer.invoke(SELECT_DIR),
   getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string }) =>
     ipcRenderer.invoke('GET_LIVE_URLS', info),
@@ -21,6 +25,9 @@ const api = {
 
   showNotification: (title: string, body: string) =>
     ipcRenderer.invoke(SHOW_NOTIFICATION, title, body),
+  minimizeWindow: () => ipcRenderer.invoke(MINIMIZE_WINDOW),
+  maxRestoreWindow: () => ipcRenderer.invoke(MAXIMIZE_RESTORE_WINDOW),
+  closeWindow: () => ipcRenderer.invoke(CLOSE_WINDOW),
 
   onStreamRecordEnd: (callback: (title: string, code: number) => void) => {
     ipcRenderer.on(STREAM_RECORD_END, (_, title, code) => {

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useMount } from 'react-use'
 
 import { Toaster } from '@/shadcn/ui/toaster'
 import TitleBar from '@/components/TitleBar/TitleBar'
@@ -19,6 +20,12 @@ function App(): JSX.Element {
       defaultSettingsConfig: state.defaultSettingsConfig
     })
   )
+
+  useMount(() => {
+    const winControls = document.getElementById('window-controls')
+    window.api.isDarwin && winControls && (winControls.style.display = 'none')
+  })
+
   useEffect(() => {
     initStreamConfigData()
     initDefaultSettingsData()

@@ -4,6 +4,7 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
+      isDarwin: boolean
       selectDir: () => Promise<{ canceled: boolean; filePaths: string[] }>
       getLiveUrls: (info: {
         roomUrl: string
@@ -14,6 +15,9 @@ declare global {
       startStreamRecord: (streamConfig: string) => Promise<{ code: number }>
       stopStreamRecord: (title: string) => Promise<{ code: number }>
       showNotification: (title: string, body: string) => void
+      minimizeWindow: () => void
+      maxRestoreWindow: () => void
+      closeWindow: () => void
 
       onStreamRecordEnd: (callback: (title: string, code: number) => void) => void
     }
