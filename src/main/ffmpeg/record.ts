@@ -9,7 +9,7 @@ import { SUCCESS_CODE, FFMPEG_ERROR_CODE } from '../../code'
 
 import { RECORD_DUMMY_PROCESS } from '../../const'
 
-const log = debug('record-stream')
+const log = debug('fideo-record-stream')
 
 const KILL_MESSAGE = 'ffmpeg was killed with signal SIGKILL'
 
