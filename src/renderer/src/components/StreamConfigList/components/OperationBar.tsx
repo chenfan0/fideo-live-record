@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import UseThemeIcon from '@/components/UseThemeIcon'
@@ -15,7 +16,6 @@ import darkDeleteIcon from '@/assets/images/dark/close.svg'
 import lightDeleteIcon from '@/assets/images/light/close.svg'
 import { StreamStatus } from '@renderer/lib/utils'
 import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
-import { useState } from 'react'
 import DeleteRecordDialog from './DeleteRecordDialog'
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
 import { useToast } from '@renderer/hooks/useToast'
@@ -25,7 +25,7 @@ interface OperationBarProps {
 }
 
 export default function OperationBar(props: OperationBarProps) {
-  let timer: NodeJS.Timeout
+  const timer = useRef<NodeJS.Timeout>()
   const { index } = props
   const { t } = useTranslation()
   const { toast } = useToast()
@@ -52,8 +52,6 @@ export default function OperationBar(props: OperationBarProps) {
 
     const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig))
 
-    console.log('code', code)
-
     if (code === SUCCESS_CODE) {
       updateStreamConfig({ ...streamConfig, status: StreamStatus.RECORDING }, index)
       toast({
@@ -64,8 +62,8 @@ export default function OperationBar(props: OperationBarProps) {
     }
 
     if (code === CRAWLER_ERROR_CODE.NOT_URLS) {
-      timer && clearTimeout(timer)
-      timer = setTimeout(() => {
+      timer.current && clearTimeout(timer.current)
+      timer.current = setTimeout(() => {
         handleStartRecord(false)
       }, 1000 * streamConfig.interval)
 
@@ -97,12 +95,11 @@ export default function OperationBar(props: OperationBarProps) {
 
   const handlePlayClick = () => {
     handleStartRecord(true)
-    clearTimeout(timer)
   }
 
   const handlePauseClick = async () => {
     await window.api.stopStreamRecord(streamConfig.title)
-    clearTimeout(timer)
+    clearTimeout(timer.current)
   }
 
   return (
