@@ -1,4 +1,8 @@
+import { useState } from 'react'
 import { useMount } from 'react-use'
+import { useTranslation } from 'react-i18next'
+
+import Dialog from '@/components/Dialog'
 import StreamConfigCard from './components/StreamConfigCard'
 
 import { SUCCESS_CODE, FFMPEG_ERROR_CODE, errorCodeToI18nMessage } from '../../../../code'
@@ -7,17 +11,30 @@ import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
 import { StreamStatus } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
-import { useTranslation } from 'react-i18next'
 
 export default function StreamConfigList() {
-  const { streamConfigList } = useStreamConfigStore((state) => state)
+  const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
+  const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => state)
   const { updateFfmpegProgressInfo } = useFfmpegProgressInfoStore((state) => state)
   const { toast } = useToast()
   const { t } = useTranslation()
 
+  const handleForceCloseWindow = () => {
+    setCloseWindowDialogOpen(false)
+
+    streamConfigList.forEach((streamConfig, index) => {
+      if (streamConfig.status !== StreamStatus.NOT_STARTED) {
+        updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
+      }
+    })
+
+    setTimeout(() => {
+      window.api.forceCloseWindow()
+    })
+  }
+
   useMount(() => {
     window.api.onFFmpegProgressInfo((progressInfo) => {
-      console.log('onFFmpegProgressInfo', progressInfo)
       updateFfmpegProgressInfo(progressInfo)
     })
 
@@ -25,7 +42,6 @@ export default function StreamConfigList() {
       const { streamConfigList, updateStreamConfig } = useStreamConfigStore.getState()
       const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)
 
-      console.log('onStreamRecordEnd', title, code)
       if (index === -1) {
         return
       }
@@ -36,7 +52,6 @@ export default function StreamConfigList() {
       const isStopByUser = code === FFMPEG_ERROR_CODE.USER_KILL_PROCESS
       const isStopByStreamEnd = code === SUCCESS_CODE
 
-      console.log('status:', streamConfig.status)
       if (streamConfig.status === StreamStatus.RECORDING) {
         updateStreamConfig({ ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION }, index)
         return
@@ -80,6 +95,19 @@ export default function StreamConfigList() {
 
       updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
     })
+
+    window.api.onUserCloseWindow(() => {
+      const { streamConfigList } = useStreamConfigStore.getState()
+
+      const stillWorkStream = streamConfigList.find(
+        (streamConfig) => streamConfig.status !== StreamStatus.NOT_STARTED
+      )
+      if (!stillWorkStream) {
+        window.api.forceCloseWindow()
+        return
+      }
+      setCloseWindowDialogOpen(true)
+    })
   })
 
   return (
@@ -91,6 +119,14 @@ export default function StreamConfigList() {
           ))}
         </div>
       }
+      <Dialog
+        title={t('stream_config.confirm_force_close_window')}
+        btnText={t('stream_config.confirm')}
+        dialogOpen={closeWindowDialogOpen}
+        onOpenChange={setCloseWindowDialogOpen}
+        variant="default"
+        handleBtnClick={handleForceCloseWindow}
+      />
     </>
   )
 }

@@ -18,9 +18,11 @@ declare global {
       minimizeWindow: () => void
       maxRestoreWindow: () => void
       closeWindow: () => void
+      forceCloseWindow: () => void
 
       onStreamRecordEnd: (callback: (title: string, code: number) => void) => void
       onFFmpegProgressInfo: (callback: (info: IFfmpegProgressInfo) => void) => void
+      onUserCloseWindow: (callback: () => void) => void
     }
   }
 }

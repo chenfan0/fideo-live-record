@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import {
   CLOSE_WINDOW,
   FFMPEG_PROGRESS_INFO,
+  FORCE_CLOSE_WINDOW,
   GET_LIVE_URLS,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
@@ -13,7 +14,8 @@ import {
   SHOW_NOTIFICATION,
   START_STREAM_RECORD,
   STOP_STREAM_RECORD,
-  STREAM_RECORD_END
+  STREAM_RECORD_END,
+  USER_CLOSE_WINDOW
 } from '../const'
 import { getLiveUrls } from './crawler/index'
 import { FFMPEG_ERROR_CODE, SUCCESS_CODE } from '../code'
@@ -79,6 +81,11 @@ function createWindow(): void {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  mainWindow.on('close', (e) => {
+    e.preventDefault()
+    mainWindow.webContents.send(USER_CLOSE_WINDOW)
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -203,6 +210,17 @@ app.whenReady().then(() => {
     win?.close()
   })
 
+  ipcMain.handle(FORCE_CLOSE_WINDOW, () => {
+    const stillRecordStreamKeys = Object.keys(recordStreamFfmpegProcessMap)
+
+    stillRecordStreamKeys.forEach((key) => {
+      resetRecordStreamFfmpeg(key)
+    })
+    clearTimerWhenAllFfmpegProcessEnd()
+
+    win?.destroy()
+  })
+
   createWindow()
 
   app.on('activate', function () {
@@ -216,7 +234,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (process.platform !== 'darwin' || is.dev) {
     app.quit()
   }
 })

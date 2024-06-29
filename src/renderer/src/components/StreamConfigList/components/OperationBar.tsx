@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import UseThemeIcon from '@/components/UseThemeIcon'
+import Dialog from '@/components/Dialog'
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 
 // import darkPreviewIcon from '@/assets/images/dark/preview.svg'
@@ -16,9 +17,9 @@ import darkDeleteIcon from '@/assets/images/dark/close.svg'
 import lightDeleteIcon from '@/assets/images/light/close.svg'
 import { StreamStatus } from '@renderer/lib/utils'
 import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
-import DeleteRecordDialog from './DeleteRecordDialog'
-import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
+
 import { useToast } from '@renderer/hooks/useToast'
+import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
 
 interface OperationBarProps {
   index: number
@@ -84,13 +85,6 @@ export default function OperationBar(props: OperationBarProps) {
       description: errMessage,
       variant: 'destructive'
     })
-
-    // updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
-    // toast({
-    //   title: streamConfig.title,
-    //   description: t('record.start_failed'),
-    //   variant: 'destructive'
-    // })
   }
 
   const handlePlayClick = () => {
@@ -150,11 +144,13 @@ export default function OperationBar(props: OperationBarProps) {
         type="edit"
       />
 
-      <DeleteRecordDialog
-        title={streamConfig.title}
+      <Dialog
+        title={t('stream_config.confirm_delete', { title: streamConfig.title })}
+        btnText={t('stream_config.delete')}
         dialogOpen={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        handleConfirmDelete={handleConfirmDelete}
+        handleBtnClick={handleConfirmDelete}
+        variant="destructive"
       />
     </>
   )

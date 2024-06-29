@@ -3,6 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import {
   CLOSE_WINDOW,
   FFMPEG_PROGRESS_INFO,
+  FORCE_CLOSE_WINDOW,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -10,7 +11,8 @@ import {
   SHOW_NOTIFICATION,
   START_STREAM_RECORD,
   STOP_STREAM_RECORD,
-  STREAM_RECORD_END
+  STREAM_RECORD_END,
+  USER_CLOSE_WINDOW
 } from '../const'
 
 // Custom APIs for renderer
@@ -29,6 +31,7 @@ const api = {
   minimizeWindow: () => ipcRenderer.invoke(MINIMIZE_WINDOW),
   maxRestoreWindow: () => ipcRenderer.invoke(MAXIMIZE_RESTORE_WINDOW),
   closeWindow: () => ipcRenderer.invoke(CLOSE_WINDOW),
+  forceCloseWindow: () => ipcRenderer.invoke(FORCE_CLOSE_WINDOW),
 
   onStreamRecordEnd: (callback: (title: string, code: number) => void) => {
     ipcRenderer.on(STREAM_RECORD_END, (_, title, code) => {
@@ -38,6 +41,11 @@ const api = {
   onFFmpegProgressInfo: (callback: (info: Record<string, IFfmpegProgressInfo>) => void) => {
     ipcRenderer.on(FFMPEG_PROGRESS_INFO, (_, info) => {
       callback(info)
+    })
+  },
+  onUserCloseWindow: (callback: () => void) => {
+    ipcRenderer.on(USER_CLOSE_WINDOW, () => {
+      callback()
     })
   }
 }

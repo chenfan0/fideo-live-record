@@ -82,6 +82,9 @@ export default {
       },
       stream_config: {
         confirm: '确认',
+        confirm_delete: '确定删除该录制项? ({{title}})',
+        delete: '删除',
+        confirm_force_close_window: '当前有录制任务正在进行, 是否强制关闭窗口?',
         create: '新建录制项',
         edit: '编辑录制项',
         title: '标题',
