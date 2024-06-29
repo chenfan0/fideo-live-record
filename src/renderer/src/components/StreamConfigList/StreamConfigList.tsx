@@ -21,21 +21,17 @@ export default function StreamConfigList() {
 
   const handleForceCloseWindow = async () => {
     setCloseWindowDialogOpen(false)
-    const pList: Promise<void>[] = []
-    streamConfigList.forEach((streamConfig) => {
+
+    for (const streamConfig of streamConfigList) {
       if (streamConfig.status !== StreamStatus.NOT_STARTED) {
-        console.log('force close window', streamConfig.title)
-        pList.push(
-          updateStreamConfig(
-            { ...streamConfig, status: StreamStatus.NOT_STARTED },
-            streamConfig.title
-          )
+        await updateStreamConfig(
+          { ...streamConfig, status: StreamStatus.NOT_STARTED },
+          streamConfig.title
         )
       }
-    })
-    console.log('force close window', pList.length)
-    await Promise.all(pList)
-    // window.api.forceCloseWindow()
+    }
+
+    window.api.forceCloseWindow()
   }
 
   useMount(() => {
