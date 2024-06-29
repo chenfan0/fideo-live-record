@@ -22,39 +22,42 @@ import { useToast } from '@renderer/hooks/useToast'
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
 
 interface OperationBarProps {
-  index: number
+  streamConfig: IStreamConfig
 }
 
 export default function OperationBar(props: OperationBarProps) {
   const timer = useRef<NodeJS.Timeout>()
-  const { index } = props
+  const { streamConfig } = props
   const { t } = useTranslation()
   const { toast } = useToast()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
-  const { streamConfigList, removeStreamConfig, updateStreamConfig } = useStreamConfigStore(
-    (state) => ({
-      streamConfigList: state.streamConfigList,
-      removeStreamConfig: state.removeStreamConfig,
-      updateStreamConfig: state.updateStreamConfig
-    })
-  )
-  const streamConfig = streamConfigList[index]
+  const { removeStreamConfig, updateStreamConfig } = useStreamConfigStore((state) => ({
+    streamConfigList: state.streamConfigList,
+    removeStreamConfig: state.removeStreamConfig,
+    updateStreamConfig: state.updateStreamConfig
+  }))
 
-  const handleConfirmDelete = () => {
-    removeStreamConfig(index)
+  const handleConfirmDelete = async () => {
+    await removeStreamConfig(streamConfig.title)
     setDeleteDialogOpen(false)
   }
 
   const handleStartRecord = async (isFirst = true) => {
     isFirst &&
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.PREPARING_TO_RECORD }, index)
+      (await updateStreamConfig(
+        { ...streamConfig, status: StreamStatus.PREPARING_TO_RECORD },
+        streamConfig.title
+      ))
 
     const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig))
 
     if (code === SUCCESS_CODE) {
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.RECORDING }, index)
+      await updateStreamConfig(
+        { ...streamConfig, status: StreamStatus.RECORDING },
+        streamConfig.title
+      )
       toast({
         title: streamConfig.title,
         description: t('start_record')
@@ -73,13 +76,19 @@ export default function OperationBar(props: OperationBarProps) {
           title: streamConfig.title,
           description: t('error.start_record.not_urls')
         })
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.MONITORING }, index)
+      await updateStreamConfig(
+        { ...streamConfig, status: StreamStatus.MONITORING },
+        streamConfig.title
+      )
       return
     }
 
     const errMessage = errorCodeToI18nMessage(code, 'error.start_record.')
 
-    updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
+    await updateStreamConfig(
+      { ...streamConfig, status: StreamStatus.NOT_STARTED },
+      streamConfig.title
+    )
     toast({
       title: streamConfig.title,
       description: errMessage,
@@ -140,7 +149,6 @@ export default function OperationBar(props: OperationBarProps) {
         streamConfig={streamConfig}
         setSheetOpen={setSheetOpen}
         sheetOpen={sheetOpen}
-        index={index}
         type="edit"
       />
 

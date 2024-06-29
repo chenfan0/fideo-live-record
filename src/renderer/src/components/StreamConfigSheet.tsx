@@ -150,7 +150,6 @@ interface StreamConfigSheetProps {
   setSheetOpen: (status: boolean) => void
   streamConfig: IStreamConfig | null
   type: 'create' | 'edit'
-  index?: number
 }
 
 export default function StreamConfigSheet(props: StreamConfigSheetProps) {
@@ -161,7 +160,7 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
   const { streamConfigList, addStreamConfig, updateStreamConfig } = useStreamConfigStore(
     (state) => state
   )
-  const { sheetOpen, setSheetOpen, type, index, streamConfig } = props
+  const { sheetOpen, setSheetOpen, type, streamConfig } = props
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -239,9 +238,9 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       }
       formValues.liveUrls = liveUrls
       if (type === 'edit') {
-        updateStreamConfig(formValues, index!)
+        await updateStreamConfig(formValues, formValues.title)
       } else {
-        addStreamConfig(formValues)
+        await addStreamConfig(formValues)
       }
     }
 

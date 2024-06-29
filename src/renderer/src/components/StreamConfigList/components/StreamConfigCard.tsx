@@ -9,7 +9,6 @@ import { useFfmpegProgressInfoStore } from '@renderer/store/useFfmpegProgressInf
 
 interface StreamConfigCardProps {
   streamConfig: IStreamConfig
-  index: number
 }
 
 const streamStatusToLocaleMap = {
@@ -20,7 +19,7 @@ const streamStatusToLocaleMap = {
   4: 'stream_config.video_format_conversion'
 }
 
-export default function StreamConfigCard({ streamConfig, index }: StreamConfigCardProps) {
+export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps) {
   const { t } = useTranslation()
   const ffmpegProgressInfo = useFfmpegProgressInfoStore((state) => state.ffmpegProgressInfo)
 
@@ -40,7 +39,7 @@ export default function StreamConfigCard({ streamConfig, index }: StreamConfigCa
               <Badge variant="outline">{t(streamStatusToLocaleMap[streamConfig.status])}</Badge>
             )}
           </div>
-          <OperationBar index={index} />
+          <OperationBar streamConfig={streamConfig} />
         </CardTitle>
         <CardDescription className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[95%]">
           {t('stream_config.room_url')}:&nbsp;

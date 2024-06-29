@@ -19,18 +19,23 @@ export default function StreamConfigList() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  const handleForceCloseWindow = () => {
+  const handleForceCloseWindow = async () => {
     setCloseWindowDialogOpen(false)
-
-    streamConfigList.forEach((streamConfig, index) => {
+    const pList: Promise<void>[] = []
+    streamConfigList.forEach((streamConfig) => {
       if (streamConfig.status !== StreamStatus.NOT_STARTED) {
-        updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
+        console.log('force close window', streamConfig.title)
+        pList.push(
+          updateStreamConfig(
+            { ...streamConfig, status: StreamStatus.NOT_STARTED },
+            streamConfig.title
+          )
+        )
       }
     })
-
-    setTimeout(() => {
-      window.api.forceCloseWindow()
-    })
+    console.log('force close window', pList.length)
+    await Promise.all(pList)
+    // window.api.forceCloseWindow()
   }
 
   useMount(() => {
@@ -53,7 +58,10 @@ export default function StreamConfigList() {
       const isStopByStreamEnd = code === SUCCESS_CODE
 
       if (streamConfig.status === StreamStatus.RECORDING) {
-        updateStreamConfig({ ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION }, index)
+        await updateStreamConfig(
+          { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
+          streamConfig.title
+        )
         return
       }
 
@@ -93,7 +101,10 @@ export default function StreamConfigList() {
         description: t(message)
       })
 
-      updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, index)
+      await updateStreamConfig(
+        { ...streamConfig, status: StreamStatus.NOT_STARTED },
+        streamConfig.title
+      )
     })
 
     window.api.onUserCloseWindow(() => {
@@ -114,8 +125,8 @@ export default function StreamConfigList() {
     <>
       {
         <div className="stream-config-list flex flex-col gap-[12px] p-[24px] overflow-y-auto h-[calc(100vh-80px)]">
-          {streamConfigList.map((streamConfig, index) => (
-            <StreamConfigCard key={streamConfig.title} streamConfig={streamConfig} index={index} />
+          {streamConfigList.map((streamConfig) => (
+            <StreamConfigCard key={streamConfig.title} streamConfig={streamConfig} />
           ))}
         </div>
       }
