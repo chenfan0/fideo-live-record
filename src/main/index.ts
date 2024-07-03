@@ -82,10 +82,10 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
-    show: false,
-    titleBarStyle: 'hiddenInset',
+    titleBarStyle: 'hidden',
     title: 'Fideo',
     autoHideMenuBar: true,
+    frame: process.platform === 'darwin',
     // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
