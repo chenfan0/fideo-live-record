@@ -20,8 +20,8 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] 网易 CC
 - [x] Huajiao
 - [x] Weibo
+- [x] Douyu
 - [ ] Huya
-- [ ] Douyu
 
 #### ❓How to Run Locally?
 ```shell
