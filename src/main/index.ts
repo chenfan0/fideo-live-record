@@ -1,6 +1,10 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, Notification } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+
+import { lt } from 'semver'
+import pkg from '../../package.json'
+
 import {
   CLOSE_WINDOW,
   FFMPEG_PROGRESS_INFO,
@@ -12,6 +16,7 @@ import {
   RECORD_DUMMY_PROCESS,
   SELECT_DIR,
   SHOW_NOTIFICATION,
+  SHOW_UPDATE_DIALOG,
   START_STREAM_RECORD,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
@@ -26,6 +31,21 @@ import {
   resetRecordStreamFfmpeg,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
+
+async function checkUpdate() {
+  const hasNewVersion = (await fetch(
+    'https://api.github.com/repos/chenfan0/fideo-live-record/releases/latest'
+  ).then((res) => {
+    res
+      .json()
+      .then(({ tag_name }) => {
+        return lt(pkg.version, tag_name)
+      })
+      .catch(() => false)
+  })) as boolean
+  if (!hasNewVersion) return
+  win?.webContents.send(SHOW_UPDATE_DIALOG)
+}
 
 let timer: NodeJS.Timeout | undefined
 const startTimerWhenFirstFfmpegProcessStart = () => {
@@ -69,7 +89,8 @@ function createWindow(): void {
     // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      devTools: is.dev
     }
   })
   win = mainWindow
@@ -222,6 +243,10 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+
+  setTimeout(() => {
+    checkUpdate()
+  }, 1000)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

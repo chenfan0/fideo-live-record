@@ -77,6 +77,9 @@ dependencies:
   react-use:
     specifier: ^17.5.0
     version: 17.5.0(react-dom@18.3.1)(react@18.3.1)
+  semver:
+    specifier: ^7.6.2
+    version: 7.6.2
   tailwind-merge:
     specifier: ^2.3.0
     version: 2.3.0

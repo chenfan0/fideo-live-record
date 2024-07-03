@@ -85,6 +85,10 @@ export default {
           current_line_error: 'Stop recording (current line error, try using another line)',
           timeout: 'Stop recording (request timed out, try using or changing the proxy)'
         }
+      },
+      app_update: {
+        title: 'New Version Available',
+        get_update_detail: 'View Update Details'
       }
     }
   },
@@ -171,6 +175,10 @@ export default {
           current_line_error: '停止录制(当前线路错误，尝试使用其他线路)',
           timeout: '停止录制(请求超时，尝试使用或者更换代理)'
         }
+      },
+      app_update: {
+        title: '发现新版本',
+        get_update_detail: '查看更新详情'
       }
     }
   }

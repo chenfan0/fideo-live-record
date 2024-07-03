@@ -47,6 +47,7 @@
     "react-hook-form": "^7.51.5",
     "react-i18next": "^14.1.2",
     "react-use": "^17.5.0",
+    "semver": "^7.6.2",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",

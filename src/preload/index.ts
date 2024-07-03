@@ -9,6 +9,7 @@ import {
   NAV_BY_DEFAULT_BROWSER,
   SELECT_DIR,
   SHOW_NOTIFICATION,
+  SHOW_UPDATE_DIALOG,
   START_STREAM_RECORD,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
@@ -45,6 +46,11 @@ const api = {
   },
   onUserCloseWindow: (callback: () => void) => {
     ipcRenderer.on(USER_CLOSE_WINDOW, () => {
+      callback()
+    })
+  },
+  onAppUpdate: (callback: () => void) => {
+    ipcRenderer.on(SHOW_UPDATE_DIALOG, () => {
       callback()
     })
   }
