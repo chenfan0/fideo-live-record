@@ -2,67 +2,89 @@ export default {
   en: {
     translation: {
       nav_bar: {
-        create: 'Create Record',
-        setting: 'Default Setting',
+        create: 'Create New Recording Item',
+        setting: 'Default Settings',
         toggle_theme: 'Toggle Theme'
       },
       default_settings: {
         title: 'Default Settings',
         language: 'Language',
-        language_placeholder: 'Please select language',
-        directory: 'Directory',
-        directory_placeholder: 'Please select directory'
+        language_placeholder: 'Please select a language',
+        directory: 'Storage Directory',
+        directory_placeholder: 'Please select a storage directory'
       },
       stream_config: {
-        create: 'Create Record',
-        edit: 'Edit Record',
         confirm: 'Confirm',
+        confirm_delete: 'Are you sure you want to delete this recording item? ({{title}})',
+        delete: 'Delete',
+        confirm_force_close_window:
+          'There are recording tasks in progress. Do you want to force close the window?',
+        create: 'Create New Recording Item',
+        edit: 'Edit Recording Item',
         title: 'Title',
-        title_placeholder: 'Please enter title',
-        room_url: 'Room URL',
-        room_url_placeholder: 'Please enter room URL',
+        title_placeholder: 'Please enter a title',
+        room_url: 'Stream URL',
+        room_url_placeholder: 'Please enter the stream URL',
         line: 'Line',
-        line_placeholder: 'Please select line',
-        interval: 'Monitor Interval (seconds)',
-        interval_placeholder: 'Please enter monitor interval, default 30s',
-        proxy: 'Proxy(optional)',
-        proxy_placeholder: 'Please enter proxy',
-        cookie: 'Cookie(optional)',
-        cookie_placeholder: 'Please enter cookie',
+        line_placeholder: 'Please select a line',
+        interval: 'Monitoring Interval (seconds)',
+        interval_placeholder: 'Please enter the monitoring interval, default is 30s',
+        segment_time: 'Segment Duration (minutes)',
+        segment_time_placeholder: 'Please enter the segment duration, default is no segmentation',
+        proxy: 'Proxy (optional)',
+        proxy_placeholder: 'Please enter the proxy',
+        cookie: 'Cookie (optional)',
+        cookie_placeholder: 'Please enter the cookie',
         filename: 'Filename',
-        filename_placeholder: 'Please enter filename',
-        directory: 'Directory',
-        directory_placeholder: 'Please select directory',
+        filename_placeholder: 'Please enter the filename',
+        directory: 'Storage Directory',
+        directory_placeholder: 'Please select a storage directory',
         select: 'Select',
-        title_can_not_be_empty: 'Title can not be empty',
+        title_can_not_be_empty: 'Title cannot be empty',
         title_already_exists: 'Title already exists',
-        room_url_can_not_be_empty: 'Room URL can not be empty',
-        room_url_invalid: 'Room URL is invalid',
-        filename_can_not_be_empty: 'Filename can not be empty',
-        directory_can_not_be_empty: 'Directory can not be empty',
-        interval_can_not_be_empty: 'Monitor interval can not be empty',
-        interval_must_be_number: 'Monitor interval is invalid, please enter a number',
-        interval_must_be_greater_than_20: 'Monitor interval is invalid, at least 20 seconds',
-        proxy_invalid: 'Proxy is invalid',
+        room_url_can_not_be_empty: 'Stream URL cannot be empty',
+        room_url_invalid: 'Stream URL is invalid',
+        filename_can_not_be_empty: 'Filename cannot be empty',
+        directory_can_not_be_empty: 'Storage directory cannot be empty',
+        interval_can_not_be_empty: 'Monitoring interval cannot be empty',
+        interval_must_be_number: 'Invalid monitoring interval, please enter a number',
+        interval_must_be_greater_than_20:
+          'Invalid monitoring interval, must be at least 20 seconds',
+        segment_time_must_be_number:
+          'Invalid segment duration, please enter a number or leave blank',
+        segment_time_must_be_greater_than_0: 'Invalid segment duration, must be greater than 0',
+        proxy_invalid: 'Proxy address is invalid',
         not_started: 'Not Started',
         preparing_to_record: 'Preparing to Record',
         monitoring: 'Monitoring',
         recording: 'Recording',
-        preview: 'Preview',
-        edit_record: 'Edit Record',
-        confirm_delete: 'Are you sure you want to delete this record?',
-        delete: 'Delete'
+        video_format_conversion: 'Video Format Conversion'
       },
-      error_code: {
-        title: 'Error',
-        not_urls: 'Room does not exist or not live',
-        not_support: 'The current live platform is not supported',
-        invalid_proxy: 'Proxy is invalid',
-        invalid_url: 'Room URL is invalid',
-        time_out: 'Request timed out, try using or changing the proxy',
-        forbidden: 'Request denied, try using or changing the proxy',
-        current_line_error: 'Current line error, try using other lines',
-        unknown_error: 'Unknown error'
+      start_record: 'Start Recording',
+      user_stop_record: 'Stop Recording (User Manually Stopped)',
+      stream_end_stop_record: 'Stop Recording (Streamer Ended Stream)',
+      error: {
+        get_line: {
+          not_urls: 'Stream does not exist or is not live',
+          not_support: 'This streaming platform is not supported',
+          invalid_proxy: 'Proxy address is invalid',
+          invalid_url: 'Stream URL is invalid',
+          time_out: 'Request timed out, try using or changing the proxy',
+          forbidden: 'Request was denied, try using or changing the proxy',
+          unknown_error: 'Unknown error'
+        },
+        start_record: {
+          not_urls: 'Stream is not live, enable monitoring and recording feature',
+          timeout: 'Request timed out, try using or changing the proxy',
+          forbidden: 'Request was denied, try using or changing the proxy',
+          invalid_proxy: 'Proxy address is invalid, please check the proxy address',
+          not_support: 'This streaming platform is not supported',
+          invalid_url: 'Stream URL is invalid'
+        },
+        stop_record: {
+          current_line_error: 'Stop recording (current line error, try using another line)',
+          timeout: 'Stop recording (request timed out, try using or changing the proxy)'
+        }
       }
     }
   },
