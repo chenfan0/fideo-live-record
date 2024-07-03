@@ -11,10 +11,10 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: '20'
 
@@ -23,6 +23,11 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install
+
+    - name: Get version from package.json
+      id: get_version
+      run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+      shell: bash
 
     - name: Build Electron App
       run: |
@@ -33,10 +38,63 @@ jobs:
         fi
       shell: bash
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+    - name: Upload Windows build artifact
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v4
       with:
-        name: electron-app-${{ runner.os }}
-        path: |
-          dist/*.exe
-          dist/*.dmg
+        name: build-win-${{ env.VERSION }}
+        path: dist/fideo-${{ env.VERSION }}.exe
+
+    - name: Upload macOS build artifacts (x64)
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-mac-x64-${{ env.VERSION }}
+        path: dist/fideo-${{ env.VERSION }}-x64.dmg
+
+    - name: Upload macOS build artifacts (arm)
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-mac-arm-${{ env.VERSION }}
+        path: dist/fideo-${{ env.VERSION }}-arm64.dmg
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version from package.json
+      id: get_version
+      run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+
+    - name: Download Windows build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: build-win-${{ env.VERSION }}
+        path: .
+
+    - name: Download macOS build artifacts (x64)
+      uses: actions/download-artifact@v4
+      with:
+        name: build-mac-x64-${{ env.VERSION }}
+        path: .
+
+    - name: Download macOS build artifacts (arm)
+      uses: actions/download-artifact@v4
+      with:
+        name: build-mac-arm-${{ env.VERSION }}
+        path: .
+
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      with:
+        files: |
+          fideo-${{ env.VERSION }}-x64.dmg
+          fideo-${{ env.VERSION }}-arm64.dmg
+          fideo-${{ env.VERSION }}.exe
+        tag_name: v${{ env.VERSION }}
