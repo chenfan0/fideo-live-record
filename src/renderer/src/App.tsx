@@ -25,8 +25,8 @@ function App(): JSX.Element {
   )
 
   useMount(() => {
-    const winControls = document.getElementById('window-controls')
-    window.api.isDarwin && winControls && (winControls.style.display = 'none')
+    const titleBar = document.getElementById('title-bar')
+    window.api.isDarwin && titleBar && (titleBar.style.opacity = '0')
 
     window.api.onAppUpdate(() => {
       setShowUpdateDialog(true)

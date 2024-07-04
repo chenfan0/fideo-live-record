@@ -135,7 +135,7 @@ export default function OperationBar(props: OperationBarProps) {
           dark={darkSettingIcon}
           light={lightSettingIcon}
           handleClick={() => setSheetOpen(true)}
-          tooltipContent={t('stream_config.edit_record')}
+          tooltipContent={t('stream_config.edit')}
         />
         <UseThemeIcon
           className="w-[20px] cursor-pointer select-none"

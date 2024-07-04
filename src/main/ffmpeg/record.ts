@@ -41,7 +41,23 @@ export const resetRecordStreamFfmpeg = (title: string) => {
   return isDummy
 }
 
+const checkFileExist = async (filepath: string) => {
+  return new Promise((resolve) => {
+    fs.access(filepath, fs.constants.F_OK, (err) => {
+      if (err) {
+        log('file not exist: ', filepath)
+        setTimeout(() => {
+          resolve(false)
+        }, 800)
+      } else {
+        resolve(true)
+      }
+    })
+  })
+}
+
 async function convertFlvToMp4(sourcePath: string) {
+  if (!(await checkFileExist(sourcePath))) return
   const process = ffmpeg()
   const output = sourcePath.replace(FLV_FLAG, '.mp4')
   let _resolve: (value?: unknown) => void
@@ -68,6 +84,7 @@ async function convertFlvToMp4(sourcePath: string) {
 }
 
 async function convert(sourcePath: string) {
+  if (!(await checkFileExist(sourcePath))) return
   const stats = fs.statSync(sourcePath)
   const isDirectory = stats.isDirectory()
 
