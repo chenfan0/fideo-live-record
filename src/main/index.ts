@@ -33,18 +33,17 @@ import {
 } from './ffmpeg/record'
 
 async function checkUpdate() {
-  const hasNewVersion = (await fetch(
-    'https://api.github.com/repos/chenfan0/fideo-live-record/releases/latest'
-  ).then((res) => {
-    res
-      .json()
-      .then(({ tag_name }) => {
-        return lt(pkg.version, tag_name)
-      })
-      .catch(() => false)
-  })) as boolean
-  if (!hasNewVersion) return
-  win?.webContents.send(SHOW_UPDATE_DIALOG)
+  try {
+    const json = await fetch(
+      'https://api.github.com/repos/chenfan0/fideo-live-record/releases/latest'
+    )
+    const { tag_name } = await json.json()
+    if (lt(pkg.version, tag_name)) {
+      win?.webContents.send(SHOW_UPDATE_DIALOG)
+    }
+  } catch {
+    // ignore
+  }
 }
 
 let timer: NodeJS.Timeout | undefined
