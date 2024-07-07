@@ -12,6 +12,7 @@ import { getTiktokLiveUrlsPlugin } from './plugins/tiktok'
 import { getWeiboLiveUrlsPlugin } from './plugins/weibo'
 import { getHuaJiaoLiveUrlsPlugin } from './plugins/huajiao'
 import { getTaobaoLiveUrlsPlugin } from './plugins/taobao'
+import { getBigoLiveUrlsPlugin } from './plugins/bigo'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -39,7 +40,8 @@ const supportPlatform = [
   'tiktok',
   'weibo',
   'huajiao',
-  'taobao'
+  'taobao',
+  'bigo'
 ]
 const platformToFnMap = {
   douyin: {
@@ -99,6 +101,14 @@ const platformToFnMap = {
     getLiveUrlsFn: getTaobaoLiveUrlsPlugin,
     getRoomIdByUrl(url) {
       return new URL(url).searchParams.get('liveId')
+    }
+  },
+  bigo: {
+    getLiveUrlsFn: getBigoLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      return Number.isNaN(Number(getPathnameItem(url)))
+        ? getPathnameItem(url, 2)
+        : getPathnameItem(url)
     }
   }
 }
