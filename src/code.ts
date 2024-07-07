@@ -11,7 +11,9 @@ export const CRAWLER_ERROR_CODE = {
   INVALID_URL: 3, // invalid url
   TIME_OUT: 4, // timeout
   FORBIDDEN: 5,
-  CURRENT_LINE_ERROR: 6 // current line error
+  CURRENT_LINE_ERROR: 6, // current line error
+  COOKIE_EXPIRED: 7,
+  COOKIE_IS_REQUIRED: 8
 }
 
 export const FFMPEG_ERROR_CODE = {
@@ -45,6 +47,12 @@ export const errorCodeToI18nMessage = (code: number, prefix: string) => {
       break
     case CRAWLER_ERROR_CODE.CURRENT_LINE_ERROR:
       message += 'current_line_error'
+      break
+    case CRAWLER_ERROR_CODE.COOKIE_EXPIRED:
+      message += 'cookie_expired'
+      break
+    case CRAWLER_ERROR_CODE.COOKIE_IS_REQUIRED:
+      message += 'cookie_is_required'
       break
     case FFMPEG_ERROR_CODE.USER_KILL_PROCESS:
       message += 'user_stop_record'
