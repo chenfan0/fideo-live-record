@@ -8,17 +8,18 @@
 This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`. It supports monitoring live streams, making it simple and convenient for users to record live streams and save them as MP4 videos.
 
 ## Supported Platforms
-- [x] YouTube
-- [x] Twitch
-- [x] TikTok
-- [x] Douyin
-- [x] Kuaishou
-- [x] Bilibili
-- [x] 网易 CC
-- [x] Huajiao
-- [x] Weibo
-- [x] Douyu
-- [ ] Huya
+- [x] [YouTube](https://www.youtube.com/)
+- [x] [Twitch](https://www.twitch.tv/)
+- [x] [TikTok](https://www.tiktok.com/live/)
+- [x] [Douyin](https://live.douyin.com/)
+- [x] [Kuaishou](https://live.kuaishou.com/)
+- [x] [Bilibili](https://live.bilibili.com/)
+- [x] [网易 CC](https://cc.163.com/)
+- [x] [Huajiao](https://www.huajiao.com/)
+- [x] [Weibo](https://weibo.com/l/wblive/p/show/1022:2321325052506609680949)
+- [x] [Douyu](https://www.douyu.com/)
+- [x] [Taobao](https://tbzb.taobao.com/)
+- [ ] [Huya](https://www.huya.com/)
 
 
 ## 📚 User Guide

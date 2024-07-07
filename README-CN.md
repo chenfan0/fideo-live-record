@@ -6,17 +6,19 @@
 这是一个基于`React` `Ffmpeg` `Electron`的**直播录制软件**。支持监控直播，可以帮助用户简单便捷的对直播进行录制并保存为MP4格式的视频，
 
 ## 已支持平台
-- [x] youtube
-- [x] twitch
-- [x] tiktok
-- [x] 抖音
-- [x] 快手
-- [x] B站
-- [x] 网易cc
-- [x] 花椒
-- [x] weibo
-- [x] 斗鱼
-- [ ] 虎牙
+- [x] [YouTube](https://www.youtube.com/)
+- [x] [Twitch](https://www.twitch.tv/)
+- [x] [TikTok](https://www.tiktok.com/live/)
+- [x] [抖音](https://live.douyin.com/)
+- [x] [快手](https://live.kuaishou.com/)
+- [x] [B站](https://live.bilibili.com/)
+- [x] [网易 CC](https://cc.163.com/)
+- [x] [花椒](https://www.huajiao.com/)
+- [x] [微博](https://weibo.com/l/wblive/p/show/1022:2321325052506609680949)
+- [x] [斗鱼](https://www.douyu.com/)
+- [x] [淘宝](https://tbzb.taobao.com/)
+- [ ] [虎牙](https://www.huya.com/)
+
 
 ## 📚 使用说明
 #### 🔧 安装
