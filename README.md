@@ -36,6 +36,9 @@ sudo xattr -r -d com.apple.quarantine /Applications/Fideo.app
 #### 🔓 Download Blocked by Browser
 - Try downloading with a different browser.
 
+#### 🍪 How to Get Cookie
+- [Cookie Acquisition Tutorial](https://www.youtube.com/watch?v=sz07F5inaFg)
+
 ## ❓How to Run Locally?
 ```shell
 pnpm install

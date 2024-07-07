@@ -34,6 +34,9 @@ sudo xattr -r -d com.apple.quarantine /Applications/Fideo.app
 #### 🔓 下载时被浏览器屏蔽
 - 尝试更换浏览器下载
 
+#### 🍪 如何获取cookie
+- [获取cookie教程](https://www.bilibili.com/video/BV1G24y1o75g/?spm_id_from=333.337.search-card.all.click&vd_source=7175c3866fe9ca259066ef7898056268)
+
 ## ❓ 如何在本地运行？
 ```shell
 pnpm install
