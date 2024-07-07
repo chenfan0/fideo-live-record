@@ -6,6 +6,8 @@ import Dialog from '@/components/Dialog'
 import StreamConfigCard from './components/StreamConfigCard'
 
 import { SUCCESS_CODE, FFMPEG_ERROR_CODE, errorCodeToI18nMessage } from '../../../../code'
+import emitter from '@/lib/bus'
+import { RECORD_END_NOT_USER_STOP } from '../../../../const'
 
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
@@ -52,6 +54,7 @@ export default function StreamConfigList() {
       // FFMPEG_ERROR_CODE.USER_KILL_PROCESS stop by user
       const isStopByUser = code === FFMPEG_ERROR_CODE.USER_KILL_PROCESS
       const isStopByStreamEnd = code === SUCCESS_CODE
+      let stopWithLineError = false
 
       if (streamConfig.status === StreamStatus.RECORDING) {
         await updateStreamConfig(
@@ -81,6 +84,7 @@ export default function StreamConfigList() {
           // if not stop by user and still can get live urls
           // mean the stream can no be record, hint change the stream line
           message = 'error.stop_record.current_line_error'
+          stopWithLineError = true
         } else {
           // mean the stream is not live
           // start monitor the stream
@@ -101,6 +105,12 @@ export default function StreamConfigList() {
         { ...streamConfig, status: StreamStatus.NOT_STARTED },
         streamConfig.title
       )
+
+      if (isStopByUser || stopWithLineError) {
+        return
+      }
+
+      emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.title)
     })
 
     window.api.onUserCloseWindow(() => {

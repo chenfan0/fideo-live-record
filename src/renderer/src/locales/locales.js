@@ -82,7 +82,10 @@ export default {
           forbidden: 'Request was denied, try using or changing the proxy',
           invalid_proxy: 'Proxy address is invalid, please check the proxy address',
           not_support: 'This streaming platform is not supported',
-          invalid_url: 'Stream URL is invalid'
+          invalid_url: 'Stream URL is invalid',
+          cookie_expired: 'Cookie has expired, please re-enter the cookie',
+          cookie_is_required:
+            'Current streaming platform requires a cookie, please enter the cookie'
         },
         stop_record: {
           current_line_error: 'Stop recording (current line error, try using another line)',
@@ -174,7 +177,9 @@ export default {
           forbidden: '请求被拒绝，尝试使用或者更换代理',
           invalid_proxy: '代理地址不合法， 请检查代理地址',
           not_support: '当前不支持该直播平台',
-          invalid_url: '直播间地址不合法'
+          invalid_url: '直播间地址不合法',
+          cookie_expired: 'Cookie已过期，请重新填写',
+          cookie_is_required: '当前直播平台需要Cookie，请填写Cookie'
         },
         stop_record: {
           current_line_error: '停止录制(当前线路错误，尝试使用其他线路)',

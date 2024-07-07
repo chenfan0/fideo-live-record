@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import UseThemeIcon from '@/components/UseThemeIcon'
@@ -20,6 +20,8 @@ import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
 
 import { useToast } from '@renderer/hooks/useToast'
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
+import { RECORD_END_NOT_USER_STOP } from '../../../../../const'
+import emitter from '@/lib/bus'
 
 interface OperationBarProps {
   streamConfig: IStreamConfig
@@ -91,7 +93,7 @@ export default function OperationBar(props: OperationBarProps) {
     )
     toast({
       title: streamConfig.title,
-      description: errMessage,
+      description: t(errMessage),
       variant: 'destructive'
     })
   }
@@ -104,6 +106,22 @@ export default function OperationBar(props: OperationBarProps) {
     await window.api.stopStreamRecord(streamConfig.title)
     clearTimeout(timer.current)
   }
+
+  useEffect(() => {
+    const handleRecordEndNotUserStop = async (title: string) => {
+      if (title !== streamConfig.title) return
+      if (timer.current) {
+        clearTimeout(timer.current)
+      }
+      timer.current = setTimeout(() => {
+        handlePlayClick()
+      }, 2000)
+    }
+    emitter.on(RECORD_END_NOT_USER_STOP, handleRecordEndNotUserStop as any)
+    return () => {
+      emitter.off(RECORD_END_NOT_USER_STOP, handleRecordEndNotUserStop as any)
+    }
+  }, [streamConfig, timer])
 
   return (
     <>
