@@ -11,6 +11,7 @@ import { getTwitchLiveUrlsPlugin } from './plugins/twitch'
 import { getTiktokLiveUrlsPlugin } from './plugins/tiktok'
 import { getWeiboLiveUrlsPlugin } from './plugins/weibo'
 import { getHuaJiaoLiveUrlsPlugin } from './plugins/huajiao'
+import { getTaobaoLiveUrlsPlugin } from './plugins/taobao'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -37,7 +38,8 @@ const supportPlatform = [
   'twitch',
   'tiktok',
   'weibo',
-  'huajiao'
+  'huajiao',
+  'taobao'
 ]
 const platformToFnMap = {
   douyin: {
@@ -92,6 +94,12 @@ const platformToFnMap = {
     getRoomIdByUrl(url) {
       return getPathnameItem(url, 2)
     }
+  },
+  taobao: {
+    getLiveUrlsFn: getTaobaoLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      return new URL(url).searchParams.get('liveId')
+    }
   }
 }
 /**
@@ -121,6 +129,11 @@ export async function getLiveUrls(info) {
   }
 
   const { getLiveUrlsFn, getRoomIdByUrl } = platformToFnMap[platform]
+  if (!getLiveUrlsFn || !getRoomIdByUrl) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_SUPPORT
+    }
+  }
   const roomId = getRoomIdByUrl(roomUrl)
   log('roomId:', roomId)
 

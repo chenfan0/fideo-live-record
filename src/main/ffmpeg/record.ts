@@ -169,6 +169,7 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
     })
     .on('progress', (progress) => {
       setRecordStreamFfmpegProgressInfo(title, progress)
+      log('record live progress: ', progress)
     })
     .on('end', async (...args) => {
       const msg = args.join(' ')
