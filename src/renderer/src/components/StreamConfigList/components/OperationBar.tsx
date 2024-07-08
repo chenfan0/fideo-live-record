@@ -15,13 +15,14 @@ import darkSettingIcon from '@/assets/images/dark/setting.svg'
 import lightSettingIcon from '@/assets/images/light/setting.svg'
 import darkDeleteIcon from '@/assets/images/dark/close.svg'
 import lightDeleteIcon from '@/assets/images/light/close.svg'
-import { StreamStatus } from '@renderer/lib/utils'
+import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
 
 import { useToast } from '@renderer/hooks/useToast'
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
 import { RECORD_END_NOT_USER_STOP } from '../../../../../const'
 import emitter from '@/lib/bus'
+import { useDefaultSettingsStore } from '../../../store/useDefaultSettingsStore'
 
 interface OperationBarProps {
   streamConfig: IStreamConfig
@@ -31,6 +32,7 @@ export default function OperationBar(props: OperationBarProps) {
   const timer = useRef<NodeJS.Timeout>()
   const { streamConfig } = props
   const { t } = useTranslation()
+  const defaultSettingsConfig = useDefaultSettingsStore((state) => state.defaultSettingsConfig)
   const { toast } = useToast()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -64,6 +66,13 @@ export default function OperationBar(props: OperationBarProps) {
         title: streamConfig.title,
         description: t('start_record')
       })
+      if (defaultSettingsConfig.xizhiKey) {
+        useXizhiToPushNotification({
+          key: defaultSettingsConfig.xizhiKey,
+          title: streamConfig.title,
+          content: t('start_record')
+        })
+      }
       return
     }
 
@@ -73,11 +82,18 @@ export default function OperationBar(props: OperationBarProps) {
         handleStartRecord(false)
       }, 1000 * streamConfig.interval)
 
-      isFirst &&
+      if (isFirst) {
         toast({
           title: streamConfig.title,
           description: t('error.start_record.not_urls')
         })
+        defaultSettingsConfig.xizhiKey &&
+          useXizhiToPushNotification({
+            key: defaultSettingsConfig.xizhiKey,
+            title: streamConfig.title,
+            content: t('error.start_record.not_urls')
+          })
+      }
       await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.MONITORING },
         streamConfig.title
@@ -96,6 +112,12 @@ export default function OperationBar(props: OperationBarProps) {
       description: t(errMessage),
       variant: 'destructive'
     })
+    defaultSettingsConfig.xizhiKey &&
+      useXizhiToPushNotification({
+        key: defaultSettingsConfig.xizhiKey,
+        title: streamConfig.title,
+        content: t(errMessage)
+      })
   }
 
   const handlePlayClick = () => {

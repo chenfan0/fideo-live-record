@@ -11,7 +11,9 @@ export default {
         language: 'Language',
         language_placeholder: 'Please select a language',
         directory: 'Storage Directory',
-        directory_placeholder: 'Please select a storage directory'
+        directory_placeholder: 'Please select a storage directory',
+        xizhi_key: 'Xizhi API Key (For WeChat Push)',
+        xizhi_key_placeholder: 'Please enter the Xizhi API Key'
       },
       stream_config: {
         confirm: 'Confirm',
@@ -110,7 +112,9 @@ export default {
         language: '语言',
         language_placeholder: '请选择语言',
         directory: '存储目录',
-        directory_placeholder: '请选择存储目录'
+        directory_placeholder: '请选择存储目录',
+        xizhi_key: '息知API Key(用于微信推送)',
+        xizhi_key_placeholder: '请输入息知API Key'
       },
       stream_config: {
         confirm: '确认',

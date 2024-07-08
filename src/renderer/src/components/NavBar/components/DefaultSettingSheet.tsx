@@ -13,7 +13,8 @@ import { useEffect } from 'react'
 
 const formSchema = z.object({
   directory: z.string(),
-  lang: z.string()
+  lang: z.string(),
+  xizhiKey: z.optional(z.string())
 })
 
 interface StreamConfigSheetProps {
@@ -51,7 +52,6 @@ export default function DefaultSettingSheet(props: StreamConfigSheetProps) {
   const handleSetSheetOpen = async (status: boolean, trigger = false) => {
     const formValues = form.getValues() as IDefaultDefaultSettingsConfig
     if (trigger) {
-      console.log('trigger', formValues)
       setDefaultSettingsConfig(formValues)
     }
 
@@ -108,6 +108,22 @@ export default function DefaultSettingSheet(props: StreamConfigSheetProps) {
                           <SelectItem value="cn">中文</SelectItem>
                         </SelectContent>
                       </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="xizhiKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('default_settings.xizhi_key')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('default_settings.xizhi_key_placeholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

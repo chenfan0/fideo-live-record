@@ -21,3 +21,14 @@ export function checkUrlValid(url: string): boolean {
     return false
   }
 }
+
+export function useXizhiToPushNotification(options: {
+  key: string
+  title: string
+  content?: string
+}) {
+  const isHide = document.hidden
+  if (!isHide) return
+  const titleAndContent = options.content ? `${options.title} - ${options.content}` : options.title
+  fetch(`${options.key}?title=${encodeURIComponent(titleAndContent)}`)
+}

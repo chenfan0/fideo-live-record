@@ -10,13 +10,17 @@ import emitter from '@/lib/bus'
 import { RECORD_END_NOT_USER_STOP } from '../../../../const'
 
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
+import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
-import { StreamStatus } from '@renderer/lib/utils'
+import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 
 export default function StreamConfigList() {
   const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
-  const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => state)
+  const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => ({
+    streamConfigList: state.streamConfigList,
+    updateStreamConfig: state.updateStreamConfig
+  }))
   const { updateFfmpegProgressInfo } = useFfmpegProgressInfoStore((state) => state)
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -43,6 +47,7 @@ export default function StreamConfigList() {
 
     window.api.onStreamRecordEnd(async (title, code) => {
       const { streamConfigList, updateStreamConfig } = useStreamConfigStore.getState()
+      const xiZhiKey = useDefaultSettingsStore.getState().defaultSettingsConfig.xizhiKey
       const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)
 
       if (index === -1) {
@@ -100,6 +105,13 @@ export default function StreamConfigList() {
         title: streamConfig.title,
         description: t(message)
       })
+      if (!isStopByUser && xiZhiKey) {
+        useXizhiToPushNotification({
+          key: xiZhiKey,
+          title: streamConfig.title,
+          content: t(message)
+        })
+      }
 
       await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.NOT_STARTED },

@@ -15,6 +15,7 @@ type Lang = 'en' | 'cn'
 interface IDefaultDefaultSettingsConfig {
   directory: string
   lang: Lang
+  xizhiKey?: string
 }
 
 type IFfmpegProgressInfo = Record<

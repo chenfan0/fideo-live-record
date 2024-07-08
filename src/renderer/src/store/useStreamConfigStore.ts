@@ -23,7 +23,6 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
     const newStreamConfigList = [streamConfig, ...get().streamConfigList]
     await localForage.setItem('streamConfigList', newStreamConfigList)
     set(() => {
-      localForage.setItem('streamConfigList', newStreamConfigList)
       return { streamConfigList: newStreamConfigList }
     })
   },
