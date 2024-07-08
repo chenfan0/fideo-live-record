@@ -37,6 +37,10 @@ sudo xattr -r -d com.apple.quarantine /Applications/Fideo.app
 #### 🍪 如何获取cookie
 - [获取cookie教程](https://www.bilibili.com/video/BV1G24y1o75g/?spm_id_from=333.337.search-card.all.click&vd_source=7175c3866fe9ca259066ef7898056268)
 
+#### 🛰 如何微信推送
+- 微信推送的功能使用的是 [息知](https://xz.qqoq.net/) 的API，需要自行注册账号并获取API Key。
+- 在默认设置中填入 **息知** 的API Key即可。
+
 ## ❓ 如何在本地运行？
 ```shell
 pnpm install
