@@ -39,6 +39,10 @@ sudo xattr -r -d com.apple.quarantine /Applications/Fideo.app
 #### 🍪 How to Get Cookie
 - [Cookie Acquisition Tutorial](https://www.youtube.com/watch?v=sz07F5inaFg)
 
+#### 🛰 How to Push Notifications via WeChat
+- The WeChat push notification feature uses the API from [Xizhi](https://xz.qqoq.net/). You need to register an account and obtain an API Key.
+- Enter the **Xizhi** API Key in the default settings to use it.
+
 ## ❓How to Run Locally?
 ```shell
 pnpm install
