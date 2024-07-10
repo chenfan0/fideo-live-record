@@ -13,6 +13,7 @@ import { getWeiboLiveUrlsPlugin } from './plugins/weibo'
 import { getHuaJiaoLiveUrlsPlugin } from './plugins/huajiao'
 import { getTaobaoLiveUrlsPlugin } from './plugins/taobao'
 import { getBigoLiveUrlsPlugin } from './plugins/bigo'
+import { getYYLiveUrlsPlugin } from './plugins/yy'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -41,7 +42,8 @@ const supportPlatform = [
   'weibo',
   'huajiao',
   'taobao',
-  'bigo'
+  'bigo',
+  'yy'
 ]
 const platformToFnMap = {
   douyin: {
@@ -110,6 +112,10 @@ const platformToFnMap = {
         ? getPathnameItem(url, 2)
         : getPathnameItem(url)
     }
+  },
+  yy: {
+    getLiveUrlsFn: getYYLiveUrlsPlugin,
+    getRoomIdByUrl: getPathnameItem
   }
 }
 /**
