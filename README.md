@@ -19,6 +19,7 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] [Weibo](https://weibo.com/l/wblive/p/show/1022:2321325052506609680949)
 - [x] [Douyu](https://www.douyu.com/)
 - [x] [Taobao](https://tbzb.taobao.com/)
+- [x] [Bigo](https://www.bigo.tv/)
 - [ ] [Huya](https://www.huya.com/)
 
 

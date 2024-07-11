@@ -17,6 +17,7 @@
 - [x] [微博](https://weibo.com/l/wblive/p/show/1022:2321325052506609680949)
 - [x] [斗鱼](https://www.douyu.com/)
 - [x] [淘宝](https://tbzb.taobao.com/)
+- [x] [Bigo](https://www.bigo.tv/)
 - [ ] [虎牙](https://www.huya.com/)
 
 
