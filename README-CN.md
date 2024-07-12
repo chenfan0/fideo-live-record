@@ -18,6 +18,7 @@
 - [x] [斗鱼](https://www.douyu.com/)
 - [x] [淘宝](https://tbzb.taobao.com/)
 - [x] [Bigo](https://www.bigo.tv/)
+- [x] [YY](https://www.yy.com/)
 - [ ] [虎牙](https://www.huya.com/)
 
 

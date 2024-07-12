@@ -20,6 +20,7 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] [Douyu](https://www.douyu.com/)
 - [x] [Taobao](https://tbzb.taobao.com/)
 - [x] [Bigo](https://www.bigo.tv/)
+- [x] [YY](https://www.yy.com/)
 - [ ] [Huya](https://www.huya.com/)
 
 
