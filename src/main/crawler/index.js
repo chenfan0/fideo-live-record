@@ -4,7 +4,7 @@ import { getBilibiliLiveUrlsPlugin } from './plugins/bilibili'
 import { getCCLiveUrlsPlugin } from './plugins/cc'
 import { getDouYinLiveUrlsPlugin } from './plugins/douyin'
 import { getDouyuLiveUrlsPlugin } from './plugins/douyu'
-// import { getHuyaLiveUrlPlugin } from './plugins/huya'
+import { getHuyaLiveUrlsPlugin } from './plugins/huya'
 import { getKuaishouLiveUrlsPlugin } from './plugins/kuaishou'
 import { getYoutubeLiveUrlsPlugin } from './plugins/youtube'
 import { getTwitchLiveUrlsPlugin } from './plugins/twitch'
@@ -39,7 +39,8 @@ const supportPlatform = [
   'tiktok',
   'weibo',
   'huajiao',
-  'taobao'
+  'taobao',
+  'huya'
 ]
 const platformToFnMap = {
   douyin: {
@@ -55,7 +56,7 @@ const platformToFnMap = {
     getRoomIdByUrl: getPathnameItem
   },
   huya: {
-    // getLiveUrlFn: getHuyaLiveUrlPlugin,
+    getLiveUrlsFn: getHuyaLiveUrlsPlugin,
     getRoomIdByUrl: getPathnameItem
   },
   douyu: {
