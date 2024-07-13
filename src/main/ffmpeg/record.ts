@@ -143,12 +143,21 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
 
   setRecordStreamFfmpegProcessMap(title, ffmpegProcess)
 
+  ffmpegProcess.inputOption(
+    '-headers',
+    'User-Agent: Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Mobile Safari/537.36'
+  )
+  ffmpegProcess.inputOptions([
+    '-reconnect 1',
+    '-reconnect_streamed 1',
+    '-reconnect_delay_max 5',
+    '-timeout 30000000'
+  ])
   if (proxy) {
-    process.env['http_proxy'] = proxy || ''
-    ffmpegProcess.outputOptions('-http_proxy', proxy)
+    ffmpegProcess.inputOption('-http_proxy', proxy)
   }
   if (cookie) {
-    ffmpegProcess.outputOptions('-headers', `Cookie: ${cookie}`)
+    ffmpegProcess.inputOption('-headers', `Cookie: ${cookie}`)
   }
   if (secondSegmentTime > 0) {
     ffmpegProcess.outputOptions([
@@ -161,8 +170,8 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
   ffmpegProcess
     .videoCodec('copy')
     .audioCodec('copy')
-    .on('start', () => {
-      log('record live start')
+    .on('start', (...args) => {
+      log('record live start', args.join(' '))
       _resolve({
         code: SUCCESS_CODE
       })
