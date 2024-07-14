@@ -68,6 +68,13 @@ async function baseGetTiktokLiveUrlsPlugin(roomId, others = {}) {
       liveUrls = [flv, hls].filter(Boolean)
     }
   }
+
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
+
   return {
     code: SUCCESS_CODE,
     liveUrls

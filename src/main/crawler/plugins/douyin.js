@@ -3,7 +3,7 @@ import debug from 'debug'
 import { request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
-import { SUCCESS_CODE } from '../../../code'
+import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-douyin')
 
@@ -33,6 +33,12 @@ async function baseGetDouYinLiveUrlsPlugin(roomId, others = {}) {
   const main = streamData['origin']?.main
   main.flv && liveUrls.push(main.flv)
   main.hls && liveUrls.push(main.hls)
+
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
 
   return {
     code: SUCCESS_CODE,

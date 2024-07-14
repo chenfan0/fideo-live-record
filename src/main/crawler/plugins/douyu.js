@@ -67,6 +67,13 @@ async function baseGetDouyuLiveUrlsPlugin(roomId, others = {}) {
       const liveUrl = rtmp_url + '/' + rtmp_live
       liveUrls.push(liveUrl)
     }
+
+    if (liveUrls.length === 0) {
+      return {
+        code: CRAWLER_ERROR_CODE.NOT_URLS
+      }
+    }
+
     return {
       code: SUCCESS_CODE,
       liveUrls

@@ -3,7 +3,7 @@ import debug from 'debug'
 import { request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
-import { SUCCESS_CODE } from '../../../code'
+import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-kuaishou')
 
@@ -47,6 +47,12 @@ async function baseGetKuaishouLiveUrlsPlugin(roomId, others = {}) {
       }
     }
     break
+  }
+
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
   }
 
   return {

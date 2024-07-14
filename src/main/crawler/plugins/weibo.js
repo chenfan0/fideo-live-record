@@ -35,9 +35,19 @@ async function baseGetWeiboLiveUrlsPlugin(roomId, others = {}) {
   const hls = data.live_origin_hls_url
   const flv = data.live_origin_flv_url
 
+  const liveUrls = []
+  flv && liveUrls.push(flv)
+  hls && liveUrls.push(hls)
+
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
+
   return {
-    liveUrls: [flv, hls],
-    code: SUCCESS_CODE
+    code: SUCCESS_CODE,
+    liveUrls: [flv, hls]
   }
 }
 

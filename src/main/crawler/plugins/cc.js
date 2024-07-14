@@ -3,7 +3,7 @@ import debug from 'debug'
 import { request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
-import { SUCCESS_CODE } from '../../../code'
+import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-cc')
 
@@ -45,6 +45,11 @@ async function baseGetCCLiveUrlsPlugin(roomId, others = {}) {
     )
   }
   await Promise.all(p)
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
   return {
     code: SUCCESS_CODE,
     liveUrls

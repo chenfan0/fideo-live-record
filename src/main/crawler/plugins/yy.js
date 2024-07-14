@@ -3,7 +3,7 @@ import debug from 'debug'
 import { request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
-import { SUCCESS_CODE } from '../../../code'
+import { SUCCESS_CODE, CRAWLER_ERROR_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-yy')
 
@@ -80,6 +80,12 @@ async function baseGetYYLiveUrlsPlugin(roomId, others = {}) {
     const url = stream.cdn_info?.url
     if (!url) continue
     liveUrls.push(url)
+  }
+
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
   }
 
   return {
