@@ -19,7 +19,7 @@
 - [x] [淘宝](https://tbzb.taobao.com/)
 - [x] [Bigo](https://www.bigo.tv/)
 - [x] [YY](https://www.yy.com/)
-- [ ] [虎牙](https://www.huya.com/)
+- [x] [虎牙](https://www.huya.com/)
 
 
 ## 📚 使用说明
