@@ -12,9 +12,25 @@ import lightSettingIcon from '@/assets/images/light/setting.svg'
 import darkLogo from '@/assets/images/dark/logo.png'
 import lightLogo from '@/assets/images/light/logo.png'
 import DefaultSettingSheet from './components/DefaultSettingSheet'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem
+} from '@renderer/shadcn/ui/select'
+
+import { useNavSelectedStatusStore } from '@renderer/store/useNavSelectedStatusStore'
 
 export default function NavBar() {
   const { t } = useTranslation()
+
+  const { navSelectedStatus, setNavSelectedStatus } = useNavSelectedStatusStore((state) => ({
+    navSelectedStatus: state.navSelectedStatus,
+    setNavSelectedStatus: state.setNavSelectedStatus
+  }))
+
   const [createSheetOpen, setCreateSheetOpen] = useState(false)
   const [settingSheetOpen, setSettingSheetOpen] = useState(false)
 
@@ -24,12 +40,33 @@ export default function NavBar() {
 
   return (
     <div className="flex items-center justify-between px-[24px]">
-      <UseThemeIcon
-        dark={darkLogo}
-        light={lightLogo}
-        className="w-[64px] cursor-pointer select-none"
-        handleClick={handleLogoClick}
-      />
+      <div className="flex items-center gap-8">
+        <UseThemeIcon
+          dark={darkLogo}
+          light={lightLogo}
+          className="w-[64px] cursor-pointer select-none"
+          handleClick={handleLogoClick}
+        />
+
+        <Select
+          defaultValue={navSelectedStatus}
+          key={navSelectedStatus}
+          onValueChange={(val) => {
+            setNavSelectedStatus(val)
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="-1">{t('stream_config.all')}</SelectItem>
+              <SelectItem value="2">{t('stream_config.monitoring')}</SelectItem>
+              <SelectItem value="3">{t('stream_config.recording')}</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="flex items-center gap-[12px]">
         <UseThemeIcon

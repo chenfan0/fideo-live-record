@@ -19,5 +19,4 @@ export const FORCE_CLOSE_WINDOW = 'FORCE_CLOSE_WINDOW'
 
 export const RECORD_DUMMY_PROCESS = { kill: () => {} }
 
-
 export const RECORD_END_NOT_USER_STOP = 'RECORD_END_NOT_USER_STOP'

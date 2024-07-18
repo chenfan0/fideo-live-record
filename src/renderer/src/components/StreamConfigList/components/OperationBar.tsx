@@ -145,6 +145,10 @@ export default function OperationBar(props: OperationBarProps) {
     }
   }, [streamConfig, timer])
 
+  useEffect(() => {
+    return () => timer.current && clearTimeout(timer.current)
+  }, [])
+
   return (
     <>
       <div className="flex absolute right-0 gap-2">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMount } from 'react-use'
 import { useTranslation } from 'react-i18next'
 
@@ -11,16 +11,28 @@ import { RECORD_END_NOT_USER_STOP } from '../../../../const'
 
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
+import { useNavSelectedStatusStore } from '@renderer/store/useNavSelectedStatusStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
 import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 
 export default function StreamConfigList() {
   const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
+
+  const navSelectedStatus = useNavSelectedStatusStore((state) => state.navSelectedStatus)
   const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => ({
     streamConfigList: state.streamConfigList,
     updateStreamConfig: state.updateStreamConfig
   }))
+  const selectedStreamConfigTitleList = useMemo(() => {
+    if (navSelectedStatus === '-1') {
+      return streamConfigList.map((stream) => stream.title)
+    }
+    return streamConfigList
+      .filter((streamConfig) => streamConfig.status === Number(navSelectedStatus))
+      .map((stream) => stream.title)
+  }, [streamConfigList, navSelectedStatus])
+
   const { updateFfmpegProgressInfo } = useFfmpegProgressInfoStore((state) => state)
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -144,7 +156,12 @@ export default function StreamConfigList() {
       {
         <div className="stream-config-list flex flex-col gap-[12px] p-[24px] overflow-y-auto h-[calc(100vh-80px)]">
           {streamConfigList.map((streamConfig) => (
-            <StreamConfigCard key={streamConfig.title} streamConfig={streamConfig} />
+            <div
+              key={streamConfig.title}
+              className={selectedStreamConfigTitleList.includes(streamConfig.title) ? '' : 'hidden'}
+            >
+              <StreamConfigCard streamConfig={streamConfig} />
+            </div>
           ))}
         </div>
       }

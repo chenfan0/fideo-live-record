@@ -10,6 +10,7 @@ import Dialog from '@/components/Dialog'
 
 import { useStreamConfigStore } from './store/useStreamConfigStore'
 import { useDefaultSettingsStore } from './store/useDefaultSettingsStore'
+import { useNavSelectedStatusStore } from './store/useNavSelectedStatusStore'
 
 function App(): JSX.Element {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
@@ -23,6 +24,9 @@ function App(): JSX.Element {
       defaultSettingsConfig: state.defaultSettingsConfig
     })
   )
+  const { initData: initNavSelectedStatus } = useNavSelectedStatusStore((state) => ({
+    initData: state.initData
+  }))
 
   useMount(() => {
     const titleBar = document.getElementById('title-bar')
@@ -36,6 +40,7 @@ function App(): JSX.Element {
   useEffect(() => {
     initStreamConfigData()
     initDefaultSettingsData()
+    initNavSelectedStatus()
   }, [])
 
   useEffect(() => {

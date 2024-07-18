@@ -19,7 +19,7 @@ export function captureError(fn) {
 
       if (message.includes('timeout')) {
         return {
-          code: CRAWLER_ERROR_CODE.TIME_OUT
+          code: CRAWLER_ERROR_CODE.TIMEOUT
         }
       }
 

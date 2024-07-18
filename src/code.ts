@@ -9,7 +9,7 @@ export const CRAWLER_ERROR_CODE = {
   NOT_SUPPORT: 1, // not support the platform
   INVALID_PROXY: 2, // invalid proxy
   INVALID_URL: 3, // invalid url
-  TIME_OUT: 4, // timeout
+  TIMEOUT: 4, // timeout
   FORBIDDEN: 5,
   CURRENT_LINE_ERROR: 6, // current line error
   COOKIE_EXPIRED: 7,
@@ -39,8 +39,8 @@ export const errorCodeToI18nMessage = (code: number, prefix: string) => {
     case CRAWLER_ERROR_CODE.INVALID_URL:
       message += 'invalid_url'
       break
-    case CRAWLER_ERROR_CODE.TIME_OUT:
-      message += 'time_out'
+    case CRAWLER_ERROR_CODE.TIMEOUT:
+      message += 'timeout'
       break
     case CRAWLER_ERROR_CODE.FORBIDDEN:
       message += 'forbidden'
