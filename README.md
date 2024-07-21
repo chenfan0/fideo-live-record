@@ -22,6 +22,7 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] [Bigo](https://www.bigo.tv/)
 - [x] [YY](https://www.yy.com/)
 - [x] [Huya](https://www.huya.com/)
+- [x] [JingDong](https://live.jd.com/)
 
 
 ## 📚 User Guide

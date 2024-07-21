@@ -20,6 +20,7 @@
 - [x] [Bigo](https://www.bigo.tv/)
 - [x] [YY](https://www.yy.com/)
 - [x] [虎牙](https://www.huya.com/)
+- [x] [京东](https://live.jd.com/)
 
 
 ## 📚 使用说明
