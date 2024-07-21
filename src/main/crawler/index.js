@@ -14,6 +14,7 @@ import { getHuaJiaoLiveUrlsPlugin } from './plugins/huajiao'
 import { getTaobaoLiveUrlsPlugin } from './plugins/taobao'
 import { getBigoLiveUrlsPlugin } from './plugins/bigo'
 import { getYYLiveUrlsPlugin } from './plugins/yy'
+import { getJDLiveUrlsPlugin } from './plugins/jd'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -44,7 +45,8 @@ const supportPlatform = [
   'taobao',
   'bigo',
   'yy',
-  'huya'
+  'huya',
+  'lives.jd.com'
 ]
 const platformToFnMap = {
   douyin: {
@@ -117,6 +119,14 @@ const platformToFnMap = {
   yy: {
     getLiveUrlsFn: getYYLiveUrlsPlugin,
     getRoomIdByUrl: getPathnameItem
+  },
+  'lives.jd.com': {
+    getLiveUrlsFn: getJDLiveUrlsPlugin,
+    getRoomIdByUrl(url) {
+      const startIndex = url.indexOf('#/')
+      const endIndex = url.indexOf('?', startIndex)
+      return url.slice(startIndex + 2, endIndex)
+    }
   }
 }
 /**
