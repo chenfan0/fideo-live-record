@@ -8,7 +8,13 @@ import { SUCCESS_CODE, CRAWLER_ERROR_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-douyu')
 
-async function baseGetDouyuLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  const { searchParams, pathname } = new URL(url)
+  return searchParams.get('rid') || pathname.split('/')[1]
+}
+
+async function baseGetDouyuLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)

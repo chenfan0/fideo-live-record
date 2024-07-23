@@ -20,14 +20,45 @@ import { CRAWLER_ERROR_CODE } from '../../code'
 
 const log = debug('fideo-crawler')
 
-const getPathnameItem = (url, index = 1) => {
-  const { pathname } = new URL(url)
-  return pathname.split('/')[index]
-}
+const hostnameToPlatformCrawlerFnMap = {
+  'www.youtube.com': getYoutubeLiveUrlsPlugin,
+  'youtube.com': getYoutubeLiveUrlsPlugin,
 
-const getYoutubeRoomId = (url) => {
-  const { searchParams } = new URL(url)
-  return searchParams.get('v')
+  'www.twitch.tv': getTwitchLiveUrlsPlugin,
+  'twitch.tv': getTwitchLiveUrlsPlugin,
+
+  'www.tiktok.com': getTiktokLiveUrlsPlugin,
+  'tiktok.com': getTiktokLiveUrlsPlugin,
+
+  'live.douyin.com': getDouYinLiveUrlsPlugin,
+  'v.douyin.com': getDouYinLiveUrlsPlugin,
+
+  'live.kuaishou.com': getKuaishouLiveUrlsPlugin,
+  'live.bilibili.com': getBilibiliLiveUrlsPlugin,
+
+  'cc.163.com': getCCLiveUrlsPlugin,
+
+  'www.huajiao.com': getHuaJiaoLiveUrlsPlugin,
+  'huajiao.com': getHuaJiaoLiveUrlsPlugin,
+
+  'weibo.com': getWeiboLiveUrlsPlugin,
+  'www.weibo.com': getWeiboLiveUrlsPlugin,
+
+  'www.douyu.com': getDouyuLiveUrlsPlugin,
+  'douyu.com': getDouyuLiveUrlsPlugin,
+
+  'tbzb.taobao.com': getTaobaoLiveUrlsPlugin,
+
+  'www.bigo.tv': getBigoLiveUrlsPlugin,
+  'bigo.tv': getBigoLiveUrlsPlugin,
+
+  'www.yy.com': getYYLiveUrlsPlugin,
+  'yy.com': getYYLiveUrlsPlugin,
+
+  'www.huya.com': getHuyaLiveUrlsPlugin,
+  'huya.com': getHuyaLiveUrlsPlugin,
+
+  'lives.jd.com': getJDLiveUrlsPlugin
 }
 
 const supportPlatform = [
@@ -48,87 +79,6 @@ const supportPlatform = [
   'huya',
   'lives.jd.com'
 ]
-const platformToFnMap = {
-  douyin: {
-    getLiveUrlsFn: getDouYinLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  bilibili: {
-    getLiveUrlsFn: getBilibiliLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  cc: {
-    getLiveUrlsFn: getCCLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  huya: {
-    getLiveUrlsFn: getHuyaLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  douyu: {
-    getLiveUrlsFn: getDouyuLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      const { searchParams } = new URL(url)
-      return searchParams.get('rid') || getPathnameItem(url)
-    }
-  },
-  kuaishou: {
-    getLiveUrlsFn: getKuaishouLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      return getPathnameItem(url, 2)
-    }
-  },
-  youtube: {
-    getLiveUrlsFn: getYoutubeLiveUrlsPlugin,
-    getRoomIdByUrl: getYoutubeRoomId
-  },
-  twitch: {
-    getLiveUrlsFn: getTwitchLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  tiktok: {
-    getLiveUrlsFn: getTiktokLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  weibo: {
-    getLiveUrlsFn: getWeiboLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      return getPathnameItem(url, 5)
-    }
-  },
-  huajiao: {
-    getLiveUrlsFn: getHuaJiaoLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      return getPathnameItem(url, 2)
-    }
-  },
-  taobao: {
-    getLiveUrlsFn: getTaobaoLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      return new URL(url).searchParams.get('liveId')
-    }
-  },
-  bigo: {
-    getLiveUrlsFn: getBigoLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      return Number.isNaN(Number(getPathnameItem(url)))
-        ? getPathnameItem(url, 2)
-        : getPathnameItem(url)
-    }
-  },
-  yy: {
-    getLiveUrlsFn: getYYLiveUrlsPlugin,
-    getRoomIdByUrl: getPathnameItem
-  },
-  'lives.jd.com': {
-    getLiveUrlsFn: getJDLiveUrlsPlugin,
-    getRoomIdByUrl(url) {
-      const startIndex = url.indexOf('#/')
-      const endIndex = url.indexOf('?', startIndex)
-      return url.slice(startIndex + 2, endIndex)
-    }
-  }
-}
 /**
  *
  * @param {{ url: string, proxy?: string, cookie?: string }} info
@@ -146,25 +96,16 @@ export async function getLiveUrls(info) {
     }
   }
 
-  const platform = supportPlatform.find((p) => host.includes(p))
-  log('platform:', platform)
+  const getLiveUrlsFn = hostnameToPlatformCrawlerFnMap[host]
 
-  if (!platform) {
+  // TODO: 判断是否是支持的平台但是url不对，提供更好的错误提示
+  if (!getLiveUrlsFn) {
     return {
       code: CRAWLER_ERROR_CODE.NOT_SUPPORT
     }
   }
 
-  const { getLiveUrlsFn, getRoomIdByUrl } = platformToFnMap[platform]
-  if (!getLiveUrlsFn || !getRoomIdByUrl) {
-    return {
-      code: CRAWLER_ERROR_CODE.NOT_SUPPORT
-    }
-  }
-  const roomId = getRoomIdByUrl(roomUrl)
-  log('roomId:', roomId)
-
-  const res = await getLiveUrlsFn(roomId, { proxy, cookie })
+  const res = await getLiveUrlsFn(roomUrl, { proxy, cookie })
   log('res:', res)
   return res
 }

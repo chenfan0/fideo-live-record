@@ -7,7 +7,14 @@ import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-jd')
 
-async function baseGetJDLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  const startIndex = url.indexOf('#/')
+  const endIndex = url.indexOf('?', startIndex)
+  return url.slice(startIndex + 2, endIndex)
+}
+
+async function baseGetJDLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)

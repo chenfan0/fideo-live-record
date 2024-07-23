@@ -224,7 +224,12 @@ function f(a) {
   return b.join('&')
 }
 
-async function baseGetTaobaoLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  return new URL(url).searchParams.get('liveId')
+}
+
+async function baseGetTaobaoLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)

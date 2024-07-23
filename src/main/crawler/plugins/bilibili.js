@@ -7,7 +7,12 @@ import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-bilibili')
 
-async function baseGetBilibiliLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  return new URL(url).pathname.split('/')[1]
+}
+
+async function baseGetBilibiliLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
   const { cookie, proxy } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
@@ -32,6 +37,7 @@ async function baseGetBilibiliLiveUrlsPlugin(roomId, others = {}) {
 
       const maxQn = Math.max(...accept_qn)
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const [_, info] of urlInfo.entries()) {
         let selectedHost = info.host
         let selectedExtra = info.extra

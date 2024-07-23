@@ -7,7 +7,12 @@ import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-youtube')
 
-async function baseGetYoutubeLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  return new URL(url).searchParams.get('v')
+}
+
+async function baseGetYoutubeLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)

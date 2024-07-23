@@ -7,7 +7,13 @@ import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-cc')
 
-async function baseGetCCLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  return new URL(url).pathname.split('/')[1]
+}
+
+async function baseGetCCLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)

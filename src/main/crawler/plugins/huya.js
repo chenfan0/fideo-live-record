@@ -11,7 +11,12 @@ import { SUCCESS_CODE, CRAWLER_ERROR_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-huya')
 
-async function baseGetHuyaLiveUrlsPlugin(roomId, others = {}) {
+function getRoomIdByUrl(url) {
+  return new URL(url).pathname.split('/')[1]
+}
+
+async function baseGetHuyaLiveUrlsPlugin(roomUrl, others = {}) {
+  let roomId = getRoomIdByUrl(roomUrl)
   const { cookie, proxy } = others
   log('roomId: ', roomId, 'cookie: ', cookie, 'proxy: ', proxy)
 
