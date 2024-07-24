@@ -1,18 +1,74 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { request, MOBILE_USER_AGENT } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
 
 const log = debug('fideo-crawler-douyin')
 
-function getRoomIdByUrl(url) {
-  return new URL(url).pathname.split('/')[1]
+async function baseGetMobileDouYinLiveUrlsPlugin(roomUrl, others = {}) {
+  // 这里直接用fetch然后取消重定向，获取location
+  const location = (
+    await fetch(roomUrl, {
+      redirect: 'manual'
+    })
+  ).headers.get('location')
+
+  const url = new URL(location)
+  const roomId = url.pathname.split('/').pop()
+
+  const { proxy, cookie } = others
+
+  log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
+
+  const secUserId = url.searchParams.get('sec_user_id')
+
+  const data = (
+    await request(
+      `https://webcast.amemv.com/webcast/room/reflow/info/?verifyFp=verify_lxj5zv70_7szNlAB7_pxNY_48Vh_ALKF_GA1Uf3yteoOY&type_id=0&live_id=1&version_code=99.99.99&app_id=1128&room_id=${roomId}&sec_user_id=${secUserId}`,
+      {
+        headers: {
+          'User-Agent': MOBILE_USER_AGENT,
+          cookie
+        },
+        proxy
+      }
+    )
+  ).data
+
+  // console.dir(data, { depth: null })
+
+  const pullData = data.data.room.stream_url.live_core_sdk_data.pull_data
+  const status = data.data.room.status
+
+  if (status !== 2) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
+
+  const streamData = JSON.parse(pullData.stream_data).data
+
+  const liveUrls = []
+  const main = streamData['origin']?.main
+  main.flv && liveUrls.push(main.flv)
+  main.hls && liveUrls.push(main.hls)
+
+  if (liveUrls.length === 0) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
+
+  return {
+    code: SUCCESS_CODE,
+    liveUrls
+  }
 }
 
-async function baseGetDouYinLiveUrlsPlugin(roomUrl, others = {}) {
-  const roomId = getRoomIdByUrl(roomUrl)
+async function baseGetDesktopDouYinLiveUrlsPlugin(roomUrl, others = {}) {
+  const roomId = new URL(roomUrl).pathname.split('/')[1]
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
@@ -48,6 +104,15 @@ async function baseGetDouYinLiveUrlsPlugin(roomUrl, others = {}) {
   return {
     code: SUCCESS_CODE,
     liveUrls
+  }
+}
+
+async function baseGetDouYinLiveUrlsPlugin(roomUrl, others = {}) {
+  const isDesktopUrl = new URL(roomUrl).host === 'live.douyin.com'
+  if (isDesktopUrl) {
+    return baseGetDesktopDouYinLiveUrlsPlugin(roomUrl, others)
+  } else {
+    return baseGetMobileDouYinLiveUrlsPlugin(roomUrl, others)
   }
 }
 

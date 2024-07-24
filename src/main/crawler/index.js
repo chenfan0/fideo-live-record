@@ -61,6 +61,7 @@ const hostnameToPlatformCrawlerFnMap = {
   'lives.jd.com': getJDLiveUrlsPlugin
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const supportPlatform = [
   'douyin',
   'bilibili',
