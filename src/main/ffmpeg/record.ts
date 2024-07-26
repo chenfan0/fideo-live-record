@@ -147,12 +147,6 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
     '-headers',
     'User-Agent: Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Mobile Safari/537.36'
   )
-  ffmpegProcess.inputOptions([
-    '-reconnect 1',
-    '-reconnect_streamed 1',
-    '-reconnect_delay_max 5',
-    '-timeout 30000000'
-  ])
   if (proxy) {
     ffmpegProcess.inputOption('-http_proxy', proxy)
   }
