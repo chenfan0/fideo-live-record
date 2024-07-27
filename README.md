@@ -22,7 +22,7 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] [Bigo](https://www.bigo.tv/)
 - [x] [YY](https://www.yy.com/)
 - [x] [Huya](https://www.huya.com/)
-- [x] [JingDong](https://live.jd.com/)
+- [x] [JingDong](https://lives.jd.com/?gx=RnAomTM2bDTeycsRqY1xDB5XAqGk-_s&gxd=RnAowmELOTLbyMkU_td0X9meMe1XxD0&ad_od=share&utm_source=androidapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=Wxfriends#/26510406?origin=2&appid=jdzb&sharer=jd_69imfpj372dqx7&user=zO8hBVAu84FG84VVLu%2BpjzHlo69Mkg6%2B)
 
 
 ## 📚 User Guide
