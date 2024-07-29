@@ -51,6 +51,9 @@ pnpm install
 ```shell
 pnpm debug
 ```
+## Star 历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=chenfan0/fideo-live-record&type=Date)](https://star-history.com/#chenfan0/fideo-live-record&Date)
 
 ## 免责申明
 本软件“fideo-live-record”仅用于个人学习和研究目的。用户在使用本软件时，应遵守相关平台的服务条款和当地法律法规。任何由于使用本软件导致的法律纠纷或责任均由用户自行承担。开发者对使用本软件产生的任何直接或间接损失不承担任何责任。本软件不保证完全无故障运行，用户需自行承担使用本软件的风险。
