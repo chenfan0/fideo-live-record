@@ -8,6 +8,7 @@ interface IStreamConfigStore {
   addStreamConfig: (streamConfig: IStreamConfig) => Promise<void>
   updateStreamConfig: (streamConfig: IStreamConfig, title: string) => Promise<void>
   removeStreamConfig: (title: string) => Promise<void>
+  replaceStreamConfig: (newStreamConfigList: IStreamConfig[]) => Promise<void>
 }
 
 export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
@@ -30,6 +31,12 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
     const newStreamConfigList = get().streamConfigList.map((streamConfig) =>
       streamConfig.title === title ? newStreamConfig : streamConfig
     )
+    await localForage.setItem('streamConfigList', newStreamConfigList)
+    set(() => {
+      return { streamConfigList: newStreamConfigList }
+    })
+  },
+  replaceStreamConfig: async (newStreamConfigList: IStreamConfig[]) => {
     await localForage.setItem('streamConfigList', newStreamConfigList)
     set(() => {
       return { streamConfigList: newStreamConfigList }

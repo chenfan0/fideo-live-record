@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardDescription, CardTitle, CardHeader } from '@/shadcn/ui/card'
+import { MoveCardDropdownMenu } from './MoveCardDropDownMenu'
 import { Badge } from '@/shadcn/ui/badge'
 import Progress from '@/components/StreamConfigList/components/Progress'
 import OperationBar from '@/components/StreamConfigList/components/OperationBar'
 import { StreamStatus } from '@renderer/lib/utils'
 import { useFfmpegProgressInfoStore } from '@renderer/store/useFfmpegProgressInfoStore'
+
+import { useNavSelectedStatusStore } from '@renderer/store/useNavSelectedStatusStore'
 
 interface StreamConfigCardProps {
   streamConfig: IStreamConfig
@@ -22,13 +25,14 @@ const streamStatusToLocaleMap = {
 export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps) {
   const { t } = useTranslation()
   const ffmpegProgressInfo = useFfmpegProgressInfoStore((state) => state.ffmpegProgressInfo)
+  const navSelectedStatus = useNavSelectedStatusStore((state) => state.navSelectedStatus)
 
   const handleRoomUrlClick = () => {
     window.api.navByDefaultBrowser(streamConfig.roomUrl)
   }
 
   return (
-    <Card>
+    <Card className="relative">
       <CardHeader>
         <CardTitle className="flex items-center relative">
           <div className="flex gap-2 flex-1">
@@ -61,6 +65,8 @@ export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps
             </>
           )}
         </div>
+
+        {navSelectedStatus === '-1' && <MoveCardDropdownMenu streamConfig={streamConfig} />}
       </CardContent>
     </Card>
   )

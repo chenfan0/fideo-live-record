@@ -61,7 +61,11 @@ export default {
         preparing_to_record: 'Preparing to Record',
         monitoring: 'Monitoring',
         recording: 'Recording',
-        video_format_conversion: 'Video Format Conversion'
+        video_format_conversion: 'Video Format Conversion',
+        position_adjust: 'Position Adjust',
+        move_top: 'Move Top',
+        move_up: 'Move Up',
+        move_down: 'Move Down'
       },
       start_record: 'Start Recording',
       user_stop_record: 'Stop Recording (User Manually Stopped)',
@@ -160,7 +164,11 @@ export default {
         preparing_to_record: '准备录制中',
         monitoring: '监控中',
         recording: '录制中',
-        video_format_conversion: '视频格式转换中'
+        video_format_conversion: '视频格式转换中',
+        position_adjust: '位置调整',
+        move_top: '置顶',
+        move_up: '上移',
+        move_down: '下移'
       },
       start_record: '开始录制',
       user_stop_record: '停止录制(用户手动停止)',
