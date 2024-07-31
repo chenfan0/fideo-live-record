@@ -15,6 +15,7 @@ import { getTaobaoLiveUrlsPlugin } from './plugins/taobao'
 import { getBigoLiveUrlsPlugin } from './plugins/bigo'
 import { getYYLiveUrlsPlugin } from './plugins/yy'
 import { getJDLiveUrlsPlugin } from './plugins/jd'
+import { getMomoLiveUrlsPlugin } from './plugins/momo'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -58,7 +59,9 @@ const hostnameToPlatformCrawlerFnMap = {
   'www.huya.com': getHuyaLiveUrlsPlugin,
   'huya.com': getHuyaLiveUrlsPlugin,
 
-  'lives.jd.com': getJDLiveUrlsPlugin
+  'lives.jd.com': getJDLiveUrlsPlugin,
+
+  'web.immomo.com': getMomoLiveUrlsPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
