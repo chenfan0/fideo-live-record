@@ -234,6 +234,12 @@ async function baseGetTaobaoLiveUrlsPlugin(roomUrl, others = {}) {
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
 
+  if (!cookie) {
+    return {
+      code: CRAWLER_ERROR_CODE.COOKIE_IS_REQUIRED
+    }
+  }
+
   const dataParam = {
     data: JSON.stringify({
       liveId: roomId,
