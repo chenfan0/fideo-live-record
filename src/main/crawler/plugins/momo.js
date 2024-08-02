@@ -19,6 +19,12 @@ async function baseGetMomoLiveUrlsPlugin(roomUrl, others = {}) {
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
 
+  if (!cookie) {
+    return {
+      code: CRAWLER_ERROR_CODE.COOKIE_IS_REQUIRED
+    }
+  }
+
   const res = (
     await request(`https://web.immomo.com/video/web/profile/enter?roomid=${roomId}&enterRoom=1`, {
       method: 'POST',
@@ -29,8 +35,6 @@ async function baseGetMomoLiveUrlsPlugin(roomUrl, others = {}) {
       }
     })
   ).data
-
-  console.log(res)
 
   const errmsg = res.errmsg
 
