@@ -65,7 +65,9 @@ export default {
         position_adjust: 'Position Adjust',
         move_top: 'Move Top',
         move_up: 'Move Up',
-        move_down: 'Move Down'
+        move_down: 'Move Down',
+        loading: 'Loading...',
+        should_convert_to_mp4: 'Convert to MP4 after recording ends'
       },
       start_record: 'Start Recording',
       user_stop_record: 'Stop Recording (User Manually Stopped)',
@@ -168,7 +170,9 @@ export default {
         position_adjust: '位置调整',
         move_top: '置顶',
         move_up: '上移',
-        move_down: '下移'
+        move_down: '下移',
+        loading: '加载中...',
+        should_convert_to_mp4: '录制结束后是否转为MP4'
       },
       start_record: '开始录制',
       user_stop_record: '停止录制(用户手动停止)',

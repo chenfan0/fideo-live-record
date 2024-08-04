@@ -10,6 +10,7 @@ interface IStreamConfig {
   segmentTime?: string | ''
   line: string // '0' '1' eg
   status: number
+  convertToMP4: boolean
 }
 type Lang = 'en' | 'cn'
 interface IDefaultDefaultSettingsConfig {

@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/shadcn/ui/sheet'
 import { Input } from '@/shadcn/ui/input'
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from '@/shadcn/ui/select'
+import { Switch } from '@/shadcn/ui/switch'
 import { useStreamConfigStore } from '@renderer/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { checkUrlValid } from '@renderer/lib/utils'
@@ -28,7 +29,8 @@ const formSchema = z.object({
   segmentTime: z.string(),
   cookie: z.string(),
   proxy: z.string(),
-  liveUrls: z.array(z.string())
+  liveUrls: z.array(z.string()),
+  convertToMP4: z.boolean()
 })
 
 const defaultStreamConfig: IStreamConfig = {
@@ -42,7 +44,8 @@ const defaultStreamConfig: IStreamConfig = {
   cookie: '',
   proxy: '',
   liveUrls: [],
-  segmentTime: ''
+  segmentTime: '',
+  convertToMP4: true
 }
 
 function validStreamConfigData(
@@ -312,11 +315,26 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                             ))
                           ) : (
                             <SelectItem disabled value="loading">
-                              loading
+                              {t('stream_config.loading')}
                             </SelectItem>
                           )}
                         </SelectContent>
                       </Select>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="convertToMP4"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('stream_config.should_convert_to_mp4')}</FormLabel>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="flex"
+                      />
                     </FormItem>
                   )}
                 />

@@ -73,7 +73,7 @@ export default function StreamConfigList() {
       const isStopByStreamEnd = code === SUCCESS_CODE
       let stopWithLineError = false
 
-      if (streamConfig.status === StreamStatus.RECORDING) {
+      if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
         await updateStreamConfig(
           { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
           streamConfig.title
