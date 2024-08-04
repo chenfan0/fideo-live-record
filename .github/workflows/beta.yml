@@ -3,7 +3,7 @@ name: Build and Release fideo
 on:
   push:
     branches:
-      - release
+      - beta
 jobs:
   build:
     runs-on: ${{ matrix.os }}
