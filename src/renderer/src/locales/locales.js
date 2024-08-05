@@ -67,7 +67,9 @@ export default {
         move_up: 'Move Up',
         move_down: 'Move Down',
         loading: 'Loading...',
-        should_convert_to_mp4: 'Convert to MP4 after recording ends'
+        should_convert_to_mp4: 'Convert to MP4 after recording ends',
+        should_convert_to_mp4_tooltip:
+          'If the resolution changes frequently during recording, it is recommended to turn off this function to prevent the screen from being distorted due to conversion.'
       },
       start_record: 'Start Recording',
       user_stop_record: 'Stop Recording (User Manually Stopped)',
@@ -172,7 +174,9 @@ export default {
         move_up: '上移',
         move_down: '下移',
         loading: '加载中...',
-        should_convert_to_mp4: '录制结束后是否转为MP4'
+        should_convert_to_mp4: '录制结束后是否转为MP4',
+        should_convert_to_mp4_tooltip:
+          '如果录制的过程会经常出现分辨率改变的情况(例如YY直播)，建议关闭该功能，防止转换导致花屏现象'
       },
       start_record: '开始录制',
       user_stop_record: '停止录制(用户手动停止)',

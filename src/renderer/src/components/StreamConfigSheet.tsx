@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/sha
 import { Input } from '@/shadcn/ui/input'
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from '@/shadcn/ui/select'
 import { Switch } from '@/shadcn/ui/switch'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shadcn/ui/tooltip'
 import { useStreamConfigStore } from '@renderer/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { checkUrlValid } from '@renderer/lib/utils'
@@ -329,7 +330,20 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                   name="convertToMP4"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('stream_config.should_convert_to_mp4')}</FormLabel>
+                      <TooltipProvider delayDuration={400}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormLabel className=" cursor-pointer">
+                              {t('stream_config.should_convert_to_mp4')}
+                            </FormLabel>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className=" max-w-[400px]">
+                              {t('stream_config.should_convert_to_mp4_tooltip')}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
