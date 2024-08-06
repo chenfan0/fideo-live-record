@@ -63,14 +63,18 @@ pnpm debug
 The "fideo-live-record" software is provided for personal learning and research purposes only. Users must comply with the terms of service of the respective platforms and abide by local laws and regulations when using this software. Users are solely responsible for any actions and consequences arising from the use of this software, including but not limited to legal and financial liabilities. The developer is not liable for any direct or indirect damages resulting from the use, modification, or redistribution of this software.
 
 **Modifications and Redistribution**
+
 Users are permitted to modify and redistribute this software in accordance with the open-source license agreement, but they must clearly distinguish their modified version from the original version and must not imply any affiliation with the original developer. Any legal disputes or liabilities arising from the modification or redistribution of this software are the sole responsibility of the individual or entity performing those actions. The developer is not responsible for any modifications, redistributions, or other derivative works created by third parties.
 
 
 **Technical Support and Maintenance**
+
 This software is provided "as is" without any form of technical support, maintenance, or updates. The developer reserves the right to discontinue the development, support, and updates for this software at any time without notice. Users assume all risks associated with using outdated or unsupported software.
 
 **No Warranty**
+
 This software is provided without any warranty of any kind, whether express or implied, including but not limited to warranties of performance, reliability, suitability, or fitness for a particular purpose. Users are responsible for evaluating the software's applicability before use and assume all risks and consequences associated with its use.
 
 **Miscellaneous**
+
 This disclaimer applies to all users of this software. The developer reserves the right to update this disclaimer at any time without prior notice. By using this software, you agree to these terms. If you do not agree to any of these terms, please discontinue use of this software immediately and delete all related files. If you have any questions, please consult a legal advisor.
