@@ -23,7 +23,8 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] [YY](https://www.yy.com/)
 - [x] [Huya](https://www.huya.com/)
 - [x] [JingDong](https://lives.jd.com/?gx=RnAomTM2bDTeycsRqY1xDB5XAqGk-_s&gxd=RnAowmELOTLbyMkU_td0X9meMe1XxD0&ad_od=share&utm_source=androidapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=Wxfriends#/26510406?origin=2&appid=jdzb&sharer=jd_69imfpj372dqx7&user=zO8hBVAu84FG84VVLu%2BpjzHlo69Mkg6%2B)
-
+- [x] [shiguang](https://www.rengzu.com/)
+- [x] [momo](https://web.immomo.com/player/liveBroadcast.html#/liveBroadcast?roomid=14799927435342&src=m71000-rcmdtype999-linkmode1-seat1-modeid0-mid96765286)
 
 ## 📚 User Guide
 #### 🔧 Installation
