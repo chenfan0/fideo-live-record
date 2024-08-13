@@ -23,7 +23,8 @@ This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`
 - [x] [YY](https://www.yy.com/)
 - [x] [Huya](https://www.huya.com/)
 - [x] [JingDong](https://lives.jd.com/?gx=RnAomTM2bDTeycsRqY1xDB5XAqGk-_s&gxd=RnAowmELOTLbyMkU_td0X9meMe1XxD0&ad_od=share&utm_source=androidapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=Wxfriends#/26510406?origin=2&appid=jdzb&sharer=jd_69imfpj372dqx7&user=zO8hBVAu84FG84VVLu%2BpjzHlo69Mkg6%2B)
-
+- [x] [shiguang](https://www.rengzu.com/)
+- [x] [momo](https://web.immomo.com/player/liveBroadcast.html#/liveBroadcast?roomid=14799927435342&src=m71000-rcmdtype999-linkmode1-seat1-modeid0-mid96765286)
 
 ## 📚 User Guide
 #### 🔧 Installation
@@ -59,6 +60,21 @@ pnpm debug
 [![Star History Chart](https://api.star-history.com/svg?repos=chenfan0/fideo-live-record&type=Date)](https://star-history.com/#chenfan0/fideo-live-record&Date)
 
 ## Disclaimer
-The "fideo-live-record" software is intended solely for personal learning and research purposes. Users must comply with the terms of service of the respective platforms and local laws when using this software. Any legal disputes or liabilities arising from the use of this software are the sole responsibility of the user. The developer is not liable for any direct or indirect damages resulting from the use of this software. The software does not guarantee error-free operation, and users assume all risks associated with its use.
+The "fideo-live-record" software is provided for personal learning and research purposes only. Users must comply with the terms of service of the respective platforms and abide by local laws and regulations when using this software. Users are solely responsible for any actions and consequences arising from the use of this software, including but not limited to legal and financial liabilities. The developer is not liable for any direct or indirect damages resulting from the use, modification, or redistribution of this software.
 
-By using this software, you agree to these terms. If you have any questions, please discontinue use and consult a legal advisor.
+**Modifications and Redistribution**
+
+Users are permitted to modify and redistribute this software in accordance with the open-source license agreement, but they must clearly distinguish their modified version from the original version and must not imply any affiliation with the original developer. Any legal disputes or liabilities arising from the modification or redistribution of this software are the sole responsibility of the individual or entity performing those actions. The developer is not responsible for any modifications, redistributions, or other derivative works created by third parties.
+
+
+**Technical Support and Maintenance**
+
+This software is provided "as is" without any form of technical support, maintenance, or updates. The developer reserves the right to discontinue the development, support, and updates for this software at any time without notice. Users assume all risks associated with using outdated or unsupported software.
+
+**No Warranty**
+
+This software is provided without any warranty of any kind, whether express or implied, including but not limited to warranties of performance, reliability, suitability, or fitness for a particular purpose. Users are responsible for evaluating the software's applicability before use and assume all risks and consequences associated with its use.
+
+**Miscellaneous**
+
+This disclaimer applies to all users of this software. The developer reserves the right to update this disclaimer at any time without prior notice. By using this software, you agree to these terms. If you do not agree to any of these terms, please discontinue use of this software immediately and delete all related files. If you have any questions, please consult a legal advisor.

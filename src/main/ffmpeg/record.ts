@@ -83,7 +83,8 @@ async function convertFlvToMp4(sourcePath: string) {
   return p
 }
 
-async function convert(sourcePath: string) {
+async function convert(sourcePath: string, convertToMP4 = true) {
+  if (!convertToMP4) return
   if (!(await checkFileExist(sourcePath))) return
   const stats = fs.statSync(sourcePath)
   const isDirectory = stats.isDirectory()
@@ -104,7 +105,8 @@ async function convert(sourcePath: string) {
 }
 
 export async function recordStream(streamConfig: IStreamConfig, cb?: (code: number) => void) {
-  const { liveUrls, line, directory, filename, proxy, cookie, title, segmentTime } = streamConfig
+  const { liveUrls, line, directory, filename, proxy, cookie, title, segmentTime, convertToMP4 } =
+    streamConfig
 
   const secondSegmentTime = Number(segmentTime) * 60
   const isSegmentMode = secondSegmentTime > 0
@@ -112,6 +114,7 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
   const time = dayjs().format('YYYY.MM.DD-HH.mm.ss')
   const baseOutput = path.resolve(directory, `${filename}-${time}`)
   const output = isSegmentMode ? path.resolve(baseOutput, `%03d`) : baseOutput
+  const convertSource = isSegmentMode ? baseOutput : output + FLV_FLAG
 
   if (isSegmentMode) {
     fs.mkdirSync(baseOutput)
@@ -182,7 +185,7 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
       resetRecordStreamFfmpeg(title)
 
       cb?.(SUCCESS_CODE)
-      await convert(isSegmentMode ? baseOutput : output + FLV_FLAG)
+      await convert(convertSource, convertToMP4)
       cb?.(SUCCESS_CODE)
     })
     .on('error', async (error) => {
@@ -198,11 +201,11 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
           errCode = FFMPEG_ERROR_CODE.TIME_OUT
         }
         cb?.(errCode)
-        await convert(isSegmentMode ? baseOutput : output + FLV_FLAG)
+        await convert(convertSource, convertToMP4)
         cb?.(errCode)
       } else {
         cb?.(FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
-        await convert(isSegmentMode ? baseOutput : output + FLV_FLAG)
+        await convert(convertSource, convertToMP4)
         cb?.(FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
       }
     })

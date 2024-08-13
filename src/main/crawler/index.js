@@ -64,7 +64,7 @@ const hostnameToPlatformCrawlerFnMap = {
 
   'web.immomo.com': getMomoLiveUrlsPlugin,
 
-  'wap.rengzu.com': getShiGuangLiveUrlsPlugin
+  'www.rengzu.com': getShiGuangLiveUrlsPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
