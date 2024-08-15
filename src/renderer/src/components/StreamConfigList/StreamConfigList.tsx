@@ -13,11 +13,13 @@ import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { useNavSelectedStatusStore } from '@renderer/store/useNavSelectedStatusStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
+import { useDownloadDepInfoStore } from '@/store/useDownloadDepStore'
 import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 
 export default function StreamConfigList() {
   const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
+  const [closeWindowText, setCloseWindowText] = useState('stream_config.confirm_force_close_window')
 
   const navSelectedStatus = useNavSelectedStatusStore((state) => state.navSelectedStatus)
   const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => ({
@@ -34,6 +36,7 @@ export default function StreamConfigList() {
   }, [streamConfigList, navSelectedStatus])
 
   const { updateFfmpegProgressInfo } = useFfmpegProgressInfoStore((state) => state)
+
   const { toast } = useToast()
   const { t } = useTranslation()
 
@@ -139,14 +142,21 @@ export default function StreamConfigList() {
 
     window.api.onUserCloseWindow(() => {
       const { streamConfigList } = useStreamConfigStore.getState()
+      const { downloadDepProgressInfo } = useDownloadDepInfoStore.getState()
 
       const stillWorkStream = streamConfigList.find(
         (streamConfig) => streamConfig.status !== StreamStatus.NOT_STARTED
       )
-      if (!stillWorkStream) {
+      const stillDownloadDep = downloadDepProgressInfo.downloading
+
+      if (!stillWorkStream && !stillDownloadDep) {
         window.api.forceCloseWindow()
         return
       }
+      if (stillDownloadDep) {
+        setCloseWindowText('downloading_dep.confirm_force_close_window_with_downloading_dep')
+      }
+
       setCloseWindowDialogOpen(true)
     })
   })
@@ -166,7 +176,7 @@ export default function StreamConfigList() {
         </div>
       }
       <Dialog
-        title={t('stream_config.confirm_force_close_window')}
+        title={t(closeWindowText)}
         btnText={t('stream_config.confirm')}
         dialogOpen={closeWindowDialogOpen}
         onOpenChange={setCloseWindowDialogOpen}

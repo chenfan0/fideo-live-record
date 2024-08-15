@@ -30,3 +30,8 @@ type IFfmpegProgressInfo = Record<
     percent?: number
   }
 >
+
+interface IDownloadDepProgressInfo {
+  downloading: boolean
+  progress: number
+}

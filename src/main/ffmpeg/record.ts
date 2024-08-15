@@ -5,6 +5,7 @@ import debug from 'debug'
 import dayjs from 'dayjs'
 
 import ffmpeg from '.'
+
 import { SUCCESS_CODE, FFMPEG_ERROR_CODE } from '../../code'
 
 import { RECORD_DUMMY_PROCESS } from '../../const'
@@ -105,6 +106,19 @@ async function convert(sourcePath: string, convertToMP4 = true) {
 }
 
 export async function recordStream(streamConfig: IStreamConfig, cb?: (code: number) => void) {
+  let _resolve!: (
+    value:
+      | {
+          code: number
+        }
+      | PromiseLike<{
+          code: number
+        }>
+  ) => void
+  const p: Promise<{ code: number }> = new Promise((resolve) => {
+    _resolve = resolve
+  })
+
   const { liveUrls, line, directory, filename, proxy, cookie, title, segmentTime, convertToMP4 } =
     streamConfig
 
@@ -119,19 +133,6 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
   if (isSegmentMode) {
     fs.mkdirSync(baseOutput)
   }
-
-  let _resolve!: (
-    value:
-      | {
-          code: number
-        }
-      | PromiseLike<{
-          code: number
-        }>
-  ) => void
-  const p: Promise<{ code: number }> = new Promise((resolve) => {
-    _resolve = resolve
-  })
 
   if (recordStreamFfmpegProcessMap[title] !== RECORD_DUMMY_PROCESS) {
     _resolve({

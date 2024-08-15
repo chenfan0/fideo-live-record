@@ -7,6 +7,7 @@ import pkg from '../../package.json'
 
 import {
   CLOSE_WINDOW,
+  DOWNLOAD_DEP_PROGRESS_INFO,
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
   GET_LIVE_URLS,
@@ -31,6 +32,13 @@ import {
   resetRecordStreamFfmpeg,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
+import ffmpeg, {
+  isMac,
+  makeSureDependenciesExist,
+  downloadDepProgressInfo,
+  checkFfmpegExist,
+  checkFfprobeExist
+} from './ffmpeg'
 
 async function checkUpdate() {
   try {
@@ -46,14 +54,15 @@ async function checkUpdate() {
   }
 }
 
-let timer: NodeJS.Timeout | undefined
-const startTimerWhenFirstFfmpegProcessStart = () => {
-  if (timer === undefined) {
-    timer = setInterval(() => {
+let ffmpegProcessTimer: NodeJS.Timeout | undefined
+const startFfmpegProcessTimerWhenFirstFfmpegProcessStart = () => {
+  if (ffmpegProcessTimer === undefined) {
+    ffmpegProcessTimer = setInterval(() => {
       win?.webContents.send(FFMPEG_PROGRESS_INFO, recordStreamFfmpegProgressInfo)
     }, 1000)
   }
 }
+
 const isAllFfmpegProcessEnd = () =>
   Object.keys(recordStreamFfmpegProcessMap).every(
     (key) =>
@@ -70,9 +79,24 @@ export const clearTimerWhenAllFfmpegProcessEnd = () => {
   if (isAllFfmpegProcessEnd()) {
     win?.webContents.send(FFMPEG_PROGRESS_INFO, recordStreamFfmpegProgressInfo)
 
-    clearInterval(timer)
-    timer = undefined
+    clearInterval(ffmpegProcessTimer)
+    ffmpegProcessTimer = undefined
   }
+}
+
+let downloadDepTimer: NodeJS.Timeout | undefined
+const startDownloadDepTimerWhenFirstDownloadDepStart = () => {
+  if (downloadDepTimer === undefined) {
+    downloadDepTimer = setInterval(() => {
+      win?.webContents.send(DOWNLOAD_DEP_PROGRESS_INFO, downloadDepProgressInfo)
+    }, 1000)
+  }
+}
+
+const stopDownloadDepTimerWhenAllDownloadDepEnd = () => {
+  win?.webContents.send(DOWNLOAD_DEP_PROGRESS_INFO, downloadDepProgressInfo)
+  clearInterval(downloadDepTimer)
+  downloadDepTimer = undefined
 }
 
 let win: BrowserWindow | null
@@ -85,7 +109,6 @@ function createWindow(): void {
     title: 'Fideo',
     autoHideMenuBar: true,
     frame: process.platform === 'darwin',
-    // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -128,9 +151,36 @@ function showNotification(title: string, body: string) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+  const userDataPath = app.getPath('userData')
+
+  const [isFFmpegExist, isFfprobeExist] = await Promise.all([
+    checkFfmpegExist(userDataPath),
+    checkFfprobeExist(userDataPath)
+  ])
+
+  console.log(app.getPath('userData'))
+
+  makeSureDependenciesExist(app.getPath('userData'), isFFmpegExist, isFfprobeExist)
+    .then(() => {
+      const ffmpegPath = isMac
+        ? join(userDataPath, 'ffmpeg-mac/ffmpeg')
+        : join(userDataPath, 'ffmpeg-win/ffmpeg.exe')
+      const ffprobePath = isMac
+        ? join(userDataPath, 'ffmpeg-mac/ffprobe')
+        : join(userDataPath, 'ffmpeg-win/ffprobe.exe')
+      ffmpeg.setFfmpegPath(ffmpegPath)
+      ffmpeg.setFfprobePath(ffprobePath)
+
+      stopDownloadDepTimerWhenAllDownloadDepEnd()
+    })
+    .catch(() => {})
+
+  if (!isFFmpegExist || !isFfprobeExist) {
+    startDownloadDepTimerWhenFirstDownloadDepStart()
+  }
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -184,7 +234,7 @@ app.whenReady().then(() => {
       clearTimerWhenAllFfmpegProcessEnd()
     })
 
-    startTimerWhenFirstFfmpegProcessStart()
+    startFfmpegProcessTimerWhenFirstFfmpegProcessStart()
 
     return {
       code: recordStreamCode

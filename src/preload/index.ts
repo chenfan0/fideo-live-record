@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
   CLOSE_WINDOW,
+  DOWNLOAD_DEP_PROGRESS_INFO,
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
   MAXIMIZE_RESTORE_WINDOW,
@@ -44,6 +45,13 @@ const api = {
       callback(info)
     })
   },
+
+  onDownloadDepProgressInfo: (callback: (info: IDownloadDepProgressInfo) => void) => {
+    ipcRenderer.on(DOWNLOAD_DEP_PROGRESS_INFO, (_, info) => {
+      callback(info)
+    })
+  },
+
   onUserCloseWindow: (callback: () => void) => {
     ipcRenderer.on(USER_CLOSE_WINDOW, () => {
       callback()

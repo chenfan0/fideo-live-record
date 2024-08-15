@@ -91,6 +91,7 @@
 
 #title-bar {
   position: relative;
+  z-index: 9999;
   display: block;
   height: 32px;
   width: calc(100%);

@@ -96,7 +96,8 @@ export default {
           invalid_url: 'Stream URL is invalid',
           cookie_expired: 'Cookie has expired, please re-enter the cookie',
           cookie_is_required:
-            'Current streaming platform requires a cookie, please enter the cookie'
+            'Current streaming platform requires a cookie, please enter the cookie',
+          miss_dep: 'Missing dependencies, trying to install dependencies. . .'
         },
         stop_record: {
           current_line_error: 'Stop recording (current line error, try using another line)',
@@ -201,7 +202,8 @@ export default {
           not_support: '当前不支持该直播平台',
           invalid_url: '直播间地址不合法',
           cookie_expired: 'Cookie已过期，请重新填写',
-          cookie_is_required: '当前直播平台需要Cookie，请填写Cookie'
+          cookie_is_required: '当前直播平台需要Cookie，请填写Cookie',
+          miss_dep: '缺少依赖，正在尝试安装依赖'
         },
         stop_record: {
           current_line_error: '停止录制(当前线路错误，尝试使用其他线路)',
@@ -211,6 +213,10 @@ export default {
       app_update: {
         title: '发现新版本',
         get_update_detail: '查看更新详情'
+      },
+      downloading_dep: {
+        title: '正在下载依赖中. . .',
+        confirm_force_close_window_with_downloading_dep: '当前正在下载依赖，是否强制关闭窗口?'
       }
     }
   }

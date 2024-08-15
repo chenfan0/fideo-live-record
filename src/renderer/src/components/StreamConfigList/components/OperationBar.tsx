@@ -57,6 +57,8 @@ export default function OperationBar(props: OperationBarProps) {
 
     const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig))
 
+    console.log('code', code)
+
     if (code === SUCCESS_CODE) {
       await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.RECORDING },
