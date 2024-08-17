@@ -3,7 +3,7 @@
 </div>
 
 ## ✋🏻 简介
-这是一个基于`React` `Ffmpeg` `Electron`的**直播录制软件**。支持监控直播，可以帮助用户简单便捷的对直播进行录制并保存为MP4格式的视频，
+这是一个基于`React` `Ffmpeg` `Electron`的**直播录制软件**。支持监控直播，可以帮助用户简单便捷的对直播进行录制并保存为MP4格式的视频。
 
 ## 已支持平台
 - [x] [YouTube](https://www.youtube.com/)
