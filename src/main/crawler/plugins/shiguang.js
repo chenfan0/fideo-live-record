@@ -61,6 +61,15 @@ async function baseGetShiGuangLiveUrlsPlugin(roomUrl, others = {}) {
         }
       )
     ).data.data.roomInfo
+
+    const liveStat = roomInfo.live_stat
+
+    if (liveStat !== 1) {
+      return {
+        code: CRAWLER_ERROR_CODE.NOT_URLS
+      }
+    }
+
     const liveID = roomInfo.liveID
     const idx = roomInfo.idx
 
