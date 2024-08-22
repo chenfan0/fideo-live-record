@@ -15,6 +15,7 @@ import {
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
   RECORD_DUMMY_PROCESS,
+  RETRY_DOWNLOAD_DEP,
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
@@ -148,22 +149,18 @@ function showNotification(title: string, body: string) {
   notification.show()
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+async function handleMakeSureDependenciesExist() {
   const userDataPath = app.getPath('userData')
-
+  console.log('userDataPath:', userDataPath)
   const [isFFmpegExist, isFfprobeExist] = await Promise.all([
     checkFfmpegExist(userDataPath),
     checkFfprobeExist(userDataPath)
   ])
 
-  console.log(app.getPath('userData'))
-
-  makeSureDependenciesExist(app.getPath('userData'), isFFmpegExist, isFfprobeExist)
+  if (!isFFmpegExist || !isFfprobeExist) {
+    startDownloadDepTimerWhenFirstDownloadDepStart()
+  }
+  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist)
     .then(() => {
       const ffmpegPath = isMac
         ? join(userDataPath, 'ffmpeg-mac/ffmpeg')
@@ -173,14 +170,21 @@ app.whenReady().then(async () => {
         : join(userDataPath, 'ffmpeg-win/ffprobe.exe')
       ffmpeg.setFfmpegPath(ffmpegPath)
       ffmpeg.setFfprobePath(ffprobePath)
-
       stopDownloadDepTimerWhenAllDownloadDepEnd()
     })
-    .catch(() => {})
+    .catch(() => {
+      stopDownloadDepTimerWhenAllDownloadDepEnd()
+    })
+}
 
-  if (!isFFmpegExist || !isFfprobeExist) {
-    startDownloadDepTimerWhenFirstDownloadDepStart()
-  }
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.whenReady().then(async () => {
+  // Set app user model id for windows
+  electronApp.setAppUserModelId('com.electron')
+
+  await handleMakeSureDependenciesExist()
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -229,10 +233,13 @@ app.whenReady().then(async () => {
     }
     streamConfig.liveUrls = liveUrls
 
-    const { code: recordStreamCode } = await recordStream(streamConfig, (code: number) => {
-      win?.webContents.send(STREAM_RECORD_END, title, code)
-      clearTimerWhenAllFfmpegProcessEnd()
-    })
+    const { code: recordStreamCode } = await recordStream(
+      streamConfig,
+      (code: number, errMsg?: string) => {
+        win?.webContents.send(STREAM_RECORD_END, title, code, errMsg)
+        clearTimerWhenAllFfmpegProcessEnd()
+      }
+    )
 
     startFfmpegProcessTimerWhenFirstFfmpegProcessStart()
 
@@ -274,6 +281,10 @@ app.whenReady().then(async () => {
     } else {
       win?.setFullScreen(true)
     }
+  })
+
+  ipcMain.handle(RETRY_DOWNLOAD_DEP, async () => {
+    await handleMakeSureDependenciesExist()
   })
 
   ipcMain.handle(CLOSE_WINDOW, () => {

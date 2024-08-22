@@ -19,8 +19,9 @@ declare global {
       maxRestoreWindow: () => void
       closeWindow: () => void
       forceCloseWindow: () => void
+      retryDownloadDep: () => void
 
-      onStreamRecordEnd: (callback: (title: string, code: number) => void) => void
+      onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => void
       onFFmpegProgressInfo: (callback: (info: IFfmpegProgressInfo) => void) => void
       onDownloadDepProgressInfo: (callback: (info: IDownloadDepProgressInfo) => void) => void
       onUserCloseWindow: (callback: () => void) => void

@@ -7,6 +7,7 @@ interface IDownloadDepStore {
 
 export const useDownloadDepInfoStore = create<IDownloadDepStore>((set) => ({
   downloadDepProgressInfo: {
+    showRetry: false,
     downloading: false,
     progress: 0
   },

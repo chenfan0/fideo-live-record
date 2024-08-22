@@ -19,7 +19,13 @@ import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
 
 import { useToast } from '@renderer/hooks/useToast'
-import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
+import {
+  CRAWLER_ERROR_CODE,
+  SUCCESS_CODE,
+  UNKNOWN_CODE,
+  crawlerErrorCodeToI18nMessage,
+  FFMPEG_ERROR_CODE
+} from '../../../../../code'
 import { RECORD_END_NOT_USER_STOP } from '../../../../../const'
 import emitter from '@/lib/bus'
 import { useDefaultSettingsStore } from '../../../store/useDefaultSettingsStore'
@@ -55,9 +61,18 @@ export default function OperationBar(props: OperationBarProps) {
         streamConfig.title
       ))
 
-    const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig))
+    const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig)).catch(() => {
+      return { code: UNKNOWN_CODE }
+    })
 
-    console.log('code', code)
+    const currentStatus = useStreamConfigStore
+      .getState()
+      .streamConfigList.find((item) => item.title === streamConfig.title)?.status
+    if (currentStatus === StreamStatus.NOT_STARTED) {
+      return
+    }
+
+    console.log('handleStartRecord code:', code)
 
     if (code === SUCCESS_CODE) {
       await updateStreamConfig(
@@ -103,7 +118,12 @@ export default function OperationBar(props: OperationBarProps) {
       return
     }
 
-    const errMessage = errorCodeToI18nMessage(code, 'error.start_record.')
+    // 这里只会处理获取直播地址失败的情况，录制失败的处理在StreamConfigList组件中
+    if (Object.values(FFMPEG_ERROR_CODE).includes(code) || code === UNKNOWN_CODE) {
+      return
+    }
+
+    const errMessage = crawlerErrorCodeToI18nMessage(code, 'error.start_record.')
 
     await updateStreamConfig(
       { ...streamConfig, status: StreamStatus.NOT_STARTED },

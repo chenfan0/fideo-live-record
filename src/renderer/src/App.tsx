@@ -43,7 +43,6 @@ function App(): JSX.Element {
     })
 
     window.api.onDownloadDepProgressInfo((progressInfo) => {
-      console.log('progressInfo', progressInfo)
       updateUpdateDownloadProgressInfo(progressInfo)
     })
   })
@@ -79,7 +78,9 @@ function App(): JSX.Element {
         }
       />
 
-      {downloadDepProgressInfo.downloading && <DownloadingDep />}
+      {(downloadDepProgressInfo.downloading || downloadDepProgressInfo.showRetry) && (
+        <DownloadingDep />
+      )}
     </>
   )
 }

@@ -41,7 +41,8 @@ export async function checkFfprobeExist(dirname: string) {
 
 export const downloadDepProgressInfo: IDownloadDepProgressInfo = {
   downloading: false,
-  progress: 0
+  progress: 0,
+  showRetry: false
 }
 
 export async function makeSureDependenciesExist(
@@ -66,38 +67,32 @@ export async function makeSureDependenciesExist(
     _resolve = resolve
     _reject = reject
   })
+  const downloadUrl = isMac ? ffmpegMacUrl : ffmpegWinUrl
 
-  if (isMac) {
-    if (!isFfmpegExist) {
-      downloadDepProgressInfo.downloading = true
-      download(ffmpegMacUrl, dirname, { extract: true })
-        .on('downloadProgress', ({ percent }) => {
-          downloadDepProgressInfo.progress = percent
-          log(`ffmpeg download progress: ${percent}`)
-        })
-        .then(() => {
-          downloadDepProgressInfo.downloading = false
-          downloadDepProgressInfo.progress = 0
-          _resolve(true)
-        })
-        .catch(() => {
-          // _reject()
-        })
-    }
-  } else {
-    downloadDepProgressInfo.downloading = true
-    download(ffmpegWinUrl, dirname, { extract: true })
-      .on('downloadProgress', ({ percent }) => {
-        downloadDepProgressInfo.progress = percent
-        log(`ffmpeg download progress: ${percent}`)
-      })
-      .then(() => {
-        downloadDepProgressInfo.downloading = false
-        downloadDepProgressInfo.progress = 0
-        _resolve(true)
-      })
-      .catch(() => {})
-  }
+  downloadDepProgressInfo.downloading = true
+  download(downloadUrl, dirname, { extract: true })
+    .on('downloadProgress', ({ percent }) => {
+      downloadDepProgressInfo.progress = percent
+      log(`ffmpeg download progress: ${percent}`)
+    })
+    .on('error', (error) => {
+      downloadDepProgressInfo.showRetry = true
+      downloadDepProgressInfo.downloading = false
+      downloadDepProgressInfo.progress = 0
+      log(error.message)
+      _reject()
+    })
+    .then(() => {
+      downloadDepProgressInfo.downloading = false
+      downloadDepProgressInfo.progress = 0
+      _resolve(true)
+    })
+    .catch(() => {
+      downloadDepProgressInfo.showRetry = true
+      downloadDepProgressInfo.downloading = false
+      downloadDepProgressInfo.progress = 0
+      _reject()
+    })
 
   return p
 }

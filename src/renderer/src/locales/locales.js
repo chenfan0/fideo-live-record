@@ -101,12 +101,20 @@ export default {
         },
         stop_record: {
           current_line_error: 'Stop recording (current line error, try using another line)',
-          timeout: 'Stop recording (request timed out, try using or changing the proxy)'
+          timeout: 'Stop recording (request timed out, try using or changing the proxy)',
+          unknown_error: 'Unknown error'
         }
       },
       app_update: {
         title: 'New Version Available',
         get_update_detail: 'View Update Details'
+      },
+      downloading_dep: {
+        downloading_title: 'Downloading Dependencies. . .',
+        retry_title: 'Download Dependencies Failed',
+        confirm_force_close_window_with_downloading_dep:
+          'Dependencies are being downloaded, force close the window?',
+        retry: 'Retry'
       }
     }
   },
@@ -207,7 +215,8 @@ export default {
         },
         stop_record: {
           current_line_error: '停止录制(当前线路错误，尝试使用其他线路)',
-          timeout: '停止录制(请求超时，尝试使用或者更换代理)'
+          timeout: '停止录制(请求超时，尝试使用或者更换代理)',
+          unknown_error: '未知错误'
         }
       },
       app_update: {
@@ -215,8 +224,10 @@ export default {
         get_update_detail: '查看更新详情'
       },
       downloading_dep: {
-        title: '正在下载依赖中. . .',
-        confirm_force_close_window_with_downloading_dep: '当前正在下载依赖，是否强制关闭窗口?'
+        downloading_title: '正在下载依赖中. . .',
+        retry_title: '下载依赖失败',
+        confirm_force_close_window_with_downloading_dep: '当前正在下载依赖，是否强制关闭窗口?',
+        retry: '重试'
       }
     }
   }

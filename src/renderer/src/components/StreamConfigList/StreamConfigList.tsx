@@ -5,7 +5,12 @@ import { useTranslation } from 'react-i18next'
 import Dialog from '@/components/Dialog'
 import StreamConfigCard from './components/StreamConfigCard'
 
-import { SUCCESS_CODE, FFMPEG_ERROR_CODE, errorCodeToI18nMessage } from '../../../../code'
+import {
+  SUCCESS_CODE,
+  FFMPEG_ERROR_CODE,
+  errorCodeToI18nMessage,
+  UNKNOWN_CODE
+} from '../../../../code'
 import emitter from '@/lib/bus'
 import { RECORD_END_NOT_USER_STOP } from '../../../../const'
 
@@ -16,6 +21,11 @@ import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
 import { useDownloadDepInfoStore } from '@/store/useDownloadDepStore'
 import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
+
+const unknownErrorRetryTimesMap: Record<string, number> = {}
+const maxRetryTimes = 3
+
+const alreadyCallbackOneTimeSet = new Set()
 
 export default function StreamConfigList() {
   const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
@@ -60,10 +70,12 @@ export default function StreamConfigList() {
       updateFfmpegProgressInfo(progressInfo)
     })
 
-    window.api.onStreamRecordEnd(async (title, code) => {
+    window.api.onStreamRecordEnd(async (title, code, errMsg) => {
       const { streamConfigList, updateStreamConfig } = useStreamConfigStore.getState()
       const xiZhiKey = useDefaultSettingsStore.getState().defaultSettingsConfig.xizhiKey
       const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)
+
+      console.log('onStreamRecordEnd:', title, code, errMsg)
 
       if (index === -1) {
         return
@@ -74,15 +86,6 @@ export default function StreamConfigList() {
       // FFMPEG_ERROR_CODE.USER_KILL_PROCESS stop by user
       const isStopByUser = code === FFMPEG_ERROR_CODE.USER_KILL_PROCESS
       const isStopByStreamEnd = code === SUCCESS_CODE
-      let stopWithLineError = false
-
-      if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
-        await updateStreamConfig(
-          { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
-          streamConfig.title
-        )
-        return
-      }
 
       let message = ''
 
@@ -94,37 +97,100 @@ export default function StreamConfigList() {
         message = 'stream_end_stop_record'
       }
 
-      if (!isStopByUser) {
-        const { code, liveUrls } = await window.api.getLiveUrls({
-          roomUrl: streamConfig.roomUrl,
-          proxy: streamConfig.proxy,
-          cookie: streamConfig.cookie
+      // 用户在获取直播地址时点击停止录制或者在监控中点击停止录制
+      if (
+        isStopByUser &&
+        (streamConfig.status === StreamStatus.PREPARING_TO_RECORD ||
+          streamConfig.status === StreamStatus.MONITORING)
+      ) {
+        await updateStreamConfig(
+          { ...streamConfig, status: StreamStatus.NOT_STARTED },
+          streamConfig.title
+        )
+
+        toast({
+          title: streamConfig.title,
+          description: code === UNKNOWN_CODE ? t(message) + errMsg : t(message)
         })
-        if (code === SUCCESS_CODE && liveUrls[Number(streamConfig.line)]) {
-          // if not stop by user and still can get live urls
-          // mean the stream can no be record, hint change the stream line
-          message = 'error.stop_record.current_line_error'
-          stopWithLineError = true
-        } else {
-          // mean the stream is not live
-          // start monitor the stream
-          message = 'stream_end_stop_record'
-        }
+        return
       }
+
+      if (!alreadyCallbackOneTimeSet.has(title)) {
+        alreadyCallbackOneTimeSet.add(title)
+        if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
+          await updateStreamConfig(
+            { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
+            streamConfig.title
+          )
+        }
+        return
+      }
+
+      alreadyCallbackOneTimeSet.delete(title)
+
+      /**
+       * 当录制过程出现错误，直播结束或者用户手动停止
+       * 会回调两次改函数，第一次是开始转换为mp4文件之前，第二次是转换后
+       */
+
+      // if (
+      //   streamConfig.status !== StreamStatus.MONITORING &&
+      //   !alreadyCallbackOneTimeSet.has(title)
+      // ) {
+      //   alreadyCallbackOneTimeSet.add(title)
+      //   // 如果当前状态是录制中，则需要修改状态为转换中
+      //   if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
+      //     await updateStreamConfig(
+      //       { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
+      //       streamConfig.title
+      //     )
+      //     return
+      //   }
+
+      //   return
+      // }
+
+      // alreadyCallbackOneTimeSet.delete(title)
+
+      // let stopWithLineError = false
+
+      // if (!isStopByUser) {
+      //   const { code, liveUrls } = await window.api.getLiveUrls({
+      //     roomUrl: streamConfig.roomUrl,
+      //     proxy: streamConfig.proxy,
+      //     cookie: streamConfig.cookie
+      //   })
+      //   if (code === SUCCESS_CODE && liveUrls[Number(streamConfig.line)]) {
+      //     // if not stop by user and still can get live urls
+      //     // mean the stream can no be record, hint change the stream line
+      //     // message = 'error.stop_record.current_line_error'
+      //     stopWithLineError = true
+      //     unknownErrorRetryTimesMap[title] = unknownErrorRetryTimesMap[title] || 0
+      //     unknownErrorRetryTimesMap[title] += 1
+      //   } else {
+      //     // mean the stream is not live
+      //     // start monitor the stream
+      //     message = 'stream_end_stop_record'
+      //   }
+      // }
+      unknownErrorRetryTimesMap[title] = unknownErrorRetryTimesMap[title] || 0
+      unknownErrorRetryTimesMap[title] += 1
 
       if (!message) {
         message = errorCodeToI18nMessage(code, 'error.stop_record.')
       }
 
+
+
       toast({
         title: streamConfig.title,
-        description: t(message)
+        description: code === UNKNOWN_CODE ? t(message) + errMsg : t(message)
       })
       if (!isStopByUser && xiZhiKey) {
         useXizhiToPushNotification({
           key: xiZhiKey,
           title: streamConfig.title,
-          content: t(message)
+          content: code === UNKNOWN_CODE ? t(message) + '\n' + errMsg : t(message)
         })
       }
 
@@ -132,11 +198,18 @@ export default function StreamConfigList() {
         { ...streamConfig, status: StreamStatus.NOT_STARTED },
         streamConfig.title
       )
-
-      if (isStopByUser || stopWithLineError) {
+      if (isStopByUser) {
         return
       }
 
+      console.log(unknownErrorRetryTimesMap[title], maxRetryTimes)
+
+      if (unknownErrorRetryTimesMap[title] >= maxRetryTimes) {
+        unknownErrorRetryTimesMap[title] = 0
+        return
+      }
+
+      console.log('emit restart')
       emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.title)
     })
 

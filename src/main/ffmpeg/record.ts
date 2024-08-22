@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 
 import ffmpeg from '.'
 
-import { SUCCESS_CODE, FFMPEG_ERROR_CODE } from '../../code'
+import { SUCCESS_CODE, FFMPEG_ERROR_CODE, UNKNOWN_CODE } from '../../code'
 
 import { RECORD_DUMMY_PROCESS } from '../../const'
 
@@ -33,7 +33,7 @@ export const setRecordStreamFfmpegProcessMap = (title: string, process: any) => 
 export const resetRecordStreamFfmpeg = (title: string) => {
   const process = recordStreamFfmpegProcessMap[title]
 
-  const isDummy = process === RECORD_DUMMY_PROCESS
+  const isDummy = process === RECORD_DUMMY_PROCESS || !process
 
   process?.kill('SIGKILL')
   delete recordStreamFfmpegProgressInfo[title]
@@ -105,7 +105,11 @@ async function convert(sourcePath: string, convertToMP4 = true) {
   }
 }
 
-export async function recordStream(streamConfig: IStreamConfig, cb?: (code: number) => void) {
+export async function recordStream(
+  streamConfig: IStreamConfig,
+  cb?: (code: number, errMsg?: string) => void
+) {
+  log('start record stream')
   let _resolve!: (
     value:
       | {
@@ -138,7 +142,11 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
     _resolve({
       code: FFMPEG_ERROR_CODE.USER_KILL_PROCESS
     })
-    cb?.(FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
+    /**
+     * 如果是这种情况，说明是在获取直播地址的时候，用户停止了录制
+     * 这个回调会在用户执行停止录制的时候被调用，这个时候不需要再次调用停止录制的回调
+     */
+    // cb?.(FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
     return p
   }
   const ffmpegProcess = ffmpeg().addInput(liveUrls![Number(line)])
@@ -197,13 +205,13 @@ export async function recordStream(streamConfig: IStreamConfig, cb?: (code: numb
       resetRecordStreamFfmpeg(title)
 
       if (errMsg !== KILL_MESSAGE) {
-        let errCode = FFMPEG_ERROR_CODE.CURRENT_LINE_ERROR
+        let errCode = UNKNOWN_CODE
         if (errMsg.includes('Error opening input files: Operation timed out')) {
           errCode = FFMPEG_ERROR_CODE.TIME_OUT
         }
-        cb?.(errCode)
+        cb?.(errCode, errMsg)
         await convert(convertSource, convertToMP4)
-        cb?.(errCode)
+        cb?.(errCode, errMsg)
       } else {
         cb?.(FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
         await convert(convertSource, convertToMP4)
