@@ -289,7 +289,7 @@ app.whenReady().then(async () => {
       killRecordStreamFfmpegProcess(key)
     })
     clearTimerWhenAllFfmpegProcessEnd()
-
+    stopDownloadDepTimerWhenAllDownloadDepEnd()
     win?.destroy()
   })
 

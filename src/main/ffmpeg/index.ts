@@ -48,22 +48,26 @@ export const downloadDepProgressInfo: IDownloadDepProgressInfo = {
   showRetry: false
 }
 
+const setFfmpegAndFfprobePath = (dirname: string) => {
+  const ffmpegPath = isMac
+    ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
+    : path.resolve(dirname, 'ffmpeg-win/ffmpeg.exe')
+  const ffprobePath = isMac
+    ? path.resolve(dirname, 'ffmpeg-mac/ffprobe')
+    : path.resolve(dirname, 'ffmpeg-win/ffprobe.exe')
+  ffmpeg.setFfmpegPath(ffmpegPath)
+  ffmpeg.setFfprobePath(ffprobePath)
+  ffmpeg.ffmpegPath = ffmpegPath
+  ffmpeg.ffprobePath = ffprobePath
+}
+
 export async function makeSureDependenciesExist(
   dirname: string,
   isFfmpegExist: boolean,
   isFFprobeExist: boolean
 ) {
   if (isFfmpegExist && isFFprobeExist) {
-    const ffmpegPath = isMac
-      ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
-      : path.resolve(dirname, 'ffmpeg-win/ffmpeg.exe')
-    const ffprobePath = isMac
-      ? path.resolve(dirname, 'ffmpeg-mac/ffprobe')
-      : path.resolve(dirname, 'ffmpeg-win/ffprobe.exe')
-    ffmpeg.setFfmpegPath(ffmpegPath)
-    ffmpeg.setFfprobePath(ffprobePath)
-    ffmpeg.ffmpegPath = ffmpegPath
-    ffmpeg.ffprobePath = ffprobePath
+    setFfmpegAndFfprobePath(dirname)
     return true
   }
 
@@ -90,16 +94,9 @@ export async function makeSureDependenciesExist(
     .then(() => {
       downloadDepProgressInfo.downloading = false
       downloadDepProgressInfo.progress = 0
-      const ffmpegPath = isMac
-        ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
-        : path.resolve(dirname, 'ffmpeg-win/ffmpeg.exe')
-      const ffprobePath = isMac
-        ? path.resolve(dirname, 'ffmpeg-mac/ffprobe')
-        : path.resolve(dirname, 'ffmpeg-win/ffprobe.exe')
-      ffmpeg.setFfmpegPath(ffmpegPath)
-      ffmpeg.setFfprobePath(ffprobePath)
-      ffmpeg.ffmpegPath = ffmpegPath
-      ffmpeg.ffprobePath = ffprobePath
+
+      setFfmpegAndFfprobePath(dirname)
+
       _resolve(true)
     })
     .catch(() => {
