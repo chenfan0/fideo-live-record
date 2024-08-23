@@ -9,13 +9,9 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - resources/**
+
 win:
   executableName: fideo
-  extraFiles:
-  - from: "./resources/ffmpeg/ffmpeg.exe"
-    to: "Resources"
 nsis:
   oneClick: false
   artifactName: ${name}-${version}.${ext}
@@ -37,9 +33,6 @@ mac:
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
   identity: null
-  extraFiles:
-    - from: "./resources/ffmpeg/ffmpeg"
-      to: "Resources"
 dmg:
   artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
