@@ -37,7 +37,8 @@ import {
   makeSureDependenciesExist,
   downloadDepProgressInfo,
   checkFfmpegExist,
-  checkFfprobeExist
+  checkFfprobeExist,
+  downloadReq
 } from './ffmpeg'
 
 async function checkUpdate() {
@@ -100,7 +101,7 @@ const stopDownloadDepTimerWhenAllDownloadDepEnd = () => {
 }
 
 let win: BrowserWindow | null
-function createWindow(): void {
+async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -138,6 +139,7 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+  await handleMakeSureDependenciesExist()
 }
 
 function showNotification(title: string, body: string) {
@@ -173,9 +175,7 @@ async function handleMakeSureDependenciesExist() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
-
-  await handleMakeSureDependenciesExist()
+  electronApp.setAppUserModelId('site.fideo.app')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -288,21 +288,24 @@ app.whenReady().then(async () => {
     stillRecordStreamKeys.forEach((key) => {
       killRecordStreamFfmpegProcess(key)
     })
+    downloadReq.destroy()
     clearTimerWhenAllFfmpegProcessEnd()
     stopDownloadDepTimerWhenAllDownloadDepEnd()
     win?.destroy()
   })
 
-  createWindow()
+  await createWindow()
 
   setTimeout(() => {
     checkUpdate()
   }, 1000)
 
-  app.on('activate', function () {
+  app.on('activate', async function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) {
+      await createWindow()
+    }
   })
 })
 

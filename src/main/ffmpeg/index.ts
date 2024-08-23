@@ -48,6 +48,10 @@ export const downloadDepProgressInfo: IDownloadDepProgressInfo = {
   showRetry: false
 }
 
+export let downloadReq = {
+  destroy: () => {}
+}
+
 const setFfmpegAndFfprobePath = (dirname: string) => {
   const ffmpegPath = isMac
     ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
@@ -80,6 +84,9 @@ export async function makeSureDependenciesExist(
 
   downloadDepProgressInfo.downloading = true
   download(downloadUrl, dirname, { extract: true })
+    .on('request', (req) => {
+      downloadReq = req
+    })
     .on('downloadProgress', ({ percent }) => {
       downloadDepProgressInfo.progress = percent
       log(`ffmpeg download progress: ${percent}`)

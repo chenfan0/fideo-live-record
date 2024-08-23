@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: site.fideo.app
 productName: fideo
 directories:
   buildResources: build

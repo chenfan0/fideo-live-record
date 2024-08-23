@@ -253,8 +253,6 @@ export async function recordStream(
 
   ffmpegProcess.inputOptions(['-re'])
 
-  console.log(ffmpegProcess, '=============================')
-
   setRecordStreamFfmpegProcessMap(title, ffmpegProcess)
 
   ffmpegProcess.inputOption(
