@@ -5,7 +5,7 @@
 [中文文档](https://github.com/chenfan0/fideo-live-record/blob/main/README-CN.md)
 
 ## ✋🏻Introduction
-This is a **live recording software** based on `React`, `Ffmpeg`, and `Electron`. It supports monitoring live streams, making it simple and convenient for users to record live streams and save them as MP4 videos.
+This is a **live recording software** based on `React`, `Ffmpeg`, `Electron`, `Shadcn`. It supports monitoring live streams, making it simple and convenient for users to record live streams and save them as MP4 videos.
 
 ## Supported Platforms
 - [x] [YouTube](https://www.youtube.com/)
