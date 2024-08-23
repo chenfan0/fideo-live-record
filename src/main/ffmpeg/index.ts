@@ -12,7 +12,10 @@ import download from 'download'
 const log = debug('fideo-ffmpeg')
 
 const require = module.createRequire(import.meta.url)
-const ffmpeg = require('fluent-ffmpeg') as typeof Ffmpeg
+const ffmpeg = require('fluent-ffmpeg') as typeof Ffmpeg & {
+  ffmpegPath: string
+  ffprobePath: string
+}
 
 export const isMac = os.platform() === 'darwin'
 
@@ -59,6 +62,8 @@ export async function makeSureDependenciesExist(
       : path.resolve(dirname, 'ffmpeg-win/ffprobe.exe')
     ffmpeg.setFfmpegPath(ffmpegPath)
     ffmpeg.setFfprobePath(ffprobePath)
+    ffmpeg.ffmpegPath = ffmpegPath
+    ffmpeg.ffprobePath = ffprobePath
     return true
   }
 
@@ -85,6 +90,16 @@ export async function makeSureDependenciesExist(
     .then(() => {
       downloadDepProgressInfo.downloading = false
       downloadDepProgressInfo.progress = 0
+      const ffmpegPath = isMac
+        ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
+        : path.resolve(dirname, 'ffmpeg-win/ffmpeg.exe')
+      const ffprobePath = isMac
+        ? path.resolve(dirname, 'ffmpeg-mac/ffprobe')
+        : path.resolve(dirname, 'ffmpeg-win/ffprobe.exe')
+      ffmpeg.setFfmpegPath(ffmpegPath)
+      ffmpeg.setFfprobePath(ffprobePath)
+      ffmpeg.ffmpegPath = ffmpegPath
+      ffmpeg.ffprobePath = ffprobePath
       _resolve(true)
     })
     .catch(() => {

@@ -68,8 +68,9 @@ export default {
         move_down: 'Move Down',
         loading: 'Loading...',
         should_convert_to_mp4: 'Convert to MP4 after recording ends',
-        should_convert_to_mp4_tooltip:
-          'If the resolution changes frequently during recording, it is recommended to turn off this function to prevent the screen from being distorted due to conversion.'
+        should_detect_resolution: 'Detect resolution',
+        should_detect_resolution_tooltip:
+          'If the resolution changes frequently during recording (e.g. YY Live), it is recommended to enable this function to detect the resolution to prevent screen tearing'
       },
       start_record: 'Start Recording',
       user_stop_record: 'Stop Recording (User Manually Stopped)',
@@ -102,6 +103,7 @@ export default {
         stop_record: {
           current_line_error: 'Stop recording (current line error, try using another line)',
           timeout: 'Stop recording (request timed out, try using or changing the proxy)',
+          resolution_change: 'Stop recording (resolution has changed)',
           unknown_error: 'Unknown error'
         }
       },
@@ -184,8 +186,9 @@ export default {
         move_down: '下移',
         loading: '加载中...',
         should_convert_to_mp4: '录制结束后是否转为MP4',
-        should_convert_to_mp4_tooltip:
-          '如果录制的过程会经常出现分辨率改变的情况(例如YY直播)，建议关闭该功能，防止转换导致花屏现象'
+        should_detect_resolution: '是否检测分辨率',
+        should_detect_resolution_tooltip:
+          '如果录制的过程会经常出现分辨率改变的情况(例如YY直播)，建议开启该功能检测分辨率，防止出现花屏情况'
       },
       start_record: '开始录制',
       user_stop_record: '停止录制(用户手动停止)',
@@ -216,6 +219,7 @@ export default {
         stop_record: {
           current_line_error: '停止录制(当前线路错误，尝试使用其他线路)',
           timeout: '停止录制(请求超时，尝试使用或者更换代理)',
+          resolution_change: '停止录制(分辨率发生变化)',
           unknown_error: '未知错误'
         }
       },

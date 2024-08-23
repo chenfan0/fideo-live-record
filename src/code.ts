@@ -22,7 +22,8 @@ export const FFMPEG_ERROR_CODE = {
   USER_KILL_PROCESS: 100,
   CURRENT_LINE_ERROR: 101,
   TIME_OUT: 102,
-  MISS_DEP: 103
+  MISS_DEP: 103,
+  RESOLUTION_CHANGE: 104
 }
 
 export const SUCCESS_CODE = 200
@@ -105,6 +106,9 @@ export const errorCodeToI18nMessage = (code: number, prefix: string) => {
       break
     case FFMPEG_ERROR_CODE.MISS_DEP:
       message += 'miss_dep'
+      break
+    case FFMPEG_ERROR_CODE.RESOLUTION_CHANGE:
+      message += 'resolution_change'
       break
     default:
       message += 'unknown_error'

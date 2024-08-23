@@ -23,8 +23,8 @@ import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 
 const unknownErrorRetryTimesMap: Record<string, number> = {}
-const maxRetryTimes = 3
 
+const maxRetryTimes = 3
 const alreadyCallbackOneTimeSet = new Set()
 
 export default function StreamConfigList() {
@@ -86,6 +86,7 @@ export default function StreamConfigList() {
       // FFMPEG_ERROR_CODE.USER_KILL_PROCESS stop by user
       const isStopByUser = code === FFMPEG_ERROR_CODE.USER_KILL_PROCESS
       const isStopByStreamEnd = code === SUCCESS_CODE
+      const isStopByResolutionChange = code === FFMPEG_ERROR_CODE.RESOLUTION_CHANGE
 
       let message = ''
 
@@ -115,8 +116,15 @@ export default function StreamConfigList() {
         return
       }
 
+      /**
+       * 当录制过程出现错误，直播结束或者用户手动停止
+       * 会回调两次改函数，第一次是开始转换为mp4文件之前，第二次是转换后
+       */
+
       if (!alreadyCallbackOneTimeSet.has(title)) {
         alreadyCallbackOneTimeSet.add(title)
+
+        // 第一次回调，除了当前状态是录制中并且需要转换为mp4文件的情况需要进行处理，其他情况都不需要处理
         if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
           await updateStreamConfig(
             { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
@@ -126,61 +134,15 @@ export default function StreamConfigList() {
         return
       }
 
+      // 第二次回调，删除当前title
       alreadyCallbackOneTimeSet.delete(title)
 
-      /**
-       * 当录制过程出现错误，直播结束或者用户手动停止
-       * 会回调两次改函数，第一次是开始转换为mp4文件之前，第二次是转换后
-       */
-
-      // if (
-      //   streamConfig.status !== StreamStatus.MONITORING &&
-      //   !alreadyCallbackOneTimeSet.has(title)
-      // ) {
-      //   alreadyCallbackOneTimeSet.add(title)
-      //   // 如果当前状态是录制中，则需要修改状态为转换中
-      //   if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
-      //     await updateStreamConfig(
-      //       { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
-      //       streamConfig.title
-      //     )
-      //     return
-      //   }
-
-      //   return
-      // }
-
-      // alreadyCallbackOneTimeSet.delete(title)
-
-      // let stopWithLineError = false
-
-      // if (!isStopByUser) {
-      //   const { code, liveUrls } = await window.api.getLiveUrls({
-      //     roomUrl: streamConfig.roomUrl,
-      //     proxy: streamConfig.proxy,
-      //     cookie: streamConfig.cookie
-      //   })
-      //   if (code === SUCCESS_CODE && liveUrls[Number(streamConfig.line)]) {
-      //     // if not stop by user and still can get live urls
-      //     // mean the stream can no be record, hint change the stream line
-      //     // message = 'error.stop_record.current_line_error'
-      //     stopWithLineError = true
-      //     unknownErrorRetryTimesMap[title] = unknownErrorRetryTimesMap[title] || 0
-      //     unknownErrorRetryTimesMap[title] += 1
-      //   } else {
-      //     // mean the stream is not live
-      //     // start monitor the stream
-      //     message = 'stream_end_stop_record'
-      //   }
-      // }
       unknownErrorRetryTimesMap[title] = unknownErrorRetryTimesMap[title] || 0
       unknownErrorRetryTimesMap[title] += 1
 
       if (!message) {
         message = errorCodeToI18nMessage(code, 'error.stop_record.')
       }
-
-
 
       toast({
         title: streamConfig.title,
@@ -198,18 +160,17 @@ export default function StreamConfigList() {
         { ...streamConfig, status: StreamStatus.NOT_STARTED },
         streamConfig.title
       )
-      if (isStopByUser) {
-        return
-      }
 
-      console.log(unknownErrorRetryTimesMap[title], maxRetryTimes)
-
-      if (unknownErrorRetryTimesMap[title] >= maxRetryTimes) {
+      if (isStopByUser || unknownErrorRetryTimesMap[title] >= maxRetryTimes) {
         unknownErrorRetryTimesMap[title] = 0
         return
       }
 
-      console.log('emit restart')
+      if (isStopByResolutionChange) {
+        unknownErrorRetryTimesMap[title] = 0
+      }
+
+      console.log('emit restart', unknownErrorRetryTimesMap[title])
       emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.title)
     })
 

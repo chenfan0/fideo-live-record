@@ -30,11 +30,10 @@ import {
   recordStream,
   recordStreamFfmpegProgressInfo,
   recordStreamFfmpegProcessMap,
-  resetRecordStreamFfmpeg,
+  killRecordStreamFfmpegProcess,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
-import ffmpeg, {
-  isMac,
+import {
   makeSureDependenciesExist,
   downloadDepProgressInfo,
   checkFfmpegExist,
@@ -162,14 +161,6 @@ async function handleMakeSureDependenciesExist() {
   }
   makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist)
     .then(() => {
-      const ffmpegPath = isMac
-        ? join(userDataPath, 'ffmpeg-mac/ffmpeg')
-        : join(userDataPath, 'ffmpeg-win/ffmpeg.exe')
-      const ffprobePath = isMac
-        ? join(userDataPath, 'ffmpeg-mac/ffprobe')
-        : join(userDataPath, 'ffmpeg-win/ffprobe.exe')
-      ffmpeg.setFfmpegPath(ffmpegPath)
-      ffmpeg.setFfprobePath(ffprobePath)
       stopDownloadDepTimerWhenAllDownloadDepEnd()
     })
     .catch(() => {
@@ -257,7 +248,7 @@ app.whenReady().then(async () => {
      * At this time, you do not need to send the STREAM_RECORD_END event,
      * because the ffmpeg process will send the STREAM_RECORD_END event when it is finished running.
      */
-    const shouldSend = resetRecordStreamFfmpeg(title)
+    const shouldSend = killRecordStreamFfmpegProcess(title)
     shouldSend &&
       win?.webContents.send(STREAM_RECORD_END, title, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
     clearTimerWhenAllFfmpegProcessEnd()
@@ -295,7 +286,7 @@ app.whenReady().then(async () => {
     const stillRecordStreamKeys = Object.keys(recordStreamFfmpegProcessMap)
 
     stillRecordStreamKeys.forEach((key) => {
-      resetRecordStreamFfmpeg(key)
+      killRecordStreamFfmpegProcess(key)
     })
     clearTimerWhenAllFfmpegProcessEnd()
 
