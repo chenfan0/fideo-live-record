@@ -166,7 +166,7 @@ export default function StreamConfigList() {
         return
       }
 
-      if (isStopByResolutionChange) {
+      if (isStopByResolutionChange || isStopByStreamEnd) {
         unknownErrorRetryTimesMap[title] = 0
       }
 
