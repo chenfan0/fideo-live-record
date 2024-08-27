@@ -78,3 +78,39 @@ This software is provided without any warranty of any kind, whether express or i
 **Miscellaneous**
 
 This disclaimer applies to all users of this software. The developer reserves the right to update this disclaimer at any time without prior notice. By using this software, you agree to these terms. If you do not agree to any of these terms, please discontinue use of this software immediately and delete all related files. If you have any questions, please consult a legal advisor.
+
+## Fideo Privacy Policy
+
+### Introduction
+
+Fideo is an open-source software, and we highly value your privacy. This privacy policy aims to explain how we (or more precisely, how we do not) handle your personal information.
+
+### Fideo Software
+
+#### No Personal Information Collection
+
+Fideo software does not collect, store, or process any user personal information. Our software runs locally on your device and does not transmit any data to our servers or third parties.
+
+#### Open Source Software
+
+Fideo is an open-source project. This means anyone can view, audit, and contribute to our source code. This further ensures the transparency and security of our software.
+
+#### Local Data
+
+All data generated or processed by Fideo software is saved on your local device. We cannot access this data and will not attempt to do so.
+
+### Fideo Website
+
+#### Website Analytics
+
+The Fideo website may use third-party analytics tools (such as Google Analytics) to collect anonymous statistical data about website usage. This data is used to improve our website experience and will not be used to identify individual users.
+
+### Policy Changes
+
+If we make any significant changes to our privacy policy, we will update the content on this page.
+
+### Contact Us
+
+If you have any questions or suggestions regarding this privacy policy, please contact us through our GitHub project page.
+
+By using Fideo software or visiting the Fideo website, you agree to the terms of this privacy policy. If you do not agree to these terms, please do not use our software or visit our website.
