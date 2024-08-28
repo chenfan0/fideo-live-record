@@ -4,7 +4,10 @@ export default {
       nav_bar: {
         create: 'Create New Recording Item',
         setting: 'Default Settings',
-        toggle_theme: 'Toggle Theme'
+        toggle_theme: 'Toggle Theme',
+        qq: 'Join QQ Group',
+        discord: 'Join Discord',
+        go_to_website: 'Go to Website'
       },
       default_settings: {
         title: 'Default Settings',
@@ -125,7 +128,10 @@ export default {
       nav_bar: {
         create: '新建录制项',
         setting: '默认配置',
-        toggle_theme: '切换主题'
+        toggle_theme: '切换主题',
+        qq: '加入QQ群',
+        discord: '加入Discord',
+        go_to_website: '前往官网'
       },
       default_settings: {
         title: '默认配置',
