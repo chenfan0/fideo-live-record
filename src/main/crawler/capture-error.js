@@ -29,7 +29,8 @@ export function captureError(fn) {
         }
       }
 
-      if (message.includes('403')) {
+      // tiktok Request failed with status code 502
+      if (message.includes('403') || message === 'Request failed with status code 502') {
         return {
           code: CRAWLER_ERROR_CODE.FORBIDDEN
         }

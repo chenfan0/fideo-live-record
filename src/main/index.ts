@@ -7,6 +7,7 @@ import pkg from '../../package.json'
 
 import {
   CLOSE_WINDOW,
+  DOWNLOAD_DEP_PROGRESS_INFO,
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
   GET_LIVE_URLS,
@@ -14,6 +15,7 @@ import {
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
   RECORD_DUMMY_PROCESS,
+  RETRY_DOWNLOAD_DEP,
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
@@ -28,9 +30,16 @@ import {
   recordStream,
   recordStreamFfmpegProgressInfo,
   recordStreamFfmpegProcessMap,
-  resetRecordStreamFfmpeg,
+  killRecordStreamFfmpegProcess,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
+import {
+  makeSureDependenciesExist,
+  downloadDepProgressInfo,
+  checkFfmpegExist,
+  checkFfprobeExist,
+  downloadReq
+} from './ffmpeg'
 
 async function checkUpdate() {
   try {
@@ -46,14 +55,15 @@ async function checkUpdate() {
   }
 }
 
-let timer: NodeJS.Timeout | undefined
-const startTimerWhenFirstFfmpegProcessStart = () => {
-  if (timer === undefined) {
-    timer = setInterval(() => {
+let ffmpegProcessTimer: NodeJS.Timeout | undefined
+const startFfmpegProcessTimerWhenFirstFfmpegProcessStart = () => {
+  if (ffmpegProcessTimer === undefined) {
+    ffmpegProcessTimer = setInterval(() => {
       win?.webContents.send(FFMPEG_PROGRESS_INFO, recordStreamFfmpegProgressInfo)
     }, 1000)
   }
 }
+
 const isAllFfmpegProcessEnd = () =>
   Object.keys(recordStreamFfmpegProcessMap).every(
     (key) =>
@@ -70,13 +80,28 @@ export const clearTimerWhenAllFfmpegProcessEnd = () => {
   if (isAllFfmpegProcessEnd()) {
     win?.webContents.send(FFMPEG_PROGRESS_INFO, recordStreamFfmpegProgressInfo)
 
-    clearInterval(timer)
-    timer = undefined
+    clearInterval(ffmpegProcessTimer)
+    ffmpegProcessTimer = undefined
   }
 }
 
+let downloadDepTimer: NodeJS.Timeout | undefined
+const startDownloadDepTimerWhenFirstDownloadDepStart = () => {
+  if (downloadDepTimer === undefined) {
+    downloadDepTimer = setInterval(() => {
+      win?.webContents.send(DOWNLOAD_DEP_PROGRESS_INFO, downloadDepProgressInfo)
+    }, 1000)
+  }
+}
+
+const stopDownloadDepTimerWhenAllDownloadDepEnd = () => {
+  win?.webContents.send(DOWNLOAD_DEP_PROGRESS_INFO, downloadDepProgressInfo)
+  clearInterval(downloadDepTimer)
+  downloadDepTimer = undefined
+}
+
 let win: BrowserWindow | null
-function createWindow(): void {
+async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -85,7 +110,6 @@ function createWindow(): void {
     title: 'Fideo',
     autoHideMenuBar: true,
     frame: process.platform === 'darwin',
-    // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -115,6 +139,7 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+  await handleMakeSureDependenciesExist()
 }
 
 function showNotification(title: string, body: string) {
@@ -125,12 +150,32 @@ function showNotification(title: string, body: string) {
   notification.show()
 }
 
+async function handleMakeSureDependenciesExist() {
+  const userDataPath = app.getPath('userData')
+  console.log('userDataPath:', userDataPath)
+  const [isFFmpegExist, isFfprobeExist] = await Promise.all([
+    checkFfmpegExist(userDataPath),
+    checkFfprobeExist(userDataPath)
+  ])
+
+  if (!isFFmpegExist || !isFfprobeExist) {
+    startDownloadDepTimerWhenFirstDownloadDepStart()
+  }
+  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist)
+    .then(() => {
+      stopDownloadDepTimerWhenAllDownloadDepEnd()
+    })
+    .catch(() => {
+      stopDownloadDepTimerWhenAllDownloadDepEnd()
+    })
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('site.fideo.app')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -179,12 +224,15 @@ app.whenReady().then(() => {
     }
     streamConfig.liveUrls = liveUrls
 
-    const { code: recordStreamCode } = await recordStream(streamConfig, (code: number) => {
-      win?.webContents.send(STREAM_RECORD_END, title, code)
-      clearTimerWhenAllFfmpegProcessEnd()
-    })
+    const { code: recordStreamCode } = await recordStream(
+      streamConfig,
+      (code: number, errMsg?: string) => {
+        win?.webContents.send(STREAM_RECORD_END, title, code, errMsg)
+        clearTimerWhenAllFfmpegProcessEnd()
+      }
+    )
 
-    startTimerWhenFirstFfmpegProcessStart()
+    startFfmpegProcessTimerWhenFirstFfmpegProcessStart()
 
     return {
       code: recordStreamCode
@@ -200,7 +248,7 @@ app.whenReady().then(() => {
      * At this time, you do not need to send the STREAM_RECORD_END event,
      * because the ffmpeg process will send the STREAM_RECORD_END event when it is finished running.
      */
-    const shouldSend = resetRecordStreamFfmpeg(title)
+    const shouldSend = killRecordStreamFfmpegProcess(title)
     shouldSend &&
       win?.webContents.send(STREAM_RECORD_END, title, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
     clearTimerWhenAllFfmpegProcessEnd()
@@ -226,6 +274,10 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle(RETRY_DOWNLOAD_DEP, async () => {
+    await handleMakeSureDependenciesExist()
+  })
+
   ipcMain.handle(CLOSE_WINDOW, () => {
     win?.close()
   })
@@ -234,23 +286,26 @@ app.whenReady().then(() => {
     const stillRecordStreamKeys = Object.keys(recordStreamFfmpegProcessMap)
 
     stillRecordStreamKeys.forEach((key) => {
-      resetRecordStreamFfmpeg(key)
+      killRecordStreamFfmpegProcess(key)
     })
+    downloadReq.destroy()
     clearTimerWhenAllFfmpegProcessEnd()
-
+    stopDownloadDepTimerWhenAllDownloadDepEnd()
     win?.destroy()
   })
 
-  createWindow()
+  await createWindow()
 
   setTimeout(() => {
     checkUpdate()
   }, 1000)
 
-  app.on('activate', function () {
+  app.on('activate', async function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) {
+      await createWindow()
+    }
   })
 })
 

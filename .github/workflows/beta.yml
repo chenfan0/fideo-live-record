@@ -42,19 +42,19 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v4
       with:
-        name: build-win-${{ env.VERSION }}
+        name: build-win-${{ env.VERSION }}-beta
         path: dist/fideo-${{ env.VERSION }}.exe
 
     - name: Upload macOS build artifacts (x64)
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v4
       with:
-        name: build-mac-x64-${{ env.VERSION }}
+        name: build-mac-x64-${{ env.VERSION }}-beta
         path: dist/fideo-${{ env.VERSION }}-x64.dmg
 
     - name: Upload macOS build artifacts (arm)
       if: ${{ runner.os == 'macOS' }}
       uses: actions/upload-artifact@v4
       with:
-        name: build-mac-arm-${{ env.VERSION }}
+        name: build-mac-arm-${{ env.VERSION }}-beta
         path: dist/fideo-${{ env.VERSION }}-arm64.dmg

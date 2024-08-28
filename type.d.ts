@@ -11,6 +11,7 @@ interface IStreamConfig {
   line: string // '0' '1' eg
   status: number
   convertToMP4: boolean
+  detectResolution: boolean
 }
 type Lang = 'en' | 'cn'
 interface IDefaultDefaultSettingsConfig {
@@ -30,3 +31,9 @@ type IFfmpegProgressInfo = Record<
     percent?: number
   }
 >
+
+interface IDownloadDepProgressInfo {
+  showRetry: boolean
+  downloading: boolean
+  progress: number
+}

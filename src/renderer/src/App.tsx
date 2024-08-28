@@ -7,14 +7,17 @@ import TitleBar from '@/components/TitleBar/TitleBar'
 import NavBar from '@/components/NavBar/NavBar'
 import StreamConfigList from '@/components/StreamConfigList/StreamConfigList'
 import Dialog from '@/components/Dialog'
+import DownloadingDep from '@/components/DownloadingDep/DownloadingDep'
 
 import { useStreamConfigStore } from './store/useStreamConfigStore'
 import { useDefaultSettingsStore } from './store/useDefaultSettingsStore'
 import { useNavSelectedStatusStore } from './store/useNavSelectedStatusStore'
+import { useDownloadDepInfoStore } from './store/useDownloadDepStore'
 
 function App(): JSX.Element {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const { i18n, t } = useTranslation()
+
   const { initData: initStreamConfigData } = useStreamConfigStore((state) => ({
     initData: state.initialData
   }))
@@ -27,6 +30,9 @@ function App(): JSX.Element {
   const { initData: initNavSelectedStatus } = useNavSelectedStatusStore((state) => ({
     initData: state.initData
   }))
+  const { downloadDepProgressInfo, updateUpdateDownloadProgressInfo } = useDownloadDepInfoStore(
+    (state) => state
+  )
 
   useMount(() => {
     const titleBar = document.getElementById('title-bar')
@@ -34,6 +40,10 @@ function App(): JSX.Element {
 
     window.api.onAppUpdate(() => {
       setShowUpdateDialog(true)
+    })
+
+    window.api.onDownloadDepProgressInfo((progressInfo) => {
+      updateUpdateDownloadProgressInfo(progressInfo)
     })
   })
 
@@ -67,6 +77,10 @@ function App(): JSX.Element {
           )
         }
       />
+
+      {(downloadDepProgressInfo.downloading || downloadDepProgressInfo.showRetry) && (
+        <DownloadingDep />
+      )}
     </>
   )
 }

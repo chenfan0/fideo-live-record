@@ -2,11 +2,13 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
   CLOSE_WINDOW,
+  DOWNLOAD_DEP_PROGRESS_INFO,
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
+  RETRY_DOWNLOAD_DEP,
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
@@ -33,10 +35,11 @@ const api = {
   maxRestoreWindow: () => ipcRenderer.invoke(MAXIMIZE_RESTORE_WINDOW),
   closeWindow: () => ipcRenderer.invoke(CLOSE_WINDOW),
   forceCloseWindow: () => ipcRenderer.invoke(FORCE_CLOSE_WINDOW),
+  retryDownloadDep: () => ipcRenderer.invoke(RETRY_DOWNLOAD_DEP),
 
-  onStreamRecordEnd: (callback: (title: string, code: number) => void) => {
-    ipcRenderer.on(STREAM_RECORD_END, (_, title, code) => {
-      callback(title, code)
+  onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => {
+    ipcRenderer.on(STREAM_RECORD_END, (_, title, code, errMsg) => {
+      callback(title, code, errMsg)
     })
   },
   onFFmpegProgressInfo: (callback: (info: Record<string, IFfmpegProgressInfo>) => void) => {
@@ -44,6 +47,13 @@ const api = {
       callback(info)
     })
   },
+
+  onDownloadDepProgressInfo: (callback: (info: IDownloadDepProgressInfo) => void) => {
+    ipcRenderer.on(DOWNLOAD_DEP_PROGRESS_INFO, (_, info) => {
+      callback(info)
+    })
+  },
+
   onUserCloseWindow: (callback: () => void) => {
     ipcRenderer.on(USER_CLOSE_WINDOW, () => {
       callback()

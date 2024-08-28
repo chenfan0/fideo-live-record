@@ -5,8 +5,8 @@ import UseThemeIcon from '@/components/UseThemeIcon'
 import Dialog from '@/components/Dialog'
 import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 
-// import darkPreviewIcon from '@/assets/images/dark/preview.svg'
-// import lightPreviewIcon from '@/assets/images/light/preview.svg'
+import darkPreviewIcon from '@/assets/images/dark/preview.svg'
+import lightPreviewIcon from '@/assets/images/light/preview.svg'
 import darkPlayIcon from '@/assets/images/dark/play.svg'
 import lightPlayIcon from '@/assets/images/light/play.svg'
 import darkPauseIcon from '@/assets/images/dark/pause.svg'
@@ -19,7 +19,14 @@ import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import StreamConfigSheet from '@renderer/components/StreamConfigSheet'
 
 import { useToast } from '@renderer/hooks/useToast'
-import { CRAWLER_ERROR_CODE, SUCCESS_CODE, errorCodeToI18nMessage } from '../../../../../code'
+import {
+  CRAWLER_ERROR_CODE,
+  SUCCESS_CODE,
+  UNKNOWN_CODE,
+  crawlerErrorCodeToI18nMessage,
+  FFMPEG_ERROR_CODE,
+  errorCodeToI18nMessage
+} from '../../../../../code'
 import { RECORD_END_NOT_USER_STOP } from '../../../../../const'
 import emitter from '@/lib/bus'
 import { useDefaultSettingsStore } from '../../../store/useDefaultSettingsStore'
@@ -36,6 +43,7 @@ export default function OperationBar(props: OperationBarProps) {
   const { toast } = useToast()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false)
 
   const { removeStreamConfig, updateStreamConfig } = useStreamConfigStore((state) => ({
     streamConfigList: state.streamConfigList,
@@ -55,7 +63,18 @@ export default function OperationBar(props: OperationBarProps) {
         streamConfig.title
       ))
 
-    const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig))
+    const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig)).catch(() => {
+      return { code: UNKNOWN_CODE }
+    })
+
+    const currentStatus = useStreamConfigStore
+      .getState()
+      .streamConfigList.find((item) => item.title === streamConfig.title)?.status
+    if (currentStatus === StreamStatus.NOT_STARTED) {
+      return
+    }
+
+    console.log('handleStartRecord code:', code)
 
     if (code === SUCCESS_CODE) {
       await updateStreamConfig(
@@ -101,7 +120,12 @@ export default function OperationBar(props: OperationBarProps) {
       return
     }
 
-    const errMessage = errorCodeToI18nMessage(code, 'error.start_record.')
+    // 这里只会处理获取直播地址失败的情况，录制失败的处理在StreamConfigList组件中
+    if (Object.values(FFMPEG_ERROR_CODE).includes(code) || code === UNKNOWN_CODE) {
+      return
+    }
+
+    const errMessage = crawlerErrorCodeToI18nMessage(code, 'error.start_record.')
 
     await updateStreamConfig(
       { ...streamConfig, status: StreamStatus.NOT_STARTED },
@@ -129,6 +153,29 @@ export default function OperationBar(props: OperationBarProps) {
     clearTimeout(timer.current)
   }
 
+  const handlePreviewClick = async () => {
+    setIsLoadingPreview(true)
+    const { code, liveUrls } = await window.api.getLiveUrls({
+      roomUrl: streamConfig.roomUrl,
+      cookie: streamConfig.cookie,
+      proxy: streamConfig.proxy
+    })
+    setIsLoadingPreview(false)
+
+    if (code !== SUCCESS_CODE) {
+      toast({
+        title: streamConfig.title,
+        description: t(errorCodeToI18nMessage(code, 'error.get_line.')),
+        variant: 'destructive'
+      })
+      return
+    }
+
+    window.api.navByDefaultBrowser(
+      `https://www.fideo.site/cn?streamUrl=${encodeURIComponent(liveUrls[streamConfig.line])}`
+    )
+  }
+
   useEffect(() => {
     const handleRecordEndNotUserStop = async (title: string) => {
       if (title !== streamConfig.title) return
@@ -152,12 +199,19 @@ export default function OperationBar(props: OperationBarProps) {
   return (
     <>
       <div className="flex absolute right-0 gap-2">
-        {/* <UseThemeIcon
-          className="w-[21px] cursor-pointer"
-          dark={darkPreviewIcon}
-          light={lightPreviewIcon}
-          tooltipContent={t('stream_config.preview')}
-        /> */}
+        {!isLoadingPreview && (
+          <UseThemeIcon
+            className="w-[21px] cursor-pointer"
+            dark={darkPreviewIcon}
+            light={lightPreviewIcon}
+            tooltipContent={t('stream_config.preview')}
+            handleClick={handlePreviewClick}
+          />
+        )}
+
+        {isLoadingPreview && (
+          <div className="w-[21px] h-[21px] rounded-full border-t-2 border-b-2 border-gray-300 animate-spin"></div>
+        )}
 
         {streamConfig.status === StreamStatus.NOT_STARTED ? (
           <UseThemeIcon

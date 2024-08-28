@@ -299,6 +299,8 @@ async function baseGetTaobaoLiveUrlsPlugin(roomUrl, others = {}) {
       }
     }
 
+    console.log(ret, 'ret======', res)
+
     return {
       code: CRAWLER_ERROR_CODE.NOT_URLS
     }

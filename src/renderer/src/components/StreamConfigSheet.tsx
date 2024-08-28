@@ -31,7 +31,8 @@ const formSchema = z.object({
   cookie: z.string(),
   proxy: z.string(),
   liveUrls: z.array(z.string()),
-  convertToMP4: z.boolean()
+  convertToMP4: z.boolean(),
+  detectResolution: z.boolean()
 })
 
 const defaultStreamConfig: IStreamConfig = {
@@ -46,7 +47,8 @@ const defaultStreamConfig: IStreamConfig = {
   proxy: '',
   liveUrls: [],
   segmentTime: '',
-  convertToMP4: true
+  convertToMP4: true,
+  detectResolution: false
 }
 
 function validStreamConfigData(
@@ -330,16 +332,30 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
                   name="convertToMP4"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>{t('stream_config.should_convert_to_mp4')}</FormLabel>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="flex"
+                      />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="detectResolution"
+                  render={({ field }) => (
+                    <FormItem>
                       <TooltipProvider delayDuration={400}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <FormLabel className=" cursor-pointer">
-                              {t('stream_config.should_convert_to_mp4')}
+                              {t('stream_config.should_detect_resolution')}
                             </FormLabel>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className=" max-w-[400px]">
-                              {t('stream_config.should_convert_to_mp4_tooltip')}
+                            <p className="max-w-[400px]">
+                              {t('stream_config.should_detect_resolution_tooltip')}
                             </p>
                           </TooltipContent>
                         </Tooltip>
