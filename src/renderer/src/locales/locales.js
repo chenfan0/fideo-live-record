@@ -73,7 +73,8 @@ export default {
         should_convert_to_mp4: 'Convert to MP4 after recording ends',
         should_detect_resolution: 'Detect resolution',
         should_detect_resolution_tooltip:
-          'If the resolution changes frequently during recording (e.g. YY Live), it is recommended to enable this function to detect the resolution to prevent screen tearing'
+          'If the resolution changes frequently during recording (e.g. YY Live), it is recommended to enable this function to detect the resolution to prevent screen tearing',
+        preview: 'Preview Stream'
       },
       start_record: 'Start Recording',
       user_stop_record: 'Stop Recording (User Manually Stopped)',
@@ -194,7 +195,8 @@ export default {
         should_convert_to_mp4: '录制结束后是否转为MP4',
         should_detect_resolution: '是否检测分辨率',
         should_detect_resolution_tooltip:
-          '如果录制的过程会经常出现分辨率改变的情况(例如YY直播)，建议开启该功能检测分辨率，防止出现花屏情况'
+          '如果录制的过程会经常出现分辨率改变的情况(例如YY直播)，建议开启该功能检测分辨率，防止出现花屏情况',
+        preview: '预览直播流'
       },
       start_record: '开始录制',
       user_stop_record: '停止录制(用户手动停止)',
