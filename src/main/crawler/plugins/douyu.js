@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js'
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { DESKTOP_USER_AGENT, request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { SUCCESS_CODE, CRAWLER_ERROR_CODE } from '../../../code'
@@ -14,7 +14,7 @@ function getRoomIdByUrl(url) {
 }
 
 async function baseGetDouyuLiveUrlsPlugin(roomUrl, others = {}) {
-  const roomId = getRoomIdByUrl(roomUrl)
+  let roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
 
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
@@ -33,6 +33,11 @@ async function baseGetDouyuLiveUrlsPlugin(roomUrl, others = {}) {
   for (let i = 0; i < scriptMatches.length; i++) {
     const scriptContent = scriptMatches[i].replace(scriptRegex, '$1')
     if (!scriptContent.includes(`ub98484234`)) continue
+    const match = htmlContent.match(/var\s+apm_room_id\s*=\s*(\d+);/)
+
+    if (match) {
+      roomId = match[1]
+    }
 
     const m = '10000000000000000000000000001501'
     const y = parseInt(new Date().getTime() / 1e3, 10)
@@ -48,7 +53,8 @@ async function baseGetDouyuLiveUrlsPlugin(roomUrl, others = {}) {
         method: 'POST',
         proxy,
         headers: {
-          cookie
+          cookie,
+          'User-Agent': DESKTOP_USER_AGENT
         }
       })
     ).data
