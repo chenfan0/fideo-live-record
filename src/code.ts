@@ -15,7 +15,8 @@ export const CRAWLER_ERROR_CODE = {
   FORBIDDEN: 5,
   CURRENT_LINE_ERROR: 6, // current line error
   COOKIE_EXPIRED: 7,
-  COOKIE_IS_REQUIRED: 8
+  COOKIE_IS_REQUIRED: 8,
+  REQUEST_TOO_FAST: 9
 }
 
 export const FFMPEG_ERROR_CODE = {
@@ -58,6 +59,9 @@ export const crawlerErrorCodeToI18nMessage = (code: number, prefix: string) => {
     case CRAWLER_ERROR_CODE.COOKIE_IS_REQUIRED:
       message += 'cookie_is_required'
       break
+    case CRAWLER_ERROR_CODE.REQUEST_TOO_FAST:
+      message += 'request_too_fast'
+      break
     default:
       message += 'unknown_error'
       break
@@ -94,6 +98,9 @@ export const errorCodeToI18nMessage = (code: number, prefix: string) => {
       break
     case CRAWLER_ERROR_CODE.COOKIE_IS_REQUIRED:
       message += 'cookie_is_required'
+      break
+    case CRAWLER_ERROR_CODE.REQUEST_TOO_FAST:
+      message += 'request_too_fast'
       break
     case FFMPEG_ERROR_CODE.USER_KILL_PROCESS:
       message += 'user_stop_record'

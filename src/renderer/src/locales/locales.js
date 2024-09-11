@@ -90,7 +90,8 @@ export default {
           unknown_error: 'Unknown error',
           cookie_expired: 'Cookie has expired, please re-enter the cookie',
           cookie_is_required:
-            'Current streaming platform requires a cookie, please enter the cookie'
+            'Current streaming platform requires a cookie, please enter the cookie',
+          request_too_fast: 'Request too fast, please try again later'
         },
         start_record: {
           not_urls: 'Stream is not live, enable monitoring and recording feature',
@@ -102,6 +103,7 @@ export default {
           cookie_expired: 'Cookie has expired, please re-enter the cookie',
           cookie_is_required:
             'Current streaming platform requires a cookie, please enter the cookie',
+          request_too_fast: 'Request too fast, please try again later',
           miss_dep: 'Missing dependencies, trying to install dependencies. . .'
         },
         stop_record: {
@@ -211,7 +213,8 @@ export default {
           forbidden: '请求被拒绝, 尝试使用或者更换代理',
           unknown_error: '未知错误',
           cookie_expired: 'Cookie已过期，请重新填写',
-          cookie_is_required: '当前直播平台需要Cookie，请填写Cookie'
+          cookie_is_required: '当前直播平台需要Cookie，请填写Cookie',
+          request_too_fast: '请求过快，请稍后再试'
         },
         start_record: {
           not_urls: '直播间未开播，开启监控录制功能',
@@ -222,6 +225,7 @@ export default {
           invalid_url: '直播间地址不合法',
           cookie_expired: 'Cookie已过期，请重新填写',
           cookie_is_required: '当前直播平台需要Cookie，请填写Cookie',
+          request_too_fast: '请求过快，请稍后再试',
           miss_dep: '缺少依赖，正在尝试安装依赖'
         },
         stop_record: {

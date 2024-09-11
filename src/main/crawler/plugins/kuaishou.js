@@ -15,15 +15,35 @@ async function baseGetKuaishouLiveUrlsPlugin(roomUrl, others = {}) {
   const roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
-  const htmlContent = (
-    await request(`https://live.kuaishou.com/u/${roomId}`, {
-      headers: {
-        cookie,
-        host: 'live.kuaishou.com'
-      },
-      proxy
-    })
-  ).data
+  let htmlContent = ''
+  try {
+    htmlContent = (
+      await request(`https://live.kuaishou.com/u/${roomId}`, {
+        headers: {
+          cookie,
+          host: 'live.kuaishou.com'
+        },
+        proxy
+      })
+    ).data
+  } catch (e) {
+    const msg = e.message
+
+    if (msg === 'Request failed with status code 501') {
+      console.log('501')
+      return {
+        code: CRAWLER_ERROR_CODE.REQUEST_TOO_FAST
+      }
+    }
+    throw e
+  }
+
+  if (htmlContent.includes('请求过快，请稍后重试')) {
+    return {
+      code: CRAWLER_ERROR_CODE.REQUEST_TOO_FAST
+    }
+  }
+
   const scriptReg = /<script\b[^>]*>([\s\S]*?)<\/script>/gi
   const matches = htmlContent.match(scriptReg)
   let liveUrls = []

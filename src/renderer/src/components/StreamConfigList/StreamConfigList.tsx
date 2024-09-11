@@ -118,7 +118,7 @@ export default function StreamConfigList() {
 
       /**
        * 当录制过程出现错误，直播结束或者用户手动停止
-       * 会回调两次改函数，第一次是开始转换为mp4文件之前，第二次是转换后
+       * 会回调两次该函数，第一次是开始转换为mp4文件之前，第二次是转换后
        */
 
       if (!alreadyCallbackOneTimeSet.has(title)) {
@@ -170,7 +170,6 @@ export default function StreamConfigList() {
         unknownErrorRetryTimesMap[title] = 0
       }
 
-      console.log('emit restart', unknownErrorRetryTimesMap[title])
       emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.title)
     })
 
