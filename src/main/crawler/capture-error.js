@@ -17,11 +17,11 @@ export function captureError(fn) {
 
       log('error:', message)
 
-      if (message.includes('timeout')) {
-        return {
-          code: CRAWLER_ERROR_CODE.TIMEOUT
-        }
-      }
+      // if (message.includes('timeout')) {
+      //   return {
+      //     code: CRAWLER_ERROR_CODE.TIMEOUT
+      //   }
+      // }
 
       if (message === ERROR_MESSAGE.INVALID_PROXY) {
         return {
