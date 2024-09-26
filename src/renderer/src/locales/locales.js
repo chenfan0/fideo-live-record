@@ -16,7 +16,9 @@ export default {
         directory: 'Storage Directory',
         directory_placeholder: 'Please select a storage directory',
         xizhi_key: 'Xizhi API Key (For WeChat Push)',
-        xizhi_key_placeholder: 'Please enter the Xizhi API Key'
+        xizhi_key_placeholder: 'Please enter the Xizhi API Key',
+        logs_dir: 'Logs Directory',
+        logs_dir_placeholder: 'Open Logs Directory'
       },
       stream_config: {
         confirm: 'Confirm',
@@ -45,6 +47,7 @@ export default {
         directory: 'Storage Directory',
         directory_placeholder: 'Please select a storage directory',
         select: 'Select',
+        open: 'Open',
         title_can_not_be_empty: 'Title cannot be empty',
         title_already_exists: 'Title already exists',
         room_url_can_not_be_empty: 'Stream URL cannot be empty',
@@ -143,7 +146,9 @@ export default {
         directory: '存储目录',
         directory_placeholder: '请选择存储目录',
         xizhi_key: '息知API Key(用于微信推送)',
-        xizhi_key_placeholder: '请输入息知API Key'
+        xizhi_key_placeholder: '请输入息知API Key',
+        logs_dir: '日志目录',
+        logs_dir_placeholder: '打开日志目录'
       },
       stream_config: {
         confirm: '确认',
@@ -171,6 +176,7 @@ export default {
         directory: '存储目录',
         directory_placeholder: '请选择存储目录',
         select: '选择',
+        open: '打开',
         title_can_not_be_empty: '标题不能为空',
         title_already_exists: '标题已存在',
         room_url_can_not_be_empty: '直播间地址不能为空',

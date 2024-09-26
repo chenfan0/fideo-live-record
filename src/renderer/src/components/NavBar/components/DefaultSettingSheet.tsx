@@ -14,7 +14,8 @@ import { useEffect } from 'react'
 const formSchema = z.object({
   directory: z.string(),
   lang: z.string(),
-  xizhiKey: z.optional(z.string())
+  xizhiKey: z.optional(z.string()),
+  logsDir: z.optional(z.string())
 })
 
 interface StreamConfigSheetProps {
@@ -47,6 +48,10 @@ export default function DefaultSettingSheet(props: StreamConfigSheetProps) {
       return
     }
     form.setValue('directory', filePaths[0])
+  }
+
+  const handleOpenLogsDir = () => {
+    window.api.openLogsDir()
   }
 
   const handleSetSheetOpen = async (status: boolean, trigger = false) => {
@@ -122,6 +127,28 @@ export default function DefaultSettingSheet(props: StreamConfigSheetProps) {
                           placeholder={t('default_settings.xizhi_key_placeholder')}
                           {...field}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="logsDir"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('default_settings.logs_dir')}</FormLabel>
+                      <FormControl>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder={t('default_settings.logs_dir_placeholder')}
+                            {...field}
+                            disabled
+                          />
+                          <Button variant="outline" type="button" onClick={handleOpenLogsDir}>
+                            {t('stream_config.open')}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -6,6 +6,7 @@ declare global {
     api: {
       isDarwin: boolean
       selectDir: () => Promise<{ canceled: boolean; filePaths: string[] }>
+      openLogsDir: () => void
       getLiveUrls: (info: {
         roomUrl: string
         proxy?: string

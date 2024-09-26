@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, Notification } from 'electron'
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import { lt } from 'semver'
@@ -14,6 +14,7 @@ import {
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
+  OPEN_LOGS_DIR,
   RECORD_DUMMY_PROCESS,
   RETRY_DOWNLOAD_DEP,
   SELECT_DIR,
@@ -268,6 +269,10 @@ app.whenReady().then(async () => {
 
   ipcMain.handle(SHOW_NOTIFICATION, (_, title: string, body: string) => {
     showNotification(title, body)
+  })
+
+  ipcMain.handle(OPEN_LOGS_DIR, () => {
+    shell.openPath(resolve(app.getPath('userData'), 'logs'))
   })
 
   ipcMain.handle(MINIMIZE_WINDOW, () => {

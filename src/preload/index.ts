@@ -8,6 +8,7 @@ import {
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
+  OPEN_LOGS_DIR,
   RETRY_DOWNLOAD_DEP,
   SELECT_DIR,
   SHOW_NOTIFICATION,
@@ -22,6 +23,7 @@ import {
 const api = {
   isDarwin: process.platform === 'darwin',
   selectDir: () => ipcRenderer.invoke(SELECT_DIR),
+  openLogsDir: () => ipcRenderer.invoke(OPEN_LOGS_DIR),
   getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string }) =>
     ipcRenderer.invoke('GET_LIVE_URLS', info),
   navByDefaultBrowser: (url: string) => ipcRenderer.invoke(NAV_BY_DEFAULT_BROWSER, url),
