@@ -1,6 +1,6 @@
 {
   "name": "fideo",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "this is a easy live record app",
   "main": "./out/main/index.js",
   "author": "chenfan",
