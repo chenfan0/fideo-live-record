@@ -10,10 +10,16 @@ const log = debug('fideo-crawler-capture-error')
  */
 export function captureError(fn) {
   return async function (...args) {
+    const writeLog = args[args.length - 1]
+    const realArgs = args.slice(0, args.length - 1)
     try {
-      return await fn.apply(this, args)
+      const res = await fn.apply(this, realArgs)
+      writeLog(`Fetch Live Res: ${JSON.stringify(res, null, 2)}`)
+      return res
     } catch (e) {
       const message = e.message
+
+      writeLog(`Fetch Live Error: ${message}`)
 
       log('error:', message)
 

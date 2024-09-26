@@ -81,7 +81,7 @@ const checkFileExist = async (filepath: string) => {
   })
 }
 
-async function convertFlvToMp4(sourcePath: string) {
+async function convertFlvToMp4(sourcePath: string, writeLog: (content: string) => void) {
   if (!(await checkFileExist(sourcePath))) return
   const process = ffmpeg()
   const output = sourcePath.replace(FLV_FLAG, '.mp4')
@@ -96,11 +96,16 @@ async function convertFlvToMp4(sourcePath: string) {
     .audioCodec('copy')
     .inputFormat('flv')
     .outputFormat('mp4')
+    .on('start', () => {
+      writeLog(`Convert Flv To Mp4 Start: ${sourcePath}`)
+    })
     .on('end', () => {
       fs.unlinkSync(sourcePath)
+      writeLog(`Convert Flv To Mp4 Success: ${sourcePath}`)
       _resolve()
     })
     .on('error', () => {
+      writeLog(`Convert Flv To Mp4 Error: ${sourcePath}`)
       _resolve()
     })
     .save(output)
@@ -108,7 +113,11 @@ async function convertFlvToMp4(sourcePath: string) {
   return p
 }
 
-async function convert(sourcePath: string, convertToMP4 = true) {
+async function convert(
+  sourcePath: string,
+  writeLog: (content: string) => void,
+  convertToMP4 = true
+) {
   if (!convertToMP4) return
   if (!(await checkFileExist(sourcePath))) return
   const stats = fs.statSync(sourcePath)
@@ -122,10 +131,10 @@ async function convert(sourcePath: string, convertToMP4 = true) {
       .map((file) => path.join(sourcePath, file))
 
     for (const flvFile of flvFiles) {
-      await convertFlvToMp4(flvFile)
+      await convertFlvToMp4(flvFile, writeLog)
     }
   } else {
-    await convertFlvToMp4(sourcePath)
+    await convertFlvToMp4(sourcePath, writeLog)
   }
 }
 
@@ -195,6 +204,7 @@ async function detectStreamResolution(streamConfig: IStreamConfig) {
 
 export async function recordStream(
   streamConfig: IStreamConfig,
+  writeLog: (title: string, content: string) => void,
   cb?: (code: number, errMsg?: string) => void
 ) {
   log('start record stream')
@@ -224,6 +234,8 @@ export async function recordStream(
     detectResolution
   } = streamConfig
 
+  writeLog(title, `RecordStream Config: ${JSON.stringify(streamConfig, null, 2)}`)
+
   detectResolution && detectStreamResolution(streamConfig)
 
   const secondSegmentTime = Number(segmentTime) * 60
@@ -239,6 +251,7 @@ export async function recordStream(
   }
 
   if (recordStreamFfmpegProcessMap[title] !== RECORD_DUMMY_PROCESS) {
+    writeLog(title, 'Record Stream is Killed')
     _resolve({
       code: FFMPEG_ERROR_CODE.USER_KILL_PROCESS
     })
@@ -278,6 +291,9 @@ export async function recordStream(
     .audioCodec('copy')
     .on('start', (...args) => {
       log('record live start', args.join(' '))
+
+      writeLog(title, `Record Live Start: ${args.join(' ')}`)
+
       _resolve({
         code: SUCCESS_CODE
       })
@@ -290,17 +306,19 @@ export async function recordStream(
       const msg = args.join(' ')
 
       log('record live end: ', msg)
+      writeLog(title, `Record Live End: ${msg}`)
 
       killRecordStreamFfmpegProcess(title)
 
       cb?.(SUCCESS_CODE)
-      await convert(convertSource, convertToMP4)
+      await convert(convertSource, writeLog.bind(null, title), convertToMP4)
       cb?.(SUCCESS_CODE)
     })
     .on('error', async (error) => {
       const errMsg = error.message
-      log('record live error: ', errMsg)
 
+      log('record live error: ', errMsg)
+      writeLog(title, `Record Live Error: ${errMsg}`)
       const isResolutionChange = resolutionChangeSet.has(title)
       // 清空数据
       killRecordStreamFfmpegProcess(title)
@@ -319,7 +337,7 @@ export async function recordStream(
       }
 
       cb?.(errCode, errMsg)
-      await convert(convertSource, convertToMP4)
+      await convert(convertSource, writeLog.bind(null, title), convertToMP4)
       cb?.(errCode, errMsg)
     })
     .save(output + FLV_FLAG)

@@ -41,6 +41,10 @@ import {
   downloadReq
 } from './ffmpeg'
 
+import { writeLogWrapper } from './log/index'
+
+export const writeLog = writeLogWrapper(app.getPath('userData'))
+
 async function checkUpdate() {
   try {
     const json = await fetch(
@@ -152,7 +156,6 @@ function showNotification(title: string, body: string) {
 
 async function handleMakeSureDependenciesExist() {
   const userDataPath = app.getPath('userData')
-  console.log('userDataPath:', userDataPath)
   const [isFFmpegExist, isFfprobeExist] = await Promise.all([
     checkFfmpegExist(userDataPath),
     checkFfprobeExist(userDataPath)
@@ -216,7 +219,11 @@ app.whenReady().then(async () => {
      */
     setRecordStreamFfmpegProcessMap(title, RECORD_DUMMY_PROCESS)
 
-    const { code: liveUrlsCode, liveUrls } = await getLiveUrls({ roomUrl, proxy, cookie })
+    const { code: liveUrlsCode, liveUrls } = await getLiveUrls(
+      { roomUrl, proxy, cookie },
+      writeLog.bind(null, title)
+    )
+
     if (liveUrlsCode !== SUCCESS_CODE) {
       return {
         code: liveUrlsCode
@@ -226,6 +233,7 @@ app.whenReady().then(async () => {
 
     const { code: recordStreamCode } = await recordStream(
       streamConfig,
+      writeLog,
       (code: number, errMsg?: string) => {
         win?.webContents.send(STREAM_RECORD_END, title, code, errMsg)
         clearTimerWhenAllFfmpegProcessEnd()

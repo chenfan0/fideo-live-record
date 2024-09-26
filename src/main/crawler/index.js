@@ -91,7 +91,7 @@ const supportPlatform = [
  * @param {{ url: string, proxy?: string, cookie?: string }} info
  * @returns {Promise<{code: number, liveUrls?: string[]}>}
  */
-export async function getLiveUrls(info) {
+export async function getLiveUrls(info, writeLog) {
   const { roomUrl, proxy, cookie } = info
   let host
   try {
@@ -112,7 +112,7 @@ export async function getLiveUrls(info) {
     }
   }
 
-  const res = await getLiveUrlsFn(roomUrl, { proxy, cookie })
+  const res = await getLiveUrlsFn(roomUrl, { proxy, cookie }, writeLog)
   log('res:', res)
   return res
 }
