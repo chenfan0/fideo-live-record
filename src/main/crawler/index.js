@@ -17,6 +17,7 @@ import { getYYLiveUrlsPlugin } from './plugins/yy'
 import { getJDLiveUrlsPlugin } from './plugins/jd'
 import { getMomoLiveUrlsPlugin } from './plugins/momo'
 import { getShiGuangLiveUrlsPlugin } from './plugins/shiguang'
+import { getVvLiveUrlsPlugin } from './plugins/vv'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -64,7 +65,9 @@ const hostnameToPlatformCrawlerFnMap = {
 
   'web.immomo.com': getMomoLiveUrlsPlugin,
 
-  'www.rengzu.com': getShiGuangLiveUrlsPlugin
+  'www.rengzu.com': getShiGuangLiveUrlsPlugin,
+
+  'h5webcdn-pro.vvxqiu.com': getVvLiveUrlsPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
