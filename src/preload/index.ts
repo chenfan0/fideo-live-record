@@ -24,7 +24,7 @@ const api = {
   isDarwin: process.platform === 'darwin',
   selectDir: () => ipcRenderer.invoke(SELECT_DIR),
   openLogsDir: () => ipcRenderer.invoke(OPEN_LOGS_DIR),
-  getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string }) =>
+  getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string; title: string }) =>
     ipcRenderer.invoke('GET_LIVE_URLS', info),
   navByDefaultBrowser: (url: string) => ipcRenderer.invoke(NAV_BY_DEFAULT_BROWSER, url),
   startStreamRecord: (streamConfig: string) =>

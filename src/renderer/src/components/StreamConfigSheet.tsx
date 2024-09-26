@@ -214,7 +214,8 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
     const { code, liveUrls } = await window.api.getLiveUrls({
       roomUrl: form.getValues('roomUrl'),
       cookie: form.getValues('cookie'),
-      proxy: form.getValues('proxy')
+      proxy: form.getValues('proxy'),
+      title: form.getValues('title')
     })
 
     if (code !== SUCCESS_CODE) {

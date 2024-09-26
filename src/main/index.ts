@@ -197,9 +197,9 @@ app.whenReady().then(async () => {
 
   ipcMain.handle(
     GET_LIVE_URLS,
-    async (_, info: { roomUrl: string; proxy?: string; cookie?: string }) => {
-      const { roomUrl, proxy, cookie } = info
-      return getLiveUrls({ roomUrl, proxy, cookie })
+    async (_, info: { roomUrl: string; proxy?: string; cookie?: string; title: string }) => {
+      const { roomUrl, proxy, cookie, title } = info
+      return getLiveUrls({ roomUrl, proxy, cookie }, writeLog.bind(null, title))
     }
   )
 

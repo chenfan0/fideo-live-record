@@ -9,6 +9,7 @@ declare global {
       openLogsDir: () => void
       getLiveUrls: (info: {
         roomUrl: string
+        title: string
         proxy?: string
         cookie?: string
       }) => Promise<{ code: number; liveUrls: string[] }>

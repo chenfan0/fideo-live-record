@@ -158,7 +158,8 @@ export default function OperationBar(props: OperationBarProps) {
     const { code, liveUrls } = await window.api.getLiveUrls({
       roomUrl: streamConfig.roomUrl,
       cookie: streamConfig.cookie,
-      proxy: streamConfig.proxy
+      proxy: streamConfig.proxy,
+      title: streamConfig.title
     })
     setIsLoadingPreview(false)
 
