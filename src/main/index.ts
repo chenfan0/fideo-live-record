@@ -205,6 +205,11 @@ async function createTray() {
   ])
   tray.setToolTip('Fideo')
   tray.setContextMenu(contextMenu)
+
+  tray.addListener('double-click', function () {
+    win?.show()
+    showTaskbar()
+  })
 }
 
 function showNotification(title: string, body: string) {
