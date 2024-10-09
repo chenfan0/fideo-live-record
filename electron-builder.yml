@@ -9,9 +9,13 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-
+asarUnpack:
+  - ./resources/iconTemplate.png
 win:
   executableName: fideo
+  extraFiles:
+    - from: "./resources/iconTemplate.png"
+      to: "Resources"
 nsis:
   oneClick: false
   artifactName: ${name}-${version}.${ext}
@@ -33,6 +37,9 @@ mac:
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
   identity: null
+  extraFiles:
+    - from: "./resources/iconTemplate.png"
+      to: "Resources"
 dmg:
   artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
