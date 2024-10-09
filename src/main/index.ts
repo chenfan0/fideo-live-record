@@ -1,4 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Notification } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  Notification,
+  Tray,
+  Menu,
+  nativeImage
+} from 'electron'
 import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
@@ -106,8 +116,25 @@ const stopDownloadDepTimerWhenAllDownloadDepEnd = () => {
 }
 
 let win: BrowserWindow | null
+let tray: Tray | null
+
+function hideTaskbar() {
+  if (process.platform === 'darwin') {
+    app.dock.hide()
+  } else {
+    win?.setSkipTaskbar(true)
+  }
+}
+
+function showTaskbar() {
+  if (process.platform === 'darwin') {
+    app.dock.show()
+  } else {
+    win?.setSkipTaskbar(false)
+  }
+}
+
 async function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -121,6 +148,7 @@ async function createWindow() {
       devTools: is.dev
     }
   })
+
   win = mainWindow
 
   mainWindow.on('ready-to-show', () => {
@@ -134,7 +162,9 @@ async function createWindow() {
 
   mainWindow.on('close', (e) => {
     e.preventDefault()
-    mainWindow.webContents.send(USER_CLOSE_WINDOW)
+
+    mainWindow.hide()
+    hideTaskbar()
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -145,6 +175,41 @@ async function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
   await handleMakeSureDependenciesExist()
+}
+
+async function createTray() {
+  const isChinese = ['zh', 'zh-CN', 'zh-TW', 'zh-HK'].includes(app.getLocale())
+  const iconPath = is.dev
+    ? join(__dirname, '../../resources/iconTemplate.png')
+    : join(process.resourcesPath, 'iconTemplate.png')
+
+  const icon = nativeImage.createFromPath(iconPath)
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: isChinese ? '打开Fideo' : 'Open Fideo',
+      click: () => {
+        win?.show()
+        showTaskbar()
+      }
+    },
+    {
+      label: isChinese ? '退出' : 'Quit',
+      click: () => {
+        if (!isAllFfmpegProcessEnd()) {
+          win?.show()
+        }
+        win?.webContents.send(USER_CLOSE_WINDOW)
+      }
+    }
+  ])
+  tray.setToolTip('Fideo')
+  tray.setContextMenu(contextMenu)
+
+  tray.addListener('double-click', function () {
+    win?.show()
+    showTaskbar()
+  })
 }
 
 function showNotification(title: string, body: string) {
@@ -308,6 +373,7 @@ app.whenReady().then(async () => {
   })
 
   await createWindow()
+  await createTray()
 
   setTimeout(() => {
     checkUpdate()
@@ -326,9 +392,9 @@ app.whenReady().then(async () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin' || is.dev) {
-    app.quit()
-  }
+  // if (process.platform !== 'darwin' || is.dev) {
+  app.quit()
+  // }
 })
 
 // In this file you can include the rest of your app"s specific main process
