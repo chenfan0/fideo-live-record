@@ -23,7 +23,7 @@ win:
       to: "Resources"
 nsis:
   oneClick: false
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
   perMachine: true
   allowElevation: true
   allowToChangeInstallationDirectory: true
