@@ -12,13 +12,18 @@ files:
 asarUnpack:
   - ./resources/iconTemplate.png
 win:
+  target:
+    - target: "nsis"
+      arch:
+        - "x64"
+        - "arm64"
   executableName: fideo
   extraFiles:
     - from: "./resources/iconTemplate.png"
       to: "Resources"
 nsis:
   oneClick: false
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
   perMachine: true
   allowElevation: true
   allowToChangeInstallationDirectory: true
