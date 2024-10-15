@@ -2,6 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 
 declare global {
   interface Window {
+    socket: WebSocket
     electron: ElectronAPI
     api: {
       isDarwin: boolean
@@ -22,6 +23,9 @@ declare global {
       closeWindow: () => void
       forceCloseWindow: () => void
       retryDownloadDep: () => void
+
+      startFrpcProcess: (code: string) => Promise<boolean>
+      stopFrpcProcess: () => void
 
       onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => void
       onFFmpegProgressInfo: (callback: (info: IFfmpegProgressInfo) => void) => void

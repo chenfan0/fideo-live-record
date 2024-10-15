@@ -30,7 +30,9 @@ import {
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
+  START_FRPC_PROCESS,
   START_STREAM_RECORD,
+  STOP_FRPC_PROCESS,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
   USER_CLOSE_WINDOW
@@ -53,6 +55,8 @@ import {
 } from './ffmpeg'
 
 import { writeLogWrapper } from './log/index'
+import { startFrpcProcess } from './frpc'
+import type { ChildProcess } from 'child_process'
 
 export const writeLog = writeLogWrapper(app.getPath('userData'))
 
@@ -117,6 +121,17 @@ const stopDownloadDepTimerWhenAllDownloadDepEnd = () => {
 
 let win: BrowserWindow | null
 let tray: Tray | null
+
+let frpcObj: {
+  stopFrpcLocalServer: () => void
+  frpcProcess: ChildProcess
+} | null = null
+
+const stopFrpcProcess = () => {
+  frpcObj?.stopFrpcLocalServer()
+  frpcObj?.frpcProcess.kill()
+  frpcObj = null
+}
 
 function hideTaskbar() {
   if (process.platform === 'darwin') {
@@ -366,10 +381,27 @@ app.whenReady().then(async () => {
     stillRecordStreamKeys.forEach((key) => {
       killRecordStreamFfmpegProcess(key)
     })
+
     downloadReq.destroy()
     clearTimerWhenAllFfmpegProcessEnd()
     stopDownloadDepTimerWhenAllDownloadDepEnd()
+
+    stopFrpcProcess()
+
     win?.destroy()
+  })
+
+  ipcMain.handle(START_FRPC_PROCESS, async (_, code: string) => {
+    if (frpcObj) {
+      return
+    }
+    frpcObj = await startFrpcProcess(code)
+
+    return !!frpcObj
+  })
+
+  ipcMain.handle(STOP_FRPC_PROCESS, async () => {
+    stopFrpcProcess()
   })
 
   await createWindow()

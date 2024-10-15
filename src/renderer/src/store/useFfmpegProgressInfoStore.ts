@@ -7,5 +7,13 @@ interface IRecordingProgressInfoStore {
 
 export const useFfmpegProgressInfoStore = create<IRecordingProgressInfoStore>((set) => ({
   ffmpegProgressInfo: {},
-  updateFfmpegProgressInfo: (newInfo) => set({ ffmpegProgressInfo: newInfo })
+  updateFfmpegProgressInfo: (newInfo) => {
+    window.socket.send(
+      JSON.stringify({
+        type: 'ffmpegProgressInfo',
+        data: newInfo
+      })
+    )
+    set({ ffmpegProgressInfo: newInfo })
+  }
 }))

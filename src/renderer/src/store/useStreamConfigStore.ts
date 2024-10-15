@@ -17,12 +17,24 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
   initialData: async () => {
     const streamConfigList = await localForage.getItem<IStreamConfig[]>('streamConfigList')
     if (streamConfigList) {
+      // window.socket?.send(
+      //   JSON.stringify({
+      //     type: 'streamConfigList',
+      //     data: streamConfigList
+      //   })
+      // )
       set(() => ({ streamConfigList }))
     }
   },
   addStreamConfig: async (streamConfig: IStreamConfig) => {
     const newStreamConfigList = [streamConfig, ...get().streamConfigList]
     await localForage.setItem('streamConfigList', newStreamConfigList)
+    window.socket.send(
+      JSON.stringify({
+        type: 'streamConfigList',
+        data: newStreamConfigList
+      })
+    )
     set(() => {
       return { streamConfigList: newStreamConfigList }
     })
@@ -32,12 +44,24 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
       streamConfig.title === title ? newStreamConfig : streamConfig
     )
     await localForage.setItem('streamConfigList', newStreamConfigList)
+    window.socket.send(
+      JSON.stringify({
+        type: 'streamConfigList',
+        data: newStreamConfigList
+      })
+    )
     set(() => {
       return { streamConfigList: newStreamConfigList }
     })
   },
   replaceStreamConfig: async (newStreamConfigList: IStreamConfig[]) => {
     await localForage.setItem('streamConfigList', newStreamConfigList)
+    window.socket.send(
+      JSON.stringify({
+        type: 'streamConfigList',
+        data: newStreamConfigList
+      })
+    )
     set(() => {
       return { streamConfigList: newStreamConfigList }
     })
@@ -47,6 +71,12 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
       (streamConfig) => streamConfig.title !== title
     )
     await localForage.setItem('streamConfigList', newStreamConfigList)
+    window.socket.send(
+      JSON.stringify({
+        type: 'streamConfigList',
+        data: newStreamConfigList
+      })
+    )
     set(() => {
       return { streamConfigList: newStreamConfigList }
     })

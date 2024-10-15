@@ -220,6 +220,7 @@ export default function OperationBar(props: OperationBarProps) {
             dark={darkPlayIcon}
             light={lightPlayIcon}
             handleClick={handlePlayClick}
+            id={streamConfig.title + '_play'}
           />
         ) : (
           <UseThemeIcon
@@ -227,6 +228,7 @@ export default function OperationBar(props: OperationBarProps) {
             dark={darkPauseIcon}
             light={lightPauseIcon}
             handleClick={handlePauseClick}
+            id={streamConfig.title + '_pause'}
           />
         )}
         <UseThemeIcon

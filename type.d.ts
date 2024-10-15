@@ -37,3 +37,9 @@ interface IDownloadDepProgressInfo {
   downloading: boolean
   progress: number
 }
+
+interface IWebControlSetting {
+  webControlPath: string
+  enableWebControl: boolean
+  email: string
+}

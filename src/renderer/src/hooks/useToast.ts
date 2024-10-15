@@ -13,7 +13,16 @@ export function useToast() {
     variant?: 'default' | 'destructive' | null
   }) {
     const isHide = document.hidden
-    // const isHide = true
+
+    window.socket.send(
+      JSON.stringify({
+        type: 'toast',
+        data: {
+          title,
+          description
+        }
+      })
+    )
 
     if (!isHide) {
       _toast({
