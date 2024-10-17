@@ -74,8 +74,6 @@ export default function OperationBar(props: OperationBarProps) {
       return
     }
 
-    console.log('handleStartRecord code:', code)
-
     if (code === SUCCESS_CODE) {
       await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.RECORDING },

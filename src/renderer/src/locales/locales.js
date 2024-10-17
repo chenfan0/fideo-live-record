@@ -121,7 +121,7 @@ export default {
         get_update_detail: 'View Update Details'
       },
       downloading_dep: {
-        downloading_title: 'Downloading Dependencies. . .',
+        downloading_title: 'Downloading {{title}}. . .',
         retry_title: 'Download Dependencies Failed',
         confirm_force_close_window_with_downloading_dep:
           'Dependencies are being downloaded, force close the window?',
@@ -273,7 +273,7 @@ export default {
         get_update_detail: '查看更新详情'
       },
       downloading_dep: {
-        downloading_title: '正在下载依赖中. . .',
+        downloading_title: '正在下载 {{title}} 中. . .',
         retry_title: '下载依赖失败',
         confirm_force_close_window_with_downloading_dep: '当前正在下载依赖，是否强制关闭窗口?',
         retry: '重试'

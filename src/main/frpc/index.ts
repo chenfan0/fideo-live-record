@@ -9,6 +9,10 @@ import WebSocket from 'ws'
 import spawn from 'cross-spawn'
 import { FRPC_PROCESS_ERROR } from '../../const'
 
+import debug from 'debug'
+
+const log = debug('fideo-frpc')
+
 export let frpcObj: {
   frpcProcess: ChildProcess
   stopFrpcLocalServer: () => void
@@ -44,7 +48,7 @@ async function startFrpcLocalServer(
 
       reply.code(200).header('Content-Type', 'text/html').send(htmlContent)
     } catch (err) {
-      console.log('err: ', err)
+      log('err: ', err)
       reply.code(500).header('Content-Type', 'text/plain').send('Internal Server Error')
     }
   })
@@ -59,7 +63,7 @@ async function startFrpcLocalServer(
   let streamConfigList: IStreamConfig[] = []
 
   wss.on('connection', (ws) => {
-    console.log('WebSocket client connected')
+    log('WebSocket client connected')
 
     ws.send(
       JSON.stringify({
@@ -89,7 +93,7 @@ async function startFrpcLocalServer(
     })
 
     ws.on('close', () => {
-      console.log('WebSocket client disconnected')
+      log('WebSocket client disconnected')
     })
   })
 
@@ -100,14 +104,14 @@ async function startFrpcLocalServer(
 
   fastify.listen({ port: 0, host: '0.0.0.0' }, async (err, address) => {
     if (err) {
-      console.error(err)
+      log(err)
       reject()
       stopFrpcLocalServer()
       return
     }
 
     const port = new URL(address).port
-    console.log(`Server is listening on ${address}`)
+    log(`Server is listening on ${address}`)
 
     resolve({
       port,
@@ -127,11 +131,11 @@ export async function startFrpcProcess(
 ) {
   try {
     writeLog('frpc', 'code: ' + code)
-    console.log('code: ', code)
+    log('code: ', code)
     const userPath = app.getPath('userData')
     const { port, stopFrpcLocalServer } = await startFrpcLocalServer(code)
     writeLog('frpc', 'port: ' + port)
-    console.log('port: ', port)
+    log('port: ', port)
 
     const frpcConfig = `
       serverAddr = "web.fideo.site"
@@ -168,7 +172,7 @@ export async function startFrpcProcess(
     frpcProcess.stdout?.on('data', (data) => {
       const str = data.toString()
       writeLog('frpc', 'frpcProcess stdout: ' + str)
-      console.log('frpcProcess stdout: ', str)
+      log('frpcProcess stdout: ', str)
       if (str.includes('error')) {
         stopFrpc()
         win.webContents.send(FRPC_PROCESS_ERROR, str)
@@ -177,7 +181,7 @@ export async function startFrpcProcess(
 
     frpcProcess.stdout?.on('error', (err) => {
       writeLog('frpc', 'frpcProcess stdout error: ' + err)
-      console.log('frpcProcess stdout error: ', err)
+      log('frpcProcess stdout error: ', err)
       stopFrpc()
       win.webContents.send(FRPC_PROCESS_ERROR, err)
     })

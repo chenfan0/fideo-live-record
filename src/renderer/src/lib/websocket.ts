@@ -42,10 +42,6 @@ export function createWebSocket(port: number, code: string) {
     }
   }
 
-  websocket.onclose = () => {
-    console.log('WebSocket connection closed')
-  }
-
   websocket.onmessage = function (event) {
     const messageObj = JSON.parse(event.data)
 

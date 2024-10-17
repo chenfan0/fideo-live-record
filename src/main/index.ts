@@ -46,13 +46,15 @@ import {
   killRecordStreamFfmpegProcess,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
+import { setFfmpegAndFfprobePath } from './ffmpeg'
 import {
-  makeSureDependenciesExist,
-  downloadDepProgressInfo,
   checkFfmpegExist,
   checkFfprobeExist,
+  checkFrpcExist,
+  downloadDepProgressInfo,
+  makeSureDependenciesExist,
   downloadReq
-} from './ffmpeg'
+} from './download-dep'
 
 import { writeLogWrapper } from './log/index'
 import { startFrpcProcess, stopFrpc, frpcObj } from './frpc'
@@ -225,17 +227,24 @@ function showNotification(title: string, body: string) {
 
 async function handleMakeSureDependenciesExist() {
   const userDataPath = app.getPath('userData')
-  const [isFFmpegExist, isFfprobeExist] = await Promise.all([
+  const [isFFmpegExist, isFfprobeExist, isFrpcExist] = await Promise.all([
     checkFfmpegExist(userDataPath),
-    checkFfprobeExist(userDataPath)
+    checkFfprobeExist(userDataPath),
+    checkFrpcExist(userDataPath)
   ])
 
-  if (!isFFmpegExist || !isFfprobeExist) {
+  if (!isFFmpegExist || !isFfprobeExist || !isFrpcExist) {
     startDownloadDepTimerWhenFirstDownloadDepStart()
   }
-  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist).finally(() => {
-    stopDownloadDepTimerWhenAllDownloadDepEnd()
-  })
+
+  makeSureDependenciesExist(userDataPath)
+    .then(() => {
+      setFfmpegAndFfprobePath(userDataPath)
+      stopDownloadDepTimerWhenAllDownloadDepEnd()
+    })
+    .catch(() => {
+      stopDownloadDepTimerWhenAllDownloadDepEnd()
+    })
 }
 
 // This method will be called when Electron has finished

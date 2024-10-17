@@ -33,6 +33,7 @@ type IFfmpegProgressInfo = Record<
 >
 
 interface IDownloadDepProgressInfo {
+  title: string
   showRetry: boolean
   downloading: boolean
   progress: number

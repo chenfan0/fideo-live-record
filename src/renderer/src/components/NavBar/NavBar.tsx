@@ -43,7 +43,7 @@ export default function NavBar() {
   const [createSheetOpen, setCreateSheetOpen] = useState(false)
   const [settingSheetOpen, setSettingSheetOpen] = useState(false)
   //
-  const [webControlSheetOpen, setWebControlSheetOpen] = useState(true)
+  const [webControlSheetOpen, setWebControlSheetOpen] = useState(false)
 
   const handleLogoClick = () => {
     window.api.navByDefaultBrowser('https://www.fideo.site')
