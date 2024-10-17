@@ -1,11 +1,24 @@
 import fsp from 'node:fs/promises'
 import { join } from 'node:path'
+import type { ChildProcess } from 'node:child_process'
 
-import { app } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import Fastify from 'fastify'
 import WebSocket from 'ws'
 import spawn from 'cross-spawn'
+import { FRPC_PROCESS_ERROR } from '../../const'
+
+export let frpcObj: {
+  frpcProcess: ChildProcess
+  stopFrpcLocalServer: () => void
+} | null = null
+
+export function stopFrpc() {
+  frpcObj?.frpcProcess.kill()
+  frpcObj?.stopFrpcLocalServer()
+  frpcObj = null
+}
 
 async function startFrpcLocalServer(
   code: string
@@ -50,7 +63,7 @@ async function startFrpcLocalServer(
 
     ws.send(
       JSON.stringify({
-        type: 'streamConfigList',
+        type: 'UPDATE_STREAM_CONFIG_LIST',
         data: streamConfigList
       })
     )
@@ -59,7 +72,7 @@ async function startFrpcLocalServer(
       const messageObj = JSON.parse(message.toString())
       const { type, data } = messageObj
 
-      if (type === 'streamConfigList') {
+      if (type === 'UPDATE_STREAM_CONFIG_LIST') {
         streamConfigList = data as IStreamConfig[]
       }
 
@@ -105,24 +118,36 @@ async function startFrpcLocalServer(
   return p as any
 }
 
-export async function startFrpcProcess(code: string) {
+let frpcProcessTimer: NodeJS.Timeout
+
+export async function startFrpcProcess(
+  code: string,
+  writeLog: (title: string, content: string) => void,
+  win: BrowserWindow
+) {
   try {
+    writeLog('frpc', 'code: ' + code)
+    console.log('code: ', code)
     const userPath = app.getPath('userData')
     const { port, stopFrpcLocalServer } = await startFrpcLocalServer(code)
+    writeLog('frpc', 'port: ' + port)
+    console.log('port: ', port)
 
     const frpcConfig = `
-      serverAddr = "152.32.188.7"
+      serverAddr = "web.fideo.site"
+      auth.token = "fideo-frp"
       [[proxies]]
-      name = "fideo-frpc"
+      name = "${code}"
       type = "http"
       localPort = ${port}
       customDomains = ["web.fideo.site"]
       locations = ["/${code}"]
     `
-
     const frpcConfigPath = join(userPath, 'frpc.toml')
 
     await fsp.writeFile(frpcConfigPath, frpcConfig, { encoding: 'utf-8' })
+
+    writeLog('frpc', 'frpcConfigPath: ' + frpcConfigPath)
 
     const frpcPath = is.dev
       ? join(__dirname, '../../resources/frpc/mac-arm64/frpc')
@@ -130,26 +155,54 @@ export async function startFrpcProcess(code: string) {
 
     const frpcProcess = spawn(frpcPath, ['-c', frpcConfigPath])
 
+    const frpcProcessCheck = () => {
+      if (!frpcProcess) return false
+      try {
+        process.kill(frpcProcess.pid!, 0)
+        return true
+      } catch (err) {
+        return false
+      }
+    }
+
     frpcProcess.stdout?.on('data', (data) => {
-      console.log('frpcProcess stdout: ', data.toString())
+      const str = data.toString()
+      writeLog('frpc', 'frpcProcess stdout: ' + str)
+      console.log('frpcProcess stdout: ', str)
+      if (str.includes('error')) {
+        stopFrpc()
+        win.webContents.send(FRPC_PROCESS_ERROR, str)
+      }
     })
 
     frpcProcess.stdout?.on('error', (err) => {
+      writeLog('frpc', 'frpcProcess stdout error: ' + err)
       console.log('frpcProcess stdout error: ', err)
-      stopFrpcLocalServer()
-      frpcProcess.kill()
-      // TODO: ipc 通知
+      stopFrpc()
+      win.webContents.send(FRPC_PROCESS_ERROR, err)
     })
 
-    frpcProcess.on('close', (code) => {
-      console.log('frpcProcess close: ', code)
-    })
+    frpcProcessTimer = setInterval(() => {
+      const isAlive = frpcProcessCheck()
+      if (!isAlive) {
+        writeLog('frpc', 'frpcProcess isAlive: ' + isAlive)
+        stopFrpcLocalServer()
+        clearInterval(frpcProcessTimer)
+      }
+    }, 3000)
 
+    frpcObj = {
+      frpcProcess,
+      stopFrpcLocalServer
+    }
     return {
-      stopFrpcLocalServer,
-      frpcProcess
+      status: true,
+      code,
+      port
     }
   } catch {
-    return null
+    return {
+      status: false
+    }
   }
 }

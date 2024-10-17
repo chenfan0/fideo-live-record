@@ -55,8 +55,7 @@ import {
 } from './ffmpeg'
 
 import { writeLogWrapper } from './log/index'
-import { startFrpcProcess } from './frpc'
-import type { ChildProcess } from 'child_process'
+import { startFrpcProcess, stopFrpc, frpcObj } from './frpc'
 
 export const writeLog = writeLogWrapper(app.getPath('userData'))
 
@@ -121,17 +120,6 @@ const stopDownloadDepTimerWhenAllDownloadDepEnd = () => {
 
 let win: BrowserWindow | null
 let tray: Tray | null
-
-let frpcObj: {
-  stopFrpcLocalServer: () => void
-  frpcProcess: ChildProcess
-} | null = null
-
-const stopFrpcProcess = () => {
-  frpcObj?.stopFrpcLocalServer()
-  frpcObj?.frpcProcess.kill()
-  frpcObj = null
-}
 
 function hideTaskbar() {
   if (process.platform === 'darwin') {
@@ -245,13 +233,9 @@ async function handleMakeSureDependenciesExist() {
   if (!isFFmpegExist || !isFfprobeExist) {
     startDownloadDepTimerWhenFirstDownloadDepStart()
   }
-  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist)
-    .then(() => {
-      stopDownloadDepTimerWhenAllDownloadDepEnd()
-    })
-    .catch(() => {
-      stopDownloadDepTimerWhenAllDownloadDepEnd()
-    })
+  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist).finally(() => {
+    stopDownloadDepTimerWhenAllDownloadDepEnd()
+  })
 }
 
 // This method will be called when Electron has finished
@@ -386,22 +370,20 @@ app.whenReady().then(async () => {
     clearTimerWhenAllFfmpegProcessEnd()
     stopDownloadDepTimerWhenAllDownloadDepEnd()
 
-    stopFrpcProcess()
+    stopFrpc()
 
     win?.destroy()
   })
 
   ipcMain.handle(START_FRPC_PROCESS, async (_, code: string) => {
     if (frpcObj) {
-      return
+      return false
     }
-    frpcObj = await startFrpcProcess(code)
-
-    return !!frpcObj
+    return await startFrpcProcess(code, writeLog, win!)
   })
 
   ipcMain.handle(STOP_FRPC_PROCESS, async () => {
-    stopFrpcProcess()
+    stopFrpc()
   })
 
   await createWindow()

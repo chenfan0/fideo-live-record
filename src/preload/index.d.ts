@@ -24,7 +24,7 @@ declare global {
       forceCloseWindow: () => void
       retryDownloadDep: () => void
 
-      startFrpcProcess: (code: string) => Promise<boolean>
+      startFrpcProcess: (code: string) => Promise<{ status: boolean; code?: string; port?: number }>
       stopFrpcProcess: () => void
 
       onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => void
@@ -32,6 +32,7 @@ declare global {
       onDownloadDepProgressInfo: (callback: (info: IDownloadDepProgressInfo) => void) => void
       onUserCloseWindow: (callback: () => void) => void
       onAppUpdate: (callback: () => void) => void
+      onFrpcProcessError: (callback: (err: string) => void) => void
     }
   }
 }

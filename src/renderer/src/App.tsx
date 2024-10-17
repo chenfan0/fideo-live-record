@@ -60,29 +60,6 @@ function App(): JSX.Element {
     window.api.onDownloadDepProgressInfo((progressInfo) => {
       updateUpdateDownloadProgressInfo(progressInfo)
     })
-
-    const socket = new WebSocket('ws://localhost:55123/0cnPnWysWmlwF7ngU0idA')
-    window.socket = socket
-    socket.onopen = function () {
-      console.log('Connected to WebSocket server')
-    }
-    socket.onmessage = function (event) {
-      const messageObj = JSON.parse(event.data)
-
-      const { type, data } = messageObj
-
-      switch (type) {
-        case 'play':
-          document.getElementById(data.title + '_play')?.click()
-          break
-        case 'pause':
-          document.getElementById(data.title + '_pause')?.click()
-          break
-      }
-    }
-    socket.onclose = function () {
-      console.log('WebSocket connection closed')
-    }
   })
 
   useEffect(() => {

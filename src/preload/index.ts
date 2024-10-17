@@ -5,6 +5,7 @@ import {
   DOWNLOAD_DEP_PROGRESS_INFO,
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
+  FRPC_PROCESS_ERROR,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -69,6 +70,11 @@ const api = {
   onAppUpdate: (callback: () => void) => {
     ipcRenderer.on(SHOW_UPDATE_DIALOG, () => {
       callback()
+    })
+  },
+  onFrpcProcessError: (callback: (err: string) => void) => {
+    ipcRenderer.on(FRPC_PROCESS_ERROR, (_, err) => {
+      callback(err)
     })
   }
 }

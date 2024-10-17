@@ -173,23 +173,22 @@
 
         const socket = new WebSocket('$$WEBSOCKET_URL$$');
 
-        // 当连接建立时
         socket.onopen = function () {
           console.log('Connected to WebSocket server');
         };
 
-        // 当接收到消息时
         socket.onmessage = function (event) {
           const messageObj = JSON.parse(event.data)
           const { type, data } = messageObj
+          console.log('messageObj: ', messageObj)
           switch (type) {
-            case 'streamConfigList':
+            case 'UPDATE_STREAM_CONFIG_LIST':
               streamConfigList.value = data
               break
-            case 'ffmpegProgressInfo':
+            case 'UPDATE_FFMPEG_PROGRESS_INFO':
               ffmpegProgressInfo.value = data
               break
-            case 'toast':
+            case 'SHOW_TOAST':
               toastList.value.push(data)
               setTimeout(() => {
                 toastList.value.shift()
@@ -204,14 +203,14 @@
 
         const handlePlayClick = (title) => {
           socket.send(JSON.stringify({
-            type: 'play',
+            type: 'START_RECORD_STREAM',
             data: { title }
           }))
         }
 
         const handlePauseClick = (title) => {
           socket.send(JSON.stringify({
-            type: 'pause',
+            type: 'PAUSE_RECORD_STREAM',
             data: { title }
           }))
         }

@@ -17,10 +17,12 @@ import {
   DialogHeader as ShadcnDialogHeader,
   DialogTitle as ShadcnDialogTitle
 } from '@/shadcn/ui/dialog'
-import { useWebControlSettingStore } from '@renderer/store/useWebControlSettingStore'
+import { useWebControlSettingStore } from '@/store/useWebControlSettingStore'
+import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useLoadingStore } from '@/store/useLoadingStore'
-import { useConfettiStore } from '@renderer/store/useConfettiStore'
-import { useToast } from '@renderer/hooks/useToast'
+import { useConfettiStore } from '@/store/useConfettiStore'
+import { useToast } from '@/hooks/useToast'
+import { closeWebSocket, createWebSocket, sendMessage, WebSocketMessageType } from '@/lib/websocket'
 
 const formSchema = z.object({
   webControlPath: z.string(),
@@ -62,6 +64,18 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   useEffect(() => {
     form.reset({ ...webControlSetting })
   }, [webControlSetting])
+
+  useEffect(() => {
+    window.api.onFrpcProcessError((err) => {
+      toast({
+        title: t('web_control_setting.frpc_process_error'),
+        description: err,
+        variant: 'destructive'
+      })
+      setWebControlSetting({ ...form.getValues(), enableWebControl: false })
+      closeWebSocket()
+    })
+  }, [])
 
   const handleSetSheetOpen = async (status: boolean, trigger = false) => {
     const formValues = form.getValues() as IWebControlSetting
@@ -210,18 +224,25 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
       }
       setLoading(true)
       const webControlPath = form.getValues('webControlPath')
-      const res = await window.api.startFrpcProcess(webControlPath)
+      const { status: startStatus, code, port } = await window.api.startFrpcProcess(webControlPath)
 
-      res && field.onChange(status)
+      if (startStatus) {
+        field.onChange(status)
+        createWebSocket(port!, code!)
+        sendMessage({
+          type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
+          data: useStreamConfigStore.getState().streamConfigList
+        })
+      }
 
       toast({
-        title: res
+        title: startStatus
           ? t('web_control_setting.start_web_control_success')
           : t('web_control_setting.start_web_control_failed'),
-        description: res
+        description: startStatus
           ? t('web_control_setting.start_web_control_success_desc')
           : t('web_control_setting.start_web_control_failed_desc'),
-        variant: res ? 'default' : 'destructive'
+        variant: startStatus ? 'default' : 'destructive'
       })
       setWebControlSetting(form.getValues())
     } else {
@@ -233,6 +254,8 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
         title: t('web_control_setting.stop_web_control_success'),
         description: t('web_control_setting.stop_web_control_success_desc')
       })
+
+      closeWebSocket()
     }
     setLoading(false)
   }

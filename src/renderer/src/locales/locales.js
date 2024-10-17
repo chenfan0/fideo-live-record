@@ -160,6 +160,7 @@ export default {
         start_web_control_success_desc: '你可以使用浏览器访问对应地址进行操作',
         start_web_control_failed: '开启网页访问功能失败',
         start_web_control_failed_desc: '请稍后重试',
+        frpc_process_error: 'frpc进程发生错误',
         stop_web_control_success: '网页访问功能已关闭',
         stop_web_control_success_desc: '你可以再次点击开启按钮开启',
         stop_web_control_failed: '网页访问功能失败',
