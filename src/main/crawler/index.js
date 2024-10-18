@@ -18,6 +18,8 @@ import { getJDLiveUrlsPlugin } from './plugins/jd'
 import { getMomoLiveUrlsPlugin } from './plugins/momo'
 import { getShiGuangLiveUrlsPlugin } from './plugins/shiguang'
 import { getVvLiveUrlsPlugin } from './plugins/vv'
+import { getChangLiaoLiveUrlsPlugin } from './plugins/changliao'
+import { get17LiveUrlsPlugin } from './plugins/17live'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -67,7 +69,13 @@ const hostnameToPlatformCrawlerFnMap = {
 
   'www.rengzu.com': getShiGuangLiveUrlsPlugin,
 
-  'h5webcdn-pro.vvxqiu.com': getVvLiveUrlsPlugin
+  'h5webcdn-pro.vvxqiu.com': getVvLiveUrlsPlugin,
+
+  'www.tlclw.com': getChangLiaoLiveUrlsPlugin,
+  'tlclw.com': getChangLiaoLiveUrlsPlugin,
+
+  'www.17.live': get17LiveUrlsPlugin,
+  '17.live': get17LiveUrlsPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
