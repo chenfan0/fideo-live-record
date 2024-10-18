@@ -109,5 +109,6 @@ jobs:
         files: |
           fideo-${{ env.VERSION }}-x64.dmg
           fideo-${{ env.VERSION }}-arm64.dmg
-          fideo-${{ env.VERSION }}.exe
+          fideo-${{ env.VERSION }}-x64.exe
+          fideo-${{ env.VERSION }}-arm64.exe
         tag_name: v${{ env.VERSION }}
