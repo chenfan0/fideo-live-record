@@ -12,7 +12,10 @@ import DownloadingDep from '@/components/DownloadingDep/DownloadingDep'
 import { useStreamConfigStore } from './store/useStreamConfigStore'
 import { useDefaultSettingsStore } from './store/useDefaultSettingsStore'
 import { useNavSelectedStatusStore } from './store/useNavSelectedStatusStore'
+import { useWebControlSettingStore } from './store/useWebControlSettingStore'
 import { useDownloadDepInfoStore } from './store/useDownloadDepStore'
+import Loading from './components/Loading'
+import Confetti from './components/Confetti'
 
 function App(): JSX.Element {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
@@ -27,6 +30,9 @@ function App(): JSX.Element {
       defaultSettingsConfig: state.defaultSettingsConfig
     })
   )
+  const { initData: initWebControlSettingData } = useWebControlSettingStore((state) => ({
+    initData: state.initData
+  }))
   const { initData: initNavSelectedStatus } = useNavSelectedStatusStore((state) => ({
     initData: state.initData
   }))
@@ -36,7 +42,16 @@ function App(): JSX.Element {
 
   useMount(() => {
     const titleBar = document.getElementById('title-bar')
-    window.api.isDarwin && titleBar && (titleBar.style.opacity = '0')
+    const minButton = document.getElementById('min-button')
+    const restoreButton = document.getElementById('restore-button')
+    const closeButton = document.getElementById('close-button')
+
+    if (window.api.isDarwin && titleBar) {
+      titleBar.style.opacity = '0'
+      minButton!.style.visibility = 'hidden'
+      restoreButton!.style.visibility = 'hidden'
+      closeButton!.style.visibility = 'hidden'
+    }
 
     window.api.onAppUpdate(() => {
       setShowUpdateDialog(true)
@@ -51,6 +66,7 @@ function App(): JSX.Element {
     initStreamConfigData()
     initDefaultSettingsData()
     initNavSelectedStatus()
+    initWebControlSettingData()
   }, [])
 
   useEffect(() => {
@@ -81,6 +97,10 @@ function App(): JSX.Element {
       {(downloadDepProgressInfo.downloading || downloadDepProgressInfo.showRetry) && (
         <DownloadingDep />
       )}
+
+      <Loading />
+
+      <Confetti />
     </>
   )
 }

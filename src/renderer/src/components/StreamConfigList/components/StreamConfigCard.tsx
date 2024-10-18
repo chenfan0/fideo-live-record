@@ -36,7 +36,10 @@ export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps
       <CardHeader>
         <CardTitle className="flex items-center relative">
           <div className="flex gap-2 flex-1">
-            <h1 className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[30%]">
+            <h1
+              className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[30%]"
+              id={streamConfig.title}
+            >
               {streamConfig.title}
             </h1>
             {streamConfig.status !== StreamStatus.NOT_STARTED && (

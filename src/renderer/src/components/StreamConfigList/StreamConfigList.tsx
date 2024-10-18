@@ -75,8 +75,6 @@ export default function StreamConfigList() {
       const xiZhiKey = useDefaultSettingsStore.getState().defaultSettingsConfig.xizhiKey
       const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)
 
-      console.log('onStreamRecordEnd:', title, code, errMsg)
-
       if (index === -1) {
         return
       }

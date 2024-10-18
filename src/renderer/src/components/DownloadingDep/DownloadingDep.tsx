@@ -15,6 +15,7 @@ export default function DownloadingDep() {
 
   const handleRetryDownloadDep = () => {
     updateUpdateDownloadProgressInfo({
+      title: '',
       showRetry: false,
       downloading: true,
       progress: 0
@@ -29,7 +30,9 @@ export default function DownloadingDep() {
           <CardTitle className="font-medium">
             {downloadDepProgressInfo.showRetry
               ? t('downloading_dep.retry_title')
-              : t('downloading_dep.downloading_title')}
+              : t('downloading_dep.downloading_title', {
+                  title: downloadDepProgressInfo.title
+                })}
           </CardTitle>
         </CardHeader>
         {downloadDepProgressInfo.downloading && (

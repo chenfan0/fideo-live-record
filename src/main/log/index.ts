@@ -4,7 +4,6 @@ import dayjs from 'dayjs'
 
 export function writeLogWrapper(baseDir: string) {
   const logPrefixPath = path.resolve(baseDir, 'logs')
-  console.log('logPrefixPath:', logPrefixPath)
   return async (title: string, content: string) => {
     const logPath = path.resolve(logPrefixPath, title)
     return fsp
