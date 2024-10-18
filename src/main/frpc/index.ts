@@ -1,5 +1,6 @@
 import fsp from 'node:fs/promises'
 import { join } from 'node:path'
+import os from 'node:os'
 import type { ChildProcess } from 'node:child_process'
 
 import { app, BrowserWindow } from 'electron'
@@ -12,6 +13,9 @@ import { FRPC_PROCESS_ERROR } from '../../const'
 import debug from 'debug'
 
 const log = debug('fideo-frpc')
+
+const isMac = os.platform() === 'darwin'
+const isArm = ['arm64', 'arm'].includes(os.arch())
 
 export let frpcObj: {
   frpcProcess: ChildProcess
@@ -153,9 +157,13 @@ export async function startFrpcProcess(
 
     writeLog('frpc', 'frpcConfigPath: ' + frpcConfigPath)
 
-    const frpcPath = is.dev
-      ? join(__dirname, '../../resources/frpc/mac-arm64/frpc')
-      : join(process.resourcesPath, 'frpc.exe')
+    const frpcPath = isMac
+      ? isArm
+        ? join(userPath, 'frp-mac-arm64/frpc')
+        : join(userPath, 'frp-mac-amd64/frpc')
+      : isArm
+        ? join(userPath, 'frp-win-arm64/frpc.exe')
+        : join(userPath, 'frp-win-amd64/frpc.exe')
 
     const frpcProcess = spawn(frpcPath, ['-c', frpcConfigPath])
 
