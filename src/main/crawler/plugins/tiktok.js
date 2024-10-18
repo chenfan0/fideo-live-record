@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { request, DESKTOP_USER_AGENT } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -20,7 +20,8 @@ async function baseGetTiktokLiveUrlsPlugin(roomUrl, others = {}) {
   const htmlContent = (
     await request(`https://www.tiktok.com/${roomId}/live`, {
       headers: {
-        cookie
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
       },
       proxy
     })
