@@ -16,13 +16,15 @@ import { useWebControlSettingStore } from './store/useWebControlSettingStore'
 import { useDownloadDepInfoStore } from './store/useDownloadDepStore'
 import Loading from './components/Loading'
 import Confetti from './components/Confetti'
+import { StreamStatus } from './lib/utils'
 
 function App(): JSX.Element {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const { i18n, t } = useTranslation()
 
-  const { initData: initStreamConfigData } = useStreamConfigStore((state) => ({
-    initData: state.initialData
+  const { initData: initStreamConfigData, updateStreamConfig } = useStreamConfigStore((state) => ({
+    initData: state.initialData,
+    updateStreamConfig: state.updateStreamConfig
   }))
   const { initData: initDefaultSettingsData, defaultSettingsConfig } = useDefaultSettingsStore(
     (state) => ({
@@ -30,15 +32,43 @@ function App(): JSX.Element {
       defaultSettingsConfig: state.defaultSettingsConfig
     })
   )
-  const { initData: initWebControlSettingData } = useWebControlSettingStore((state) => ({
-    initData: state.initData
-  }))
+  const { initData: initWebControlSettingData, setWebControlSetting } = useWebControlSettingStore(
+    (state) => ({
+      initData: state.initData,
+      setWebControlSetting: state.setWebControlSetting
+    })
+  )
   const { initData: initNavSelectedStatus } = useNavSelectedStatusStore((state) => ({
     initData: state.initData
   }))
   const { downloadDepProgressInfo, updateUpdateDownloadProgressInfo } = useDownloadDepInfoStore(
     (state) => state
   )
+
+  const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
+  const [closeWindowText, setCloseWindowText] = useState('stream_config.confirm_force_close_window')
+
+  const handleForceCloseWindow = async () => {
+    const { streamConfigList } = useStreamConfigStore.getState()
+    const { webControlSetting } = useWebControlSettingStore.getState()
+    setCloseWindowDialogOpen(false)
+
+    for (const streamConfig of streamConfigList) {
+      if (streamConfig.status !== StreamStatus.NOT_STARTED) {
+        await updateStreamConfig(
+          { ...streamConfig, status: StreamStatus.NOT_STARTED },
+          streamConfig.title
+        )
+      }
+    }
+
+    if (webControlSetting.enableWebControl) {
+      window.api.stopFrpcProcess()
+      await setWebControlSetting({ ...webControlSetting, enableWebControl: false })
+    }
+
+    window.api.forceCloseWindow()
+  }
 
   useMount(() => {
     const titleBar = document.getElementById('title-bar')
@@ -59,6 +89,31 @@ function App(): JSX.Element {
 
     window.api.onDownloadDepProgressInfo((progressInfo) => {
       updateUpdateDownloadProgressInfo(progressInfo)
+    })
+
+    window.api.onUserCloseWindow(() => {
+      const { streamConfigList } = useStreamConfigStore.getState()
+      const { downloadDepProgressInfo } = useDownloadDepInfoStore.getState()
+      const { webControlSetting } = useWebControlSettingStore.getState()
+
+      const stillWorkStream = streamConfigList.find(
+        (streamConfig) => streamConfig.status !== StreamStatus.NOT_STARTED
+      )
+      const stillDownloadDep = downloadDepProgressInfo.downloading
+      const stillWorkWebControl = webControlSetting.enableWebControl
+
+      if (!stillWorkStream && !stillDownloadDep && !stillWorkWebControl) {
+        window.api.forceCloseWindow()
+        return
+      }
+      if (stillDownloadDep) {
+        setCloseWindowText('downloading_dep.confirm_force_close_window_with_downloading_dep')
+      }
+      if (stillWorkWebControl) {
+        setCloseWindowText('web_control_setting.confirm_force_close_window_with_web_control')
+      }
+
+      setCloseWindowDialogOpen(true)
     })
   })
 
@@ -92,6 +147,14 @@ function App(): JSX.Element {
             'https://github.com/chenfan0/fideo-live-record/releases/latest'
           )
         }
+      />
+      <Dialog
+        title={t(closeWindowText)}
+        btnText={t('stream_config.confirm')}
+        dialogOpen={closeWindowDialogOpen}
+        onOpenChange={setCloseWindowDialogOpen}
+        variant="default"
+        handleBtnClick={handleForceCloseWindow}
       />
 
       {(downloadDepProgressInfo.downloading || downloadDepProgressInfo.showRetry) && (

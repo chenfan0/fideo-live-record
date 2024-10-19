@@ -201,7 +201,7 @@ async function createTray() {
     {
       label: isChinese ? '退出' : 'Quit',
       click: () => {
-        if (!isAllFfmpegProcessEnd()) {
+        if (!isAllFfmpegProcessEnd() || frpcObj !== null) {
           win?.show()
         }
         win?.webContents.send(USER_CLOSE_WINDOW)

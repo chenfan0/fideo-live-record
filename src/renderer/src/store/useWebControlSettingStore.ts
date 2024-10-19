@@ -3,7 +3,7 @@ import localForage from 'localforage'
 
 interface IWebControlSettingStore {
   webControlSetting: IWebControlSetting
-  setWebControlSetting: (setting: IWebControlSetting) => void
+  setWebControlSetting: (setting: IWebControlSetting) => Promise<void>
   initData: () => void
 }
 
@@ -19,9 +19,10 @@ export const useWebControlSettingStore = create<IWebControlSettingStore>((set) =
       set(() => ({ webControlSetting }))
     }
   },
-  setWebControlSetting: (setting: IWebControlSetting) =>
+  setWebControlSetting: async (setting: IWebControlSetting) => {
+    await localForage.setItem('webControlSetting', setting)
     set(() => {
-      localForage.setItem('webControlSetting', setting)
       return { webControlSetting: setting }
     })
+  }
 }))

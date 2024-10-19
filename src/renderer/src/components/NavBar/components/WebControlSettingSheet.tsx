@@ -233,6 +233,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
           type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
           data: useStreamConfigStore.getState().streamConfigList
         })
+        setWebControlSetting(form.getValues())
       }
 
       toast({
@@ -244,7 +245,6 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
           : t('web_control_setting.start_web_control_failed_desc'),
         variant: startStatus ? 'default' : 'destructive'
       })
-      setWebControlSetting(form.getValues())
     } else {
       window.api.stopFrpcProcess()
       field.onChange(status)

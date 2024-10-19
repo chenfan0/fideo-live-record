@@ -20,6 +20,20 @@ export default {
         logs_dir: 'Logs Directory',
         logs_dir_placeholder: 'Open Logs Directory'
       },
+      web_control_setting: {
+        title: 'Web Control Setting',
+        web_control_path: 'Activation Code',
+        web_control_path_required: 'Activation Code cannot be empty',
+        web_control_path_placeholder: 'Can be obtained by clicking the get button',
+        get_web_control_path: 'Get',
+        email: 'Email',
+        email_placeholder: 'Please enter the email (for receiving activation code)',
+        email_required: 'Email cannot be empty',
+        email_invalid: 'Email is invalid',
+        enable_web_control: 'Enable Web Control',
+        confirm_force_close_window_with_web_control:
+          'Web control is running, do you want to force close the window?'
+      },
       stream_config: {
         confirm: 'Confirm',
         confirm_delete: 'Are you sure you want to delete this recording item? ({{title}})',
@@ -164,7 +178,8 @@ export default {
         stop_web_control_success: '网页访问功能已关闭',
         stop_web_control_success_desc: '你可以再次点击开启按钮开启',
         stop_web_control_failed: '网页访问功能失败',
-        web_control_address: '网页访问地址'
+        web_control_address: '网页访问地址',
+        confirm_force_close_window_with_web_control: '网页访问功能正在运行, 是否强制关闭窗口?'
       },
       default_settings: {
         title: '默认配置',
