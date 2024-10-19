@@ -274,7 +274,11 @@ export async function recordStream(
     '-headers',
     'User-Agent: Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Mobile Safari/537.36'
   )
-  ffmpegProcess.inputOption('-headers', `Referer: ${roomUrl}`)
+
+  if (!roomUrl.includes('huya.com')) {
+    // 虎牙添加referer 会录制不了
+    ffmpegProcess.inputOption('-headers', `Referer: ${roomUrl}`)
+  }
 
   if (proxy) {
     ffmpegProcess.inputOption('-http_proxy', proxy)
