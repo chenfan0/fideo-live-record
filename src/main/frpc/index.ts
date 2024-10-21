@@ -8,7 +8,7 @@ import { is } from '@electron-toolkit/utils'
 import Fastify from 'fastify'
 import WebSocket from 'ws'
 import spawn from 'cross-spawn'
-import { FRPC_PROCESS_ERROR } from '../../const'
+import { FRP_DOMAIN, FRPC_PROCESS_ERROR } from '../../const'
 
 import debug from 'debug'
 
@@ -48,7 +48,7 @@ async function startFrpcLocalServer(
     try {
       const htmlContent = (await fsp.readFile(filePath, 'utf-8'))
         .toString()
-        .replace('$$WEBSOCKET_URL$$', `wss://web.fideo.site/${code}`)
+        .replace('$$WEBSOCKET_URL$$', `wss://${FRP_DOMAIN}/${code}`)
 
       reply.code(200).header('Content-Type', 'text/html').send(htmlContent)
     } catch (err) {
@@ -142,13 +142,13 @@ export async function startFrpcProcess(
     log('port: ', port)
 
     const frpcConfig = `
-      serverAddr = "web.fideo.site"
+      serverAddr = "${FRP_DOMAIN}"
       auth.token = "fideo-frp"
       [[proxies]]
       name = "${code}"
       type = "http"
       localPort = ${port}
-      customDomains = ["web.fideo.site"]
+      customDomains = ["${FRP_DOMAIN}"]
       locations = ["/${code}"]
     `
     const frpcConfigPath = join(userPath, 'frpc.toml')

@@ -29,3 +29,6 @@ export const START_FRPC_PROCESS = 'START_FRPC_PROCESS'
 export const STOP_FRPC_PROCESS = 'STOP_FRPC_PROCESS'
 
 export const FRPC_PROCESS_ERROR = 'FRPC_PROCESS_ERROR'
+
+export const FRP_DOMAIN = 'web-control.fideo.site'
+export const API_DOMAIN = 'api-web-control.fideo.site'

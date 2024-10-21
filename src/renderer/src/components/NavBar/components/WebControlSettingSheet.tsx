@@ -102,7 +102,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   }
 
   function intervalCheckOrderStatus(orderId: number) {
-    fetch('https://www.fideo.site/api/pay/check', {
+    fetch('https://api-web-control.fideo.site/api/pay/check', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -113,11 +113,9 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     }).then((res) => {
       res
         .json()
-        .then(({ code, data }) => {
+        .then(({ code, data: webControlPath }) => {
           // 这里的code是200，表示支付成功
           if (code === 200) {
-            const { code: webControlPath } = data
-
             form.setValue('webControlPath', webControlPath)
             setWebControlSetting(form.getValues())
             setDialogOpen(false)
@@ -164,7 +162,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     setLoading(true)
 
     try {
-      const res = await fetch('https://www.fideo.site/api/pay/wx', {
+      const res = await fetch('https://api-web-control.fideo.site/api/pay/wx', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -358,17 +356,17 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
                                       className="cursor-pointer underline"
                                       onClick={() => {
                                         window.api.navByDefaultBrowser(
-                                          `https://web.fideo.site/${form.getValues('webControlPath')}`
+                                          `https://web-control.fideo.site/${form.getValues('webControlPath')}`
                                         )
                                       }}
                                     >
-                                      {`https://web.fideo.site/${form.getValues('webControlPath')}`}
+                                      {`https://web-control.fideo.site/${form.getValues('webControlPath')}`}
                                     </a>
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div>
-                                    {`https://web.fideo.site/${form.getValues('webControlPath')}`}
+                                    {`https://web-control.fideo.site/${form.getValues('webControlPath')}`}
                                   </div>
                                 </TooltipContent>
                               </Tooltip>
