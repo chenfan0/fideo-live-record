@@ -30,7 +30,9 @@ import {
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
+  START_FRPC_PROCESS,
   START_STREAM_RECORD,
+  STOP_FRPC_PROCESS,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
   USER_CLOSE_WINDOW
@@ -44,15 +46,18 @@ import {
   killRecordStreamFfmpegProcess,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
+import { setFfmpegAndFfprobePath } from './ffmpeg'
 import {
-  makeSureDependenciesExist,
-  downloadDepProgressInfo,
   checkFfmpegExist,
   checkFfprobeExist,
+  checkFrpcExist,
+  downloadDepProgressInfo,
+  makeSureDependenciesExist,
   downloadReq
-} from './ffmpeg'
+} from './download-dep'
 
 import { writeLogWrapper } from './log/index'
+import { startFrpcProcess, stopFrpc, frpcObj } from './frpc'
 
 export const writeLog = writeLogWrapper(app.getPath('userData'))
 
@@ -196,7 +201,7 @@ async function createTray() {
     {
       label: isChinese ? '退出' : 'Quit',
       click: () => {
-        if (!isAllFfmpegProcessEnd()) {
+        if (!isAllFfmpegProcessEnd() || frpcObj !== null) {
           win?.show()
         }
         win?.webContents.send(USER_CLOSE_WINDOW)
@@ -222,16 +227,19 @@ function showNotification(title: string, body: string) {
 
 async function handleMakeSureDependenciesExist() {
   const userDataPath = app.getPath('userData')
-  const [isFFmpegExist, isFfprobeExist] = await Promise.all([
+  const [isFFmpegExist, isFfprobeExist, isFrpcExist] = await Promise.all([
     checkFfmpegExist(userDataPath),
-    checkFfprobeExist(userDataPath)
+    checkFfprobeExist(userDataPath),
+    checkFrpcExist(userDataPath)
   ])
 
-  if (!isFFmpegExist || !isFfprobeExist) {
+  if (!isFFmpegExist || !isFfprobeExist || !isFrpcExist) {
     startDownloadDepTimerWhenFirstDownloadDepStart()
   }
-  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist)
+
+  makeSureDependenciesExist(userDataPath)
     .then(() => {
+      setFfmpegAndFfprobePath(userDataPath)
       stopDownloadDepTimerWhenAllDownloadDepEnd()
     })
     .catch(() => {
@@ -366,10 +374,25 @@ app.whenReady().then(async () => {
     stillRecordStreamKeys.forEach((key) => {
       killRecordStreamFfmpegProcess(key)
     })
+
     downloadReq.destroy()
     clearTimerWhenAllFfmpegProcessEnd()
     stopDownloadDepTimerWhenAllDownloadDepEnd()
+
+    stopFrpc()
+
     win?.destroy()
+  })
+
+  ipcMain.handle(START_FRPC_PROCESS, async (_, code: string) => {
+    if (frpcObj) {
+      return false
+    }
+    return await startFrpcProcess(code, writeLog, win!)
+  })
+
+  ipcMain.handle(STOP_FRPC_PROCESS, async () => {
+    stopFrpc()
   })
 
   await createWindow()

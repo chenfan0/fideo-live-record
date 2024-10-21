@@ -5,6 +5,7 @@ import {
   DOWNLOAD_DEP_PROGRESS_INFO,
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
+  FRPC_PROCESS_ERROR,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -13,7 +14,9 @@ import {
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
+  START_FRPC_PROCESS,
   START_STREAM_RECORD,
+  STOP_FRPC_PROCESS,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
   USER_CLOSE_WINDOW
@@ -38,6 +41,9 @@ const api = {
   closeWindow: () => ipcRenderer.invoke(CLOSE_WINDOW),
   forceCloseWindow: () => ipcRenderer.invoke(FORCE_CLOSE_WINDOW),
   retryDownloadDep: () => ipcRenderer.invoke(RETRY_DOWNLOAD_DEP),
+
+  startFrpcProcess: (code: string) => ipcRenderer.invoke(START_FRPC_PROCESS, code),
+  stopFrpcProcess: () => ipcRenderer.invoke(STOP_FRPC_PROCESS),
 
   onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => {
     ipcRenderer.on(STREAM_RECORD_END, (_, title, code, errMsg) => {
@@ -64,6 +70,11 @@ const api = {
   onAppUpdate: (callback: () => void) => {
     ipcRenderer.on(SHOW_UPDATE_DIALOG, () => {
       callback()
+    })
+  },
+  onFrpcProcessError: (callback: (err: string) => void) => {
+    ipcRenderer.on(FRPC_PROCESS_ERROR, (_, err) => {
+      callback(err)
     })
   }
 }

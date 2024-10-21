@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useMount } from 'react-use'
 import { useTranslation } from 'react-i18next'
 
-import Dialog from '@/components/Dialog'
 import StreamConfigCard from './components/StreamConfigCard'
 
 import {
@@ -18,7 +17,6 @@ import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { useNavSelectedStatusStore } from '@renderer/store/useNavSelectedStatusStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
-import { useDownloadDepInfoStore } from '@/store/useDownloadDepStore'
 import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 
@@ -28,13 +26,9 @@ const maxRetryTimes = 3
 const alreadyCallbackOneTimeSet = new Set()
 
 export default function StreamConfigList() {
-  const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
-  const [closeWindowText, setCloseWindowText] = useState('stream_config.confirm_force_close_window')
-
   const navSelectedStatus = useNavSelectedStatusStore((state) => state.navSelectedStatus)
-  const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => ({
-    streamConfigList: state.streamConfigList,
-    updateStreamConfig: state.updateStreamConfig
+  const { streamConfigList } = useStreamConfigStore((state) => ({
+    streamConfigList: state.streamConfigList
   }))
   const selectedStreamConfigTitleList = useMemo(() => {
     if (navSelectedStatus === '-1') {
@@ -50,21 +44,6 @@ export default function StreamConfigList() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  const handleForceCloseWindow = async () => {
-    setCloseWindowDialogOpen(false)
-
-    for (const streamConfig of streamConfigList) {
-      if (streamConfig.status !== StreamStatus.NOT_STARTED) {
-        await updateStreamConfig(
-          { ...streamConfig, status: StreamStatus.NOT_STARTED },
-          streamConfig.title
-        )
-      }
-    }
-
-    window.api.forceCloseWindow()
-  }
-
   useMount(() => {
     window.api.onFFmpegProgressInfo((progressInfo) => {
       updateFfmpegProgressInfo(progressInfo)
@@ -74,8 +53,6 @@ export default function StreamConfigList() {
       const { streamConfigList, updateStreamConfig } = useStreamConfigStore.getState()
       const xiZhiKey = useDefaultSettingsStore.getState().defaultSettingsConfig.xizhiKey
       const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)
-
-      console.log('onStreamRecordEnd:', title, code, errMsg)
 
       if (index === -1) {
         return
@@ -172,26 +149,6 @@ export default function StreamConfigList() {
 
       emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.title)
     })
-
-    window.api.onUserCloseWindow(() => {
-      const { streamConfigList } = useStreamConfigStore.getState()
-      const { downloadDepProgressInfo } = useDownloadDepInfoStore.getState()
-
-      const stillWorkStream = streamConfigList.find(
-        (streamConfig) => streamConfig.status !== StreamStatus.NOT_STARTED
-      )
-      const stillDownloadDep = downloadDepProgressInfo.downloading
-
-      if (!stillWorkStream && !stillDownloadDep) {
-        window.api.forceCloseWindow()
-        return
-      }
-      if (stillDownloadDep) {
-        setCloseWindowText('downloading_dep.confirm_force_close_window_with_downloading_dep')
-      }
-
-      setCloseWindowDialogOpen(true)
-    })
   })
 
   return (
@@ -208,14 +165,6 @@ export default function StreamConfigList() {
           ))}
         </div>
       }
-      <Dialog
-        title={t(closeWindowText)}
-        btnText={t('stream_config.confirm')}
-        dialogOpen={closeWindowDialogOpen}
-        onOpenChange={setCloseWindowDialogOpen}
-        variant="default"
-        handleBtnClick={handleForceCloseWindow}
-      />
     </>
   )
 }

@@ -24,3 +24,11 @@ export const FORCE_CLOSE_WINDOW = 'FORCE_CLOSE_WINDOW'
 export const RECORD_DUMMY_PROCESS = { kill: () => {} }
 
 export const RECORD_END_NOT_USER_STOP = 'RECORD_END_NOT_USER_STOP'
+
+export const START_FRPC_PROCESS = 'START_FRPC_PROCESS'
+export const STOP_FRPC_PROCESS = 'STOP_FRPC_PROCESS'
+
+export const FRPC_PROCESS_ERROR = 'FRPC_PROCESS_ERROR'
+
+export const FRP_DOMAIN = 'web-control.fideo.site'
+export const API_DOMAIN = 'api-web-control.fideo.site'

@@ -1,5 +1,3 @@
-
-
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -34,4 +32,3 @@ export function useXizhiToPushNotification(options: {
   const titleAndContent = options.content ? `${options.title} - ${options.content}` : options.title
   fetch(`${options.key}?title=${encodeURIComponent(titleAndContent)}`)
 }
-

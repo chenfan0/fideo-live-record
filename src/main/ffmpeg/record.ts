@@ -163,7 +163,8 @@ async function detectStreamResolution(streamConfig: IStreamConfig) {
   ])
 
   process.on('error', (error) => {
-    console.log('detect stream resolution error: ', error)
+    log('detect stream resolution error: ', error)
+
     delete detectStreamProcessMap[title]
   })
 

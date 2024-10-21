@@ -20,6 +20,20 @@ export default {
         logs_dir: 'Logs Directory',
         logs_dir_placeholder: 'Open Logs Directory'
       },
+      web_control_setting: {
+        title: 'Web Control Setting',
+        web_control_path: 'Activation Code',
+        web_control_path_required: 'Activation Code cannot be empty',
+        web_control_path_placeholder: 'Can be obtained by clicking the get button',
+        get_web_control_path: 'Get',
+        email: 'Email',
+        email_placeholder: 'Please enter the email (for receiving activation code)',
+        email_required: 'Email cannot be empty',
+        email_invalid: 'Email is invalid',
+        enable_web_control: 'Enable Web Control',
+        confirm_force_close_window_with_web_control:
+          'Web control is running, do you want to force close the window?'
+      },
       stream_config: {
         confirm: 'Confirm',
         confirm_delete: 'Are you sure you want to delete this recording item? ({{title}})',
@@ -121,7 +135,7 @@ export default {
         get_update_detail: 'View Update Details'
       },
       downloading_dep: {
-        downloading_title: 'Downloading Dependencies. . .',
+        downloading_title: 'Downloading {{title}}. . .',
         retry_title: 'Download Dependencies Failed',
         confirm_force_close_window_with_downloading_dep:
           'Dependencies are being downloaded, force close the window?',
@@ -137,7 +151,35 @@ export default {
         toggle_theme: '切换主题',
         qq: '加入QQ群',
         discord: '加入Discord',
-        go_to_website: '前往官网'
+        go_to_website: '前往官网',
+        web_control: '网页操作'
+      },
+      web_control_setting: {
+        title: '网页操作配置',
+        web_control_path: '激活码',
+        web_control_path_required: '激活码不能为空',
+        web_control_path_placeholder: '可通过点击获取按钮获取',
+        get_web_control_path: '获取',
+        email: '邮箱',
+        email_placeholder: '请输入邮箱(用于接收激活码)',
+        email_required: '邮箱不能为空',
+        email_invalid: '邮箱不合法',
+        enable_web_control: '开启网页访问功能',
+        enable_web_control_tooltip: '启用后可在手机通过网页操作录制',
+        get_web_control_path_success: '获取激活码成功',
+        get_web_control_path_success_desc: '激活码已发送至邮箱, 请注意查收',
+        get_web_control_path_failed: '获取激活码失败',
+        get_web_control_path_failed_desc: '请稍后重试',
+        start_web_control_success: '网页访问功能已开启',
+        start_web_control_success_desc: '你可以使用浏览器访问对应地址进行操作',
+        start_web_control_failed: '开启网页访问功能失败',
+        start_web_control_failed_desc: '请稍后重试',
+        frpc_process_error: 'frpc进程发生错误',
+        stop_web_control_success: '网页访问功能已关闭',
+        stop_web_control_success_desc: '你可以再次点击开启按钮开启',
+        stop_web_control_failed: '网页访问功能失败',
+        web_control_address: '网页访问地址',
+        confirm_force_close_window_with_web_control: '网页访问功能正在运行, 是否强制关闭窗口?'
       },
       default_settings: {
         title: '默认配置',
@@ -246,7 +288,7 @@ export default {
         get_update_detail: '查看更新详情'
       },
       downloading_dep: {
-        downloading_title: '正在下载依赖中. . .',
+        downloading_title: '正在下载 {{title}} 中. . .',
         retry_title: '下载依赖失败',
         confirm_force_close_window_with_downloading_dep: '当前正在下载依赖，是否强制关闭窗口?',
         retry: '重试'

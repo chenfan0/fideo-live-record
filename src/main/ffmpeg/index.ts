@@ -1,15 +1,8 @@
 import module from 'module'
 import os from 'node:os'
 import path from 'node:path'
-import fsp from 'node:fs/promises'
 
 import type Ffmpeg from 'fluent-ffmpeg'
-
-import debug from 'debug'
-
-import download from 'download'
-
-const log = debug('fideo-ffmpeg')
 
 const require = module.createRequire(import.meta.url)
 const ffmpeg = require('fluent-ffmpeg') as typeof Ffmpeg & {
@@ -17,42 +10,9 @@ const ffmpeg = require('fluent-ffmpeg') as typeof Ffmpeg & {
   ffprobePath: string
 }
 
-export const isMac = os.platform() === 'darwin'
+const isMac = os.platform() === 'darwin'
 
-const ffmpegMacUrl = 'https://gitlab.com/chenfan0/ffmpeg-resource/-/raw/main/ffmpeg-mac.zip'
-const ffmpegWinUrl = 'https://gitlab.com/chenfan0/ffmpeg-resource/-/raw/main/ffmpeg-win.zip'
-
-export async function checkFfmpegExist(dirname: string) {
-  const ffmpegPath = isMac
-    ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
-    : path.resolve(dirname, 'ffmpeg-win/ffmpeg.exe')
-  return fsp
-    .access(ffmpegPath, fsp.constants.F_OK)
-    .then(() => true)
-    .catch(() => false)
-}
-
-export async function checkFfprobeExist(dirname: string) {
-  const ffprobePath = isMac
-    ? path.resolve(dirname, 'ffmpeg-mac/ffprobe')
-    : path.resolve(dirname, 'ffmpeg-win/ffprobe.exe')
-  return fsp
-    .access(ffprobePath, fsp.constants.F_OK)
-    .then(() => true)
-    .catch(() => false)
-}
-
-export const downloadDepProgressInfo: IDownloadDepProgressInfo = {
-  downloading: false,
-  progress: 0,
-  showRetry: false
-}
-
-export let downloadReq = {
-  destroy: () => {}
-}
-
-const setFfmpegAndFfprobePath = (dirname: string) => {
+export const setFfmpegAndFfprobePath = (dirname: string) => {
   const ffmpegPath = isMac
     ? path.resolve(dirname, 'ffmpeg-mac/ffmpeg')
     : path.resolve(dirname, 'ffmpeg-win/ffmpeg.exe')
@@ -63,57 +23,6 @@ const setFfmpegAndFfprobePath = (dirname: string) => {
   ffmpeg.setFfprobePath(ffprobePath)
   ffmpeg.ffmpegPath = ffmpegPath
   ffmpeg.ffprobePath = ffprobePath
-}
-
-export async function makeSureDependenciesExist(
-  dirname: string,
-  isFfmpegExist: boolean,
-  isFFprobeExist: boolean
-) {
-  if (isFfmpegExist && isFFprobeExist) {
-    setFfmpegAndFfprobePath(dirname)
-    return true
-  }
-
-  let _resolve: (value: unknown) => void, _reject: (reason?: any) => void
-  const p = new Promise((resolve, reject) => {
-    _resolve = resolve
-    _reject = reject
-  })
-  const downloadUrl = isMac ? ffmpegMacUrl : ffmpegWinUrl
-
-  downloadDepProgressInfo.downloading = true
-  download(downloadUrl, dirname, { extract: true })
-    .on('request', (req) => {
-      downloadReq = req
-    })
-    .on('downloadProgress', ({ percent }) => {
-      downloadDepProgressInfo.progress = percent
-      log(`ffmpeg download progress: ${percent}`)
-    })
-    .on('error', (error) => {
-      downloadDepProgressInfo.showRetry = true
-      downloadDepProgressInfo.downloading = false
-      downloadDepProgressInfo.progress = 0
-      log(error.message)
-      _reject()
-    })
-    .then(() => {
-      downloadDepProgressInfo.downloading = false
-      downloadDepProgressInfo.progress = 0
-
-      setFfmpegAndFfprobePath(dirname)
-
-      _resolve(true)
-    })
-    .catch(() => {
-      downloadDepProgressInfo.showRetry = true
-      downloadDepProgressInfo.downloading = false
-      downloadDepProgressInfo.progress = 0
-      _reject()
-    })
-
-  return p
 }
 
 // const isDev = import.meta.env.MODE === 'development'
