@@ -22,48 +22,48 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const recordStreamFfmpegProgressInfo: IFfmpegProgressInfo = {}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const setRecordStreamFfmpegProgressInfo = (title: string, progress: any) => {
-  recordStreamFfmpegProgressInfo[title] = progress
+export const setRecordStreamFfmpegProgressInfo = (id: string, progress: any) => {
+  recordStreamFfmpegProgressInfo[id] = progress
 }
 
 export const recordStreamFfmpegProcessMap = {}
 
-export const setRecordStreamFfmpegProcessMap = (title: string, process: any) => {
-  recordStreamFfmpegProcessMap[title] = process
+export const setRecordStreamFfmpegProcessMap = (id: string, process: any) => {
+  recordStreamFfmpegProcessMap[id] = process
 }
 
-export const killRecordStreamFfmpegProcess = (title: string) => {
-  const process = recordStreamFfmpegProcessMap[title]
+export const killRecordStreamFfmpegProcess = (id: string) => {
+  const process = recordStreamFfmpegProcessMap[id]
 
   const isDummy = process === RECORD_DUMMY_PROCESS || !process
   process?.kill('SIGKILL')
-  delete recordStreamFfmpegProgressInfo[title]
-  delete recordStreamFfmpegProcessMap[title]
+  delete recordStreamFfmpegProgressInfo[id]
+  delete recordStreamFfmpegProcessMap[id]
 
-  killDetectStreamProcess(title)
+  killDetectStreamProcess(id)
 
   return isDummy
 }
 
 const detectStreamProcessMap = {}
 const streamResolutionMap = {}
-const setDetectStreamProcessMap = (title: string, process: execa.ExecaChildProcess) => {
-  detectStreamProcessMap[title] = process
+const setDetectStreamProcessMap = (id: string, process: execa.ExecaChildProcess) => {
+  detectStreamProcessMap[id] = process
 }
-const killDetectStreamProcess = (title: string) => {
-  const process = detectStreamProcessMap[title]
+const killDetectStreamProcess = (id: string) => {
+  const process = detectStreamProcessMap[id]
   process?.kill('SIGKILL')
 
-  delete detectStreamProcessMap[title]
-  delete streamResolutionMap[title]
+  delete detectStreamProcessMap[id]
+  delete streamResolutionMap[id]
 }
 
 const resolutionChangeSet = new Set()
-const addResolutionChangeSet = (title: string) => {
-  resolutionChangeSet.add(title)
+const addResolutionChangeSet = (id: string) => {
+  resolutionChangeSet.add(id)
 }
-const removeResolutionChangeSet = (title: string) => {
-  resolutionChangeSet.delete(title)
+const removeResolutionChangeSet = (id: string) => {
+  resolutionChangeSet.delete(id)
 }
 
 const checkFileExist = async (filepath: string) => {
@@ -139,10 +139,10 @@ async function convert(
 }
 
 async function detectStreamResolution(streamConfig: IStreamConfig) {
-  const { liveUrls, line, cookie, proxy, title } = streamConfig
+  const { liveUrls, line, cookie, proxy, id } = streamConfig
 
   // 检测之前先清除之前的检测数据
-  removeResolutionChangeSet(title)
+  removeResolutionChangeSet(id)
 
   const process = execa(ffmpeg.ffprobePath, [
     '-v',
@@ -165,18 +165,18 @@ async function detectStreamResolution(streamConfig: IStreamConfig) {
   process.on('error', (error) => {
     log('detect stream resolution error: ', error)
 
-    delete detectStreamProcessMap[title]
+    delete detectStreamProcessMap[id]
   })
 
   process.stdout?.on('data', (data) => {
     const stringData = data.toString() as string
     const [width, height] = stringData.split(',').map((item) => item.replace('\n', ''))
 
-    const prevResolution = streamResolutionMap[title]
+    const prevResolution = streamResolutionMap[id]
     log('width, height: ', width, height)
 
     if (!prevResolution) {
-      streamResolutionMap[title] = {
+      streamResolutionMap[id] = {
         width,
         height
       }
@@ -184,23 +184,23 @@ async function detectStreamResolution(streamConfig: IStreamConfig) {
       const { width: prevWidth, height: prevHeight } = prevResolution
 
       if (prevWidth !== width || prevHeight !== height) {
-        log('resolution change: ', title, width, height)
+        log('resolution change: ', id, width, height)
 
-        addResolutionChangeSet(title)
+        addResolutionChangeSet(id)
 
-        killRecordStreamFfmpegProcess(title)
+        killRecordStreamFfmpegProcess(id)
 
         return
       }
 
-      streamResolutionMap[title] = {
+      streamResolutionMap[id] = {
         width,
         height
       }
     }
   })
 
-  setDetectStreamProcessMap(title, process)
+  setDetectStreamProcessMap(id, process)
 }
 
 export async function recordStream(
@@ -233,7 +233,8 @@ export async function recordStream(
     title,
     segmentTime,
     convertToMP4,
-    detectResolution
+    detectResolution,
+    id
   } = streamConfig
 
   writeLog(title, `RecordStream Config: ${JSON.stringify(streamConfig, null, 2)}`)
@@ -252,7 +253,7 @@ export async function recordStream(
     fs.mkdirSync(baseOutput)
   }
 
-  if (recordStreamFfmpegProcessMap[title] !== RECORD_DUMMY_PROCESS) {
+  if (recordStreamFfmpegProcessMap[id] !== RECORD_DUMMY_PROCESS) {
     writeLog(title, 'Record Stream is Killed')
     _resolve({
       code: FFMPEG_ERROR_CODE.USER_KILL_PROCESS
@@ -268,7 +269,7 @@ export async function recordStream(
 
   ffmpegProcess.inputOptions(['-re'])
 
-  setRecordStreamFfmpegProcessMap(title, ffmpegProcess)
+  setRecordStreamFfmpegProcessMap(id, ffmpegProcess)
 
   ffmpegProcess.inputOption(
     '-headers',
@@ -307,7 +308,7 @@ export async function recordStream(
       })
     })
     .on('progress', (progress) => {
-      setRecordStreamFfmpegProgressInfo(title, progress)
+      setRecordStreamFfmpegProgressInfo(id, progress)
       log('record live progress: ', progress)
     })
     .on('end', async (...args) => {
@@ -316,7 +317,7 @@ export async function recordStream(
       log('record live end: ', msg)
       writeLog(title, `Record Live End: ${msg}`)
 
-      killRecordStreamFfmpegProcess(title)
+      killRecordStreamFfmpegProcess(id)
 
       cb?.(SUCCESS_CODE)
       await convert(convertSource, writeLog.bind(null, title), convertToMP4)
@@ -327,9 +328,9 @@ export async function recordStream(
 
       log('record live error: ', errMsg)
       writeLog(title, `Record Live Error: ${errMsg}`)
-      const isResolutionChange = resolutionChangeSet.has(title)
+      const isResolutionChange = resolutionChangeSet.has(id)
       // 清空数据
-      killRecordStreamFfmpegProcess(title)
+      killRecordStreamFfmpegProcess(id)
 
       let errCode!: number
 

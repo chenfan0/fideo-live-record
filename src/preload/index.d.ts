@@ -27,7 +27,7 @@ declare global {
       startFrpcProcess: (code: string) => Promise<{ status: boolean; code?: string; port?: number }>
       stopFrpcProcess: () => void
 
-      onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => void
+      onStreamRecordEnd: (callback: (id: string, code: number, errMsg?: string) => void) => void
       onFFmpegProgressInfo: (callback: (info: IFfmpegProgressInfo) => void) => void
       onDownloadDepProgressInfo: (callback: (info: IDownloadDepProgressInfo) => void) => void
       onUserCloseWindow: (callback: () => void) => void

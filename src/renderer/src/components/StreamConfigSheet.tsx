@@ -18,8 +18,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shad
 import { useStreamConfigStore } from '@renderer/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { checkUrlValid } from '@renderer/lib/utils'
+import { nanoid } from 'nanoid'
 
 const formSchema = z.object({
+  id: z.string(),
   title: z.string(),
   roomUrl: z.string(),
   filename: z.string(),
@@ -36,6 +38,7 @@ const formSchema = z.object({
 })
 
 const defaultStreamConfig: IStreamConfig = {
+  id: '',
   title: '',
   roomUrl: '',
   filename: '',
@@ -245,8 +248,10 @@ export default function StreamConfigSheet(props: StreamConfigSheetProps) {
       }
       formValues.liveUrls = liveUrls
       if (type === 'edit') {
-        await updateStreamConfig(formValues, formValues.title)
+        await updateStreamConfig(formValues, formValues.id)
       } else {
+        // 创建时，id为空
+        formValues.id = nanoid()
         await addStreamConfig(formValues)
       }
     }

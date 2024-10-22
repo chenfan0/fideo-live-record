@@ -1,4 +1,5 @@
 interface IStreamConfig {
+  id: string
   title: string
   roomUrl: string
   filename: string

@@ -38,7 +38,7 @@ export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps
           <div className="flex gap-2 flex-1">
             <h1
               className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[30%]"
-              id={streamConfig.title}
+              id={streamConfig.id}
             >
               {streamConfig.title}
             </h1>
@@ -58,12 +58,12 @@ export default function StreamConfigCard({ streamConfig }: StreamConfigCardProps
       <CardContent>
         <Progress animate={streamConfig.status !== StreamStatus.NOT_STARTED} />
         <div className="mt-2 h-[20px] flex gap-16">
-          {ffmpegProgressInfo[streamConfig.title] && (
+          {ffmpegProgressInfo[streamConfig.id] && (
             <>
-              <div>{ffmpegProgressInfo[streamConfig.title]?.timemark}</div>
+              <div>{ffmpegProgressInfo[streamConfig.id]?.timemark}</div>
               <div>
                 {(streamConfig.segmentTime === '0' || streamConfig.segmentTime === '') &&
-                  ffmpegProgressInfo[streamConfig.title].targetSize / 1024 + 'M'}
+                  ffmpegProgressInfo[streamConfig.id].targetSize / 1024 + 'M'}
               </div>
             </>
           )}

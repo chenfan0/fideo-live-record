@@ -49,10 +49,10 @@ export function createWebSocket(port: number, code: string) {
 
     switch (type) {
       case WebSocketMessageType.START_RECORD_STREAM:
-        document.getElementById(data.title + '_play')?.click()
+        document.getElementById(data.id + '_play')?.click()
         break
       case WebSocketMessageType.PAUSE_RECORD_STREAM:
-        document.getElementById(data.title + '_pause')?.click()
+        document.getElementById(data.id + '_pause')?.click()
         break
     }
   }

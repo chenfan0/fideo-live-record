@@ -3,6 +3,8 @@ import { create } from 'zustand'
 import localForage from 'localforage'
 import { sendMessage, WebSocketMessageType } from '@/lib/websocket'
 
+import { nanoid } from 'nanoid'
+
 interface IStreamConfigStore {
   streamConfigList: IStreamConfig[]
   initialData: () => void
@@ -16,14 +18,28 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
   streamConfigList: [],
   streamConfigSheetOpen: false,
   initialData: async () => {
-    const streamConfigList = await localForage.getItem<IStreamConfig[]>('streamConfigList')
-    if (streamConfigList) {
-      sendMessage({
-        type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
-        data: streamConfigList
-      })
-      set(() => ({ streamConfigList }))
+    let streamConfigList = await localForage.getItem<IStreamConfig[]>('streamConfigList')
+
+    if (!streamConfigList) return
+
+    let shouldUpdate = false
+    streamConfigList = streamConfigList.map((streamConfig) => {
+      if (!streamConfig.id) {
+        shouldUpdate = true
+        streamConfig.id = nanoid()
+      }
+      return streamConfig
+    })
+
+    if (shouldUpdate) {
+      await localForage.setItem('streamConfigList', streamConfigList)
     }
+
+    sendMessage({
+      type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
+      data: streamConfigList
+    })
+    set(() => ({ streamConfigList: streamConfigList! }))
   },
   addStreamConfig: async (streamConfig: IStreamConfig) => {
     const newStreamConfigList = [streamConfig, ...get().streamConfigList]
@@ -36,9 +52,9 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
       return { streamConfigList: newStreamConfigList }
     })
   },
-  updateStreamConfig: async (newStreamConfig: IStreamConfig, title: string) => {
+  updateStreamConfig: async (newStreamConfig: IStreamConfig, id: string) => {
     const newStreamConfigList = get().streamConfigList.map((streamConfig) =>
-      streamConfig.title === title ? newStreamConfig : streamConfig
+      streamConfig.id === id ? newStreamConfig : streamConfig
     )
     await localForage.setItem('streamConfigList', newStreamConfigList)
     sendMessage({
@@ -59,9 +75,9 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
       return { streamConfigList: newStreamConfigList }
     })
   },
-  removeStreamConfig: async (title: string) => {
+  removeStreamConfig: async (id: string) => {
     const newStreamConfigList = get().streamConfigList.filter(
-      (streamConfig) => streamConfig.title !== title
+      (streamConfig) => streamConfig.id !== id
     )
     await localForage.setItem('streamConfigList', newStreamConfigList)
     sendMessage({

@@ -24,7 +24,7 @@ export function MoveCardDropdownMenu({ streamConfig }: { streamConfig: IStreamCo
     replaceStreamConfig: state.replaceStreamConfig
   }))
 
-  const index = streamConfigList.findIndex((stream) => stream.title === streamConfig.title)
+  const index = streamConfigList.findIndex((stream) => stream.id === streamConfig.id)
 
   const handleMoveToTop = () => {
     const newStreamConfigList = [

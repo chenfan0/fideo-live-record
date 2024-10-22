@@ -57,7 +57,7 @@ function App(): JSX.Element {
       if (streamConfig.status !== StreamStatus.NOT_STARTED) {
         await updateStreamConfig(
           { ...streamConfig, status: StreamStatus.NOT_STARTED },
-          streamConfig.title
+          streamConfig.id
         )
       }
     }

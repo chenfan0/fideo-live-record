@@ -52,6 +52,7 @@
     "localforage": "^1.10.0",
     "lucide-react": "^0.383.0",
     "mitt": "^3.0.1",
+    "nanoid": "^5.0.7",
     "react-confetti": "^6.1.0",
     "react-hook-form": "^7.51.5",
     "react-i18next": "^14.1.2",

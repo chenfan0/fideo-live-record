@@ -282,7 +282,7 @@ app.whenReady().then(async () => {
 
   ipcMain.handle(START_STREAM_RECORD, async (_, streamConfigStr: string) => {
     const streamConfig = JSON.parse(streamConfigStr) as IStreamConfig
-    const { roomUrl, proxy, cookie, title } = streamConfig
+    const { roomUrl, proxy, cookie, title, id } = streamConfig
 
     /**
      * When requesting the live stream address,
@@ -291,7 +291,7 @@ app.whenReady().then(async () => {
      * Prevent clicking the stop recording button while requesting the live stream address,
      * causing the page to display that the recording has stopped, but the ffmpeg process is still running
      */
-    setRecordStreamFfmpegProcessMap(title, RECORD_DUMMY_PROCESS)
+    setRecordStreamFfmpegProcessMap(id, RECORD_DUMMY_PROCESS)
 
     const { code: liveUrlsCode, liveUrls } = await getLiveUrls(
       { roomUrl, proxy, cookie },
@@ -309,7 +309,7 @@ app.whenReady().then(async () => {
       streamConfig,
       writeLog,
       (code: number, errMsg?: string) => {
-        win?.webContents.send(STREAM_RECORD_END, title, code, errMsg)
+        win?.webContents.send(STREAM_RECORD_END, id, code, errMsg)
         clearTimerWhenAllFfmpegProcessEnd()
       }
     )
@@ -321,7 +321,7 @@ app.whenReady().then(async () => {
     }
   })
 
-  ipcMain.handle(STOP_STREAM_RECORD, async (_, title: string) => {
+  ipcMain.handle(STOP_STREAM_RECORD, async (_, id: string) => {
     /**
      * If the ffmpeg process is RECORD_DUMMY_PROCESS when stopping recording,
      * need to send the STREAM_RECORD_END event to display the information that the recording has stopped on the page.
@@ -330,9 +330,8 @@ app.whenReady().then(async () => {
      * At this time, you do not need to send the STREAM_RECORD_END event,
      * because the ffmpeg process will send the STREAM_RECORD_END event when it is finished running.
      */
-    const shouldSend = killRecordStreamFfmpegProcess(title)
-    shouldSend &&
-      win?.webContents.send(STREAM_RECORD_END, title, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
+    const shouldSend = killRecordStreamFfmpegProcess(id)
+    shouldSend && win?.webContents.send(STREAM_RECORD_END, id, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
     clearTimerWhenAllFfmpegProcessEnd()
 
     return {
