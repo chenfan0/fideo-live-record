@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { DESKTOP_USER_AGENT, request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -15,66 +15,46 @@ async function baseGetKuaishouLiveUrlsPlugin(roomUrl, others = {}) {
   const roomId = getRoomIdByUrl(roomUrl)
   const { proxy, cookie } = others
   log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
-  let htmlContent = ''
-  try {
-    htmlContent = (
-      await request(`https://live.kuaishou.com/u/${roomId}`, {
-        headers: {
-          cookie,
-          host: 'live.kuaishou.com'
-        },
-        proxy
-      })
-    ).data
-  } catch (e) {
-    const msg = e.message
 
-    if (msg === 'Request failed with status code 501') {
-      console.log('501')
-      return {
-        code: CRAWLER_ERROR_CODE.REQUEST_TOO_FAST
-      }
-    }
-    throw e
-  }
-
-  if (htmlContent.includes('请求过快，请稍后重试')) {
+  if (!cookie) {
     return {
-      code: CRAWLER_ERROR_CODE.REQUEST_TOO_FAST
+      code: CRAWLER_ERROR_CODE.COOKIE_IS_REQUIRED
     }
   }
 
-  const scriptReg = /<script\b[^>]*>([\s\S]*?)<\/script>/gi
-  const matches = htmlContent.match(scriptReg)
-  let liveUrls = []
-  let maxBitrate = -1
-  for (const match of matches) {
-    if (!match.includes('window.__INITIAL_STATE__')) {
+  const data = (
+    await request('https://live.kuaishou.com/live_api/follow/living', {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      }
+    })
+  ).data
+
+  const list = data.data.list
+  let liveUrl = ''
+
+  for (const item of list) {
+    const { author, playUrls } = item
+
+    if (author.id !== roomId) {
       continue
     }
-    const scriptContent = match.replace(scriptReg, '$1')
-    const fn = new Function(`
-          const window = {};
-          try {
-            ${scriptContent};
-          } catch(e) {}
-          return window.__INITIAL_STATE__`)
-    const data = fn()
-    const playUrls = data.liveroom.playList[0].liveStream.playUrls
-    const adaptationSet = playUrls[0].adaptationSet
-    const representation = adaptationSet.representation
-    for (const re of representation) {
-      if (re.bitrate > maxBitrate) {
-        maxBitrate = re.bitrate
-        liveUrls = [re.url]
-      } else if (re.bitrate === maxBitrate) {
-        liveUrls.push(re.url)
+
+    let maxBitrate = 0
+    const representations = playUrls[0].adaptationSet.representation
+
+    for (const representation of representations) {
+      const { bitrate, url } = representation
+
+      if (bitrate > maxBitrate) {
+        maxBitrate = bitrate
+        liveUrl = url
       }
     }
-    break
   }
 
-  if (liveUrls.length === 0) {
+  if (!liveUrl) {
     return {
       code: CRAWLER_ERROR_CODE.NOT_URLS
     }
@@ -82,7 +62,7 @@ async function baseGetKuaishouLiveUrlsPlugin(roomUrl, others = {}) {
 
   return {
     code: SUCCESS_CODE,
-    liveUrls
+    liveUrls: [liveUrl]
   }
 }
 
