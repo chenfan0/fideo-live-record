@@ -21,6 +21,7 @@ import { getVvLiveUrlsPlugin } from './plugins/vv'
 import { getChangLiaoLiveUrlsPlugin } from './plugins/changliao'
 import { get17LiveUrlsPlugin } from './plugins/17live'
 import { getXhsUrlsPlugin } from './plugins/xhs'
+import { getKilakilaLiveUrlsPlugin } from './plugins/kilakila'
 
 import { CRAWLER_ERROR_CODE } from '../../code'
 
@@ -79,7 +80,9 @@ const hostnameToPlatformCrawlerFnMap = {
   '17.live': get17LiveUrlsPlugin,
 
   'www.xiaohongshu.com': getXhsUrlsPlugin,
-  'xiaohongshu.com': getXhsUrlsPlugin
+  'xiaohongshu.com': getXhsUrlsPlugin,
+
+  'live.kilakila.cn': getKilakilaLiveUrlsPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
