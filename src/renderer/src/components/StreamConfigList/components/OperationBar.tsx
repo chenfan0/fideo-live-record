@@ -95,7 +95,7 @@ export default function OperationBar(props: OperationBarProps) {
       return
     }
 
-    if (code === CRAWLER_ERROR_CODE.NOT_URLS) {
+    if (code === CRAWLER_ERROR_CODE.NOT_URLS || code === UNKNOWN_CODE) {
       timer.current && clearTimeout(timer.current)
       timer.current = setTimeout(() => {
         handleStartRecord(false)
@@ -121,7 +121,7 @@ export default function OperationBar(props: OperationBarProps) {
     }
 
     // 这里只会处理获取直播地址失败的情况，录制失败的处理在StreamConfigList组件中
-    if (Object.values(FFMPEG_ERROR_CODE).includes(code) || code === UNKNOWN_CODE) {
+    if (Object.values(FFMPEG_ERROR_CODE).includes(code)) {
       return
     }
 
