@@ -1,5 +1,6 @@
 import { useToast as _useToast } from '@/shadcn/ui/use-toast'
-import { sendMessage, WebSocketMessageType } from '@/lib/websocket'
+import { sendMessage } from '@/lib/websocket'
+import { WEBSOCKET_MESSAGE_TYPE } from '../../../const'
 
 export function useToast() {
   const { toast: _toast } = _useToast()
@@ -16,10 +17,11 @@ export function useToast() {
     const isHide = document.hidden
 
     sendMessage({
-      type: WebSocketMessageType.SHOW_TOAST,
+      type: WEBSOCKET_MESSAGE_TYPE.SHOW_TOAST,
       data: {
         title,
-        description
+        description,
+        variant
       }
     })
 

@@ -22,7 +22,10 @@ import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useLoadingStore } from '@/store/useLoadingStore'
 import { useConfettiStore } from '@/store/useConfettiStore'
 import { useToast } from '@/hooks/useToast'
-import { closeWebSocket, createWebSocket, sendMessage, WebSocketMessageType } from '@/lib/websocket'
+
+import { closeWebSocket, createWebSocket, sendMessage } from '@/lib/websocket'
+import emitter from '@/lib/bus'
+import { START_WEB_CONTROL, WEBSOCKET_MESSAGE_TYPE } from '../../../../../const'
 
 const formSchema = z.object({
   webControlPath: z.string(),
@@ -47,6 +50,10 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   const { sheetOpen, setSheetOpen } = props
 
   const { webControlSetting, setWebControlSetting } = useWebControlSettingStore((state) => state)
+  const { updateStreamConfig, removeStreamConfig, addStreamConfig } = useStreamConfigStore(
+    (state) => state
+  )
+
   const [dialogOpen, setDialogOpen] = useState(false)
   const [qrcode, setQrcode] = useState('')
   const [title, setTitle] = useState(initialTitle)
@@ -60,6 +67,30 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
       ...webControlSetting
     }
   })
+
+  useEffect(() => {
+    async function handleStartWebControl(webControlPath: string, timeout = 1000 * 10) {
+      setWebControlSetting({ ...form.getValues(), enableWebControl: true })
+      const isSuccess = await startFrpc(webControlPath)
+      if (!isSuccess) {
+        setWebControlSetting({ ...form.getValues(), enableWebControl: false })
+
+        toast({
+          title: t('web_control_setting.start_web_control_failed'),
+          description: t('web_control_setting.will_retry', { time: timeout / 1000 }),
+          variant: 'destructive'
+        })
+        setTimeout(() => {
+          handleStartWebControl(webControlPath, timeout + 1000 * 10)
+        }, timeout)
+      }
+    }
+
+    emitter.on(START_WEB_CONTROL, handleStartWebControl as any)
+    return () => {
+      emitter.off(START_WEB_CONTROL, handleStartWebControl as any)
+    }
+  }, [])
 
   useEffect(() => {
     form.reset({ ...webControlSetting })
@@ -114,7 +145,6 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
       res
         .json()
         .then(({ code, data: webControlPath }) => {
-          // 这里的code是200，表示支付成功
           if (code === 200) {
             form.setValue('webControlPath', webControlPath)
             setWebControlSetting(form.getValues())
@@ -211,51 +241,86 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     }
   }
 
+  const websocketOnMessage = (event: MessageEvent) => {
+    const messageObj = JSON.parse(event.data)
+
+    const { type, data } = messageObj
+
+    switch (type) {
+      case WEBSOCKET_MESSAGE_TYPE.START_RECORD_STREAM:
+        document.getElementById(data + '_play')?.click()
+        break
+      case WEBSOCKET_MESSAGE_TYPE.PAUSE_RECORD_STREAM:
+        document.getElementById(data + '_pause')?.click()
+        break
+      case WEBSOCKET_MESSAGE_TYPE.REMOVE_STREAM_CONFIG:
+        removeStreamConfig(data)
+        break
+      case WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG:
+        updateStreamConfig(data, data.id)
+        break
+      case WEBSOCKET_MESSAGE_TYPE.ADD_STREAM_CONFIG:
+        addStreamConfig(data)
+        break
+    }
+  }
+
+  const startFrpc = async (webControlPath: string) => {
+    setLoading(true)
+    const { status: isSuccess, code, port } = await window.api.startFrpcProcess(webControlPath)
+    const formValues = form.getValues()
+
+    if (isSuccess) {
+      createWebSocket(port!, code!, websocketOnMessage)
+      sendMessage({
+        type: WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG_LIST,
+        data: useStreamConfigStore.getState().streamConfigList
+      })
+    } else {
+      window.api.stopFrpcProcess()
+      closeWebSocket()
+    }
+
+    setWebControlSetting({ ...formValues, enableWebControl: isSuccess })
+
+    const prefix = 'web_control_setting.start_web_control'
+    toast({
+      title: isSuccess ? t(`${prefix}_success`) : t(`${prefix}_failed`),
+      description: isSuccess ? t(`${prefix}_success_desc`) : t(`${prefix}_failed_desc`),
+      variant: isSuccess ? 'default' : 'destructive'
+    })
+
+    setLoading(false)
+    return isSuccess
+  }
+
   const handleToggleWebControl = async (status: boolean, field: any) => {
     form.clearErrors('webControlPath')
     if (status) {
-      if (!form.getValues('webControlPath')) {
+      const webControlPath = form.getValues('webControlPath')
+      if (!webControlPath) {
         form.setError('webControlPath', {
           message: t('web_control_setting.web_control_path_required')
         })
         return
       }
-      setLoading(true)
-      const webControlPath = form.getValues('webControlPath')
-      const { status: startStatus, code, port } = await window.api.startFrpcProcess(webControlPath)
 
-      if (startStatus) {
+      const isSuccess = await startFrpc(webControlPath)
+
+      if (isSuccess) {
         field.onChange(status)
-        createWebSocket(port!, code!)
-        sendMessage({
-          type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
-          data: useStreamConfigStore.getState().streamConfigList
-        })
-        setWebControlSetting(form.getValues())
       }
-
-      toast({
-        title: startStatus
-          ? t('web_control_setting.start_web_control_success')
-          : t('web_control_setting.start_web_control_failed'),
-        description: startStatus
-          ? t('web_control_setting.start_web_control_success_desc')
-          : t('web_control_setting.start_web_control_failed_desc'),
-        variant: startStatus ? 'default' : 'destructive'
-      })
-    } else {
-      window.api.stopFrpcProcess()
-      field.onChange(status)
-      setWebControlSetting(form.getValues())
-
-      toast({
-        title: t('web_control_setting.stop_web_control_success'),
-        description: t('web_control_setting.stop_web_control_success_desc')
-      })
-
-      closeWebSocket()
+      return
     }
-    setLoading(false)
+
+    window.api.stopFrpcProcess()
+    closeWebSocket()
+    field.onChange(status)
+
+    toast({
+      title: t('web_control_setting.stop_web_control_success'),
+      description: t('web_control_setting.stop_web_control_success_desc')
+    })
   }
 
   return (

@@ -1,20 +1,11 @@
 let websocket: WebSocket | null = null
 
-export enum WebSocketMessageType {
-  UPDATE_STREAM_CONFIG_LIST = 'UPDATE_STREAM_CONFIG_LIST',
-  UPDATE_FFMPEG_PROGRESS_INFO = 'UPDATE_FFMPEG_PROGRESS_INFO',
-  SHOW_TOAST = 'SHOW_TOAST',
-
-  START_RECORD_STREAM = 'START_RECORD_STREAM',
-  PAUSE_RECORD_STREAM = 'PAUSE_RECORD_STREAM'
-}
-
 export function getWebsocket() {
   return websocket
 }
 
 interface IMessage {
-  type: WebSocketMessageType
+  type: string
   data: any
 }
 const messageQueue: IMessage[] = []
@@ -30,7 +21,11 @@ export function sendMessage(message: IMessage) {
   }
 }
 
-export function createWebSocket(port: number, code: string) {
+export function createWebSocket(
+  port: number,
+  code: string,
+  onMessage: (event: MessageEvent) => void
+) {
   websocket = new WebSocket(`ws://localhost:${port}/${code}`)
 
   websocket.onopen = () => {
@@ -42,25 +37,20 @@ export function createWebSocket(port: number, code: string) {
     }
   }
 
-  websocket.onmessage = function (event) {
-    const messageObj = JSON.parse(event.data)
+  websocket.onmessage = onMessage
 
-    const { type, data } = messageObj
-
-    switch (type) {
-      case WebSocketMessageType.START_RECORD_STREAM:
-        document.getElementById(data.id + '_play')?.click()
-        break
-      case WebSocketMessageType.PAUSE_RECORD_STREAM:
-        document.getElementById(data.id + '_pause')?.click()
-        break
+  websocket.onclose = (event) => {
+    if (event.code === 1000) {
+      websocket = null
+    } else {
+      createWebSocket(port, code, onMessage)
     }
   }
 }
 
 export function closeWebSocket() {
   if (websocket) {
-    websocket.close()
+    websocket.close(1000)
     websocket = null
   }
 }

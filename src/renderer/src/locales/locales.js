@@ -179,7 +179,8 @@ export default {
         stop_web_control_success_desc: '你可以再次点击开启按钮开启',
         stop_web_control_failed: '网页访问功能失败',
         web_control_address: '网页访问地址',
-        confirm_force_close_window_with_web_control: '网页访问功能正在运行, 是否强制关闭窗口?'
+        confirm_force_close_window_with_web_control: '网页访问功能正在运行, 是否强制关闭窗口?',
+        will_retry: '将会在{{time}}秒后重试'
       },
       default_settings: {
         title: '默认配置',

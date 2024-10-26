@@ -32,12 +32,9 @@ function App(): JSX.Element {
       defaultSettingsConfig: state.defaultSettingsConfig
     })
   )
-  const { initData: initWebControlSettingData, setWebControlSetting } = useWebControlSettingStore(
-    (state) => ({
-      initData: state.initData,
-      setWebControlSetting: state.setWebControlSetting
-    })
-  )
+  const { initData: initWebControlSettingData } = useWebControlSettingStore((state) => ({
+    initData: state.initData
+  }))
   const { initData: initNavSelectedStatus } = useNavSelectedStatusStore((state) => ({
     initData: state.initData
   }))
@@ -64,7 +61,6 @@ function App(): JSX.Element {
 
     if (webControlSetting.enableWebControl) {
       window.api.stopFrpcProcess()
-      await setWebControlSetting({ ...webControlSetting, enableWebControl: false })
     }
 
     window.api.forceCloseWindow()

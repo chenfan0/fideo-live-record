@@ -8,7 +8,7 @@ import { is } from '@electron-toolkit/utils'
 import Fastify from 'fastify'
 import WebSocket from 'ws'
 import spawn from 'cross-spawn'
-import { FRP_DOMAIN, FRPC_PROCESS_ERROR } from '../../const'
+import { FRP_DOMAIN, FRPC_PROCESS_ERROR, WEBSOCKET_MESSAGE_TYPE } from '../../const'
 
 import debug from 'debug'
 
@@ -33,6 +33,8 @@ async function startFrpcLocalServer(
 ): Promise<{ port: string; stopFrpcLocalServer: () => void }> {
   let resolve!: (value: unknown) => void, reject!: (reason?: any) => void
 
+  let port: string
+
   const p = new Promise((_resolve, _reject) => {
     resolve = _resolve
     reject = _reject
@@ -48,7 +50,10 @@ async function startFrpcLocalServer(
     try {
       const htmlContent = (await fsp.readFile(filePath, 'utf-8'))
         .toString()
-        .replace('$$WEBSOCKET_URL$$', `wss://${FRP_DOMAIN}/${code}`)
+        .replace(
+          '$$WEBSOCKET_URL$$',
+          !is.dev ? `ws://localhost:${port}` : `wss://${FRP_DOMAIN}/${code}`
+        )
 
       reply.code(200).header('Content-Type', 'text/html').send(htmlContent)
     } catch (err) {
@@ -57,12 +62,19 @@ async function startFrpcLocalServer(
     }
   })
 
+  fastify.get('/health', async (_, reply) => {
+    reply.code(200).header('Content-Type', 'text/plain').send('OK')
+  })
+
   fastify.setNotFoundHandler((_, reply) => {
     reply.code(404).header('Content-Type', 'text/plain').send('Not Found')
   })
 
   const server = fastify.server
-  const wss = new WebSocket.Server({ server })
+  const wss = new WebSocket.Server({
+    server,
+    perMessageDeflate: true
+  })
 
   let streamConfigList: IStreamConfig[] = []
 
@@ -77,11 +89,29 @@ async function startFrpcLocalServer(
     )
 
     ws.on('message', (message) => {
-      const messageObj = JSON.parse(message.toString())
+      let messageObj
+      try {
+        messageObj = JSON.parse(message.toString())
+      } catch {
+        messageObj = {}
+      }
       const { type, data } = messageObj
 
-      if (type === 'UPDATE_STREAM_CONFIG_LIST') {
-        streamConfigList = data as IStreamConfig[]
+      switch (type) {
+        case WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG_LIST:
+          streamConfigList = data as IStreamConfig[]
+          break
+        case WEBSOCKET_MESSAGE_TYPE.REMOVE_STREAM_CONFIG:
+          streamConfigList = streamConfigList.filter((streamConfig) => streamConfig.id !== data)
+          break
+        case WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG:
+          streamConfigList = streamConfigList.map((streamConfig) =>
+            streamConfig.id === data.id ? data : streamConfig
+          )
+          break
+        case WEBSOCKET_MESSAGE_TYPE.ADD_STREAM_CONFIG:
+          streamConfigList.unshift(data as IStreamConfig)
+          break
       }
 
       wss.clients.forEach((client) => {
@@ -114,7 +144,7 @@ async function startFrpcLocalServer(
       return
     }
 
-    const port = new URL(address).port
+    port = new URL(address).port
     log(`Server is listening on ${address}`)
 
     resolve({
@@ -144,12 +174,20 @@ export async function startFrpcProcess(
     const frpcConfig = `
       serverAddr = "${FRP_DOMAIN}"
       auth.token = "fideo-frp"
+      loginFailExit = false
+      [transport]
+      heartbeatInterval = 60
+      heartbeatTimeout = 180
+      tcpMuxKeepaliveInterval = -1
+      dialServerTimeout = 30
       [[proxies]]
       name = "${code}"
       type = "http"
       localPort = ${port}
       customDomains = ["${FRP_DOMAIN}"]
       locations = ["/${code}"]
+      healthCheck.type = "http"
+      healthCheck.path = "/health"
     `
     const frpcConfigPath = join(userPath, 'frpc.toml')
 
@@ -181,7 +219,7 @@ export async function startFrpcProcess(
       const str = data.toString()
       writeLog('frpc', 'frpcProcess stdout: ' + str)
       log('frpcProcess stdout: ', str)
-      if (str.includes('error')) {
+      if (str.includes('Fideo FRPS ERROR: ')) {
         stopFrpc()
         win.webContents.send(FRPC_PROCESS_ERROR, str)
       }

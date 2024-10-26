@@ -308,7 +308,10 @@ export async function recordStream(
       })
     })
     .on('progress', (progress) => {
-      setRecordStreamFfmpegProgressInfo(id, progress)
+      setRecordStreamFfmpegProgressInfo(id, {
+        targetSize: progress.targetSize,
+        timemark: progress.timemark
+      })
       log('record live progress: ', progress)
     })
     .on('end', async (...args) => {

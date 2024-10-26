@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 
 import localForage from 'localforage'
-import { sendMessage, WebSocketMessageType } from '@/lib/websocket'
+import { sendMessage } from '@/lib/websocket'
+import { WEBSOCKET_MESSAGE_TYPE } from '../../../const'
 
 import { nanoid } from 'nanoid'
 
@@ -11,7 +12,7 @@ interface IStreamConfigStore {
   addStreamConfig: (streamConfig: IStreamConfig) => Promise<void>
   updateStreamConfig: (streamConfig: IStreamConfig, title: string) => Promise<void>
   removeStreamConfig: (title: string) => Promise<void>
-  replaceStreamConfig: (newStreamConfigList: IStreamConfig[]) => Promise<void>
+  replaceStreamConfigList: (newStreamConfigList: IStreamConfig[]) => Promise<void>
 }
 
 export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
@@ -36,7 +37,7 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
     }
 
     sendMessage({
-      type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
+      type: WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG_LIST,
       data: streamConfigList
     })
     set(() => ({ streamConfigList: streamConfigList! }))
@@ -45,8 +46,8 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
     const newStreamConfigList = [streamConfig, ...get().streamConfigList]
     await localForage.setItem('streamConfigList', newStreamConfigList)
     sendMessage({
-      type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
-      data: newStreamConfigList
+      type: WEBSOCKET_MESSAGE_TYPE.ADD_STREAM_CONFIG,
+      data: streamConfig
     })
     set(() => {
       return { streamConfigList: newStreamConfigList }
@@ -58,17 +59,17 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
     )
     await localForage.setItem('streamConfigList', newStreamConfigList)
     sendMessage({
-      type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
-      data: newStreamConfigList
+      type: WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG,
+      data: newStreamConfig
     })
     set(() => {
       return { streamConfigList: newStreamConfigList }
     })
   },
-  replaceStreamConfig: async (newStreamConfigList: IStreamConfig[]) => {
+  replaceStreamConfigList: async (newStreamConfigList: IStreamConfig[]) => {
     await localForage.setItem('streamConfigList', newStreamConfigList)
     sendMessage({
-      type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
+      type: WEBSOCKET_MESSAGE_TYPE.UPDATE_STREAM_CONFIG_LIST,
       data: newStreamConfigList
     })
     set(() => {
@@ -81,8 +82,8 @@ export const useStreamConfigStore = create<IStreamConfigStore>((set, get) => ({
     )
     await localForage.setItem('streamConfigList', newStreamConfigList)
     sendMessage({
-      type: WebSocketMessageType.UPDATE_STREAM_CONFIG_LIST,
-      data: newStreamConfigList
+      type: WEBSOCKET_MESSAGE_TYPE.REMOVE_STREAM_CONFIG,
+      data: id
     })
     set(() => {
       return { streamConfigList: newStreamConfigList }
