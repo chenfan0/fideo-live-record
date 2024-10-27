@@ -62,4 +62,27 @@ async function baseGetCCLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetCCRoomInfoPlugin(roomUrl, others = {}) {
+  const { proxy, cookie } = others
+  const html = (
+    await request(roomUrl, {
+      headers: {
+        cookie
+      },
+      proxy
+    })
+  ).data
+
+  const flag = '"nickname":"'
+  const startIndex = html.indexOf(flag) + flag.length
+  const endIndex = html.indexOf('","', startIndex)
+  const name = html.slice(startIndex, endIndex)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getCCLiveUrlsPlugin = captureError(baseGetCCLiveUrlsPlugin)
+export const getCCRoomInfoPlugin = captureError(baseGetCCRoomInfoPlugin)
