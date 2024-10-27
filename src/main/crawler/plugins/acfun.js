@@ -32,6 +32,7 @@ async function baseGetAcFunLiveUrlsPlugin(roomUrl, others = {}) {
         Referer: 'https://live.acfun.cn',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
+      proxy,
       data: 'sid=acfun.api.visitor'
     })
   ).data
@@ -42,11 +43,12 @@ async function baseGetAcFunLiveUrlsPlugin(roomUrl, others = {}) {
       {
         method: 'POST',
         headers: {
-          Cookie: cookie ? `${setCookie};${cookie}` : `${setCookie}`,
+          cookie: cookie ? `${setCookie};${cookie}` : `${setCookie}`,
           'User-Agent': DESKTOP_USER_AGENT,
           Referer: 'https://live.acfun.cn',
           'Content-Type': 'application/x-www-form-urlencoded'
         },
+        proxy,
         data: `authorId=${roomId}&pullStreamType=FLV`
       }
     )
@@ -84,4 +86,30 @@ async function baseGetAcFunLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetAcFunRoomInfoPlugin(roomUrl, others = {}) {
+  const { proxy, cookie } = others
+  const roomId = getRoomIdByUrl(roomUrl)
+
+  const res = (
+    await request(`https://live.acfun.cn/rest/pc-direct/user/userInfo?userId=${roomId}`, {
+      headers: {
+        'User-Agent': DESKTOP_USER_AGENT,
+        referer: 'https://live.acfun.cn',
+        cookie
+      },
+      proxy
+    })
+  ).data
+
+  log('name:', res.profile.name)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: {
+      name: res.profile.name
+    }
+  }
+}
+
 export const getAcFunLiveUrlsPlugin = captureError(baseGetAcFunLiveUrlsPlugin)
+export const getAcFunRoomInfoPlugin = captureError(baseGetAcFunRoomInfoPlugin)
