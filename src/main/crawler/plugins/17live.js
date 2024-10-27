@@ -44,4 +44,33 @@ async function baseGet17LiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGet17LiveRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+
+  log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
+
+  const res = (
+    await request(`https://wap-api.17app.co/api/v1/lives/${roomId}/info`, {
+      headers: {
+        cookie,
+        'User-Agent': MOBILE_USER_AGENT
+      },
+      proxy
+    })
+  ).data
+
+  const name = res.userInfo.displayName
+
+  log('name:', name)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: {
+      name
+    }
+  }
+}
+
 export const get17LiveUrlsPlugin = captureError(baseGet17LiveUrlsPlugin)
+export const get17LiveRoomInfoPlugin = captureError(baseGet17LiveRoomInfoPlugin)
