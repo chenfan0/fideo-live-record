@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { DESKTOP_USER_AGENT, request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -47,4 +47,31 @@ async function baseGetBigoLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetBigoRoomInfoPlugin(roomUrl, others = {}) {
+  const { proxy, cookie } = others
+
+  log('roomUrl:', roomUrl, 'cookie:', cookie, 'proxy:', proxy)
+
+  const html = (
+    await request(roomUrl, {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      },
+      proxy
+    })
+  ).data
+
+  const flag = '.nickname="'
+  const startIndex = html.indexOf(flag) + flag.length
+  const endIndex = html.indexOf('";', startIndex)
+  const name = html.slice(startIndex, endIndex)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getBigoLiveUrlsPlugin = captureError(baseGetBigoLiveUrlsPlugin)
+export const getBigoRoomInfoPlugin = captureError(baseGetBigoRoomInfoPlugin)
