@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { DESKTOP_USER_AGENT, request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -25,6 +25,12 @@ async function baseGetHuaJiaoLiveUrlsPlugin(roomUrl, others = {}) {
       proxy
     })
   ).data
+
+  if (htmlContent.includes('正在重播')) {
+    return {
+      code: CRAWLER_ERROR_CODE.NOT_URLS
+    }
+  }
 
   const scriptContentRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gi
   const matches = htmlContent.match(scriptContentRegex)
@@ -62,7 +68,7 @@ async function baseGetHuaJiaoLiveUrlsPlugin(roomUrl, others = {}) {
     )
   ).data
 
-  const liveUrls = [liveUrlData.data.main, liveUrlData.data.h264_url]
+  const liveUrls = [liveUrlData.data.main, liveUrlData.data.h264_url].filter(Boolean)
 
   if (liveUrls.length === 0) {
     return {
@@ -76,4 +82,31 @@ async function baseGetHuaJiaoLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetHuaJiaoRoomInfoPlugin(roomUrl, others = {}) {
+  const { proxy, cookie } = others
+  const htmlContent = (
+    await request(roomUrl, {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      },
+      proxy
+    })
+  ).data
+
+  const flag = '<h3>'
+  const jsNicknameIndex = htmlContent.indexOf('js-nickname')
+  const startIndex = htmlContent.indexOf(flag, jsNicknameIndex) + flag.length
+
+  const endIndex = htmlContent.indexOf('</h3>', startIndex)
+
+  const name = htmlContent.slice(startIndex, endIndex)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getHuaJiaoLiveUrlsPlugin = captureError(baseGetHuaJiaoLiveUrlsPlugin)
+export const getHuaJiaoRoomInfoPlugin = captureError(baseGetHuaJiaoRoomInfoPlugin)
