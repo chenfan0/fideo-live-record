@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/useToast'
 import { closeWebSocket, createWebSocket, sendMessage } from '@/lib/websocket'
 import emitter from '@/lib/bus'
 import { START_WEB_CONTROL, WEBSOCKET_MESSAGE_TYPE } from '../../../../../const'
+import { errorCodeToI18nMessage, SUCCESS_CODE } from '../../../../../code'
 
 const formSchema = z.object({
   webControlPath: z.string(),
@@ -261,6 +262,31 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
         break
       case WEBSOCKET_MESSAGE_TYPE.ADD_STREAM_CONFIG:
         addStreamConfig(data)
+        break
+      case WEBSOCKET_MESSAGE_TYPE.GET_LIVE_URLS:
+        {
+          const { roomUrl, proxy, cookie, title } = data
+          window.api
+            .getLiveUrls({
+              roomUrl,
+              proxy,
+              cookie,
+              title
+            })
+            .then(({ code, liveUrls }) => {
+              if (code !== SUCCESS_CODE) {
+                toast({
+                  title,
+                  description: t(errorCodeToI18nMessage(code, 'error.get_line.')),
+                  variant: 'destructive'
+                })
+              }
+              sendMessage({
+                type: WEBSOCKET_MESSAGE_TYPE.UPDATE_LIVE_URLS,
+                data: liveUrls || []
+              })
+            })
+        }
         break
     }
   }
