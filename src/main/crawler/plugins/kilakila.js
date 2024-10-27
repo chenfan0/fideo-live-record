@@ -71,4 +71,28 @@ async function baseGetKilakilaLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetKilakilaRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+
+  log('roomId:', roomId, 'cookie:', cookie, 'proxy:', proxy)
+
+  const res = (
+    await request(`https://live.kilakila.cn/LiveRoom/getRoomInfo?roomId=${roomId}`, {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      }
+    })
+  ).data
+
+  const name = res.b.userInfo.nickname
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getKilakilaLiveUrlsPlugin = captureError(baseGetKilakilaLiveUrlsPlugin)
+export const getKilakilaRoomInfoPlugin = captureError(baseGetKilakilaRoomInfoPlugin)
