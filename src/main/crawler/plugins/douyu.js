@@ -114,7 +114,7 @@ async function baseGetDouyuRoomInfoPlugin(roomUrl, others = {}) {
 
   return {
     code: SUCCESS_CODE,
-    name
+    roomInfo: { name }
   }
 }
 

@@ -144,7 +144,7 @@ async function baseGetDouYinRoomInfoPlugin(roomUrl, others = {}) {
 
   return {
     code: SUCCESS_CODE,
-    name
+    roomInfo: { name }
   }
 }
 
