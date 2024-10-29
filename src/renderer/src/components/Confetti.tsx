@@ -5,7 +5,7 @@ import { useConfettiStore } from '@renderer/store/useConfettiStore'
 
 export default function Confetti() {
   const { width, height } = useWindowSize()
-  const { showConfetti, numberOfPieces } = useConfettiStore()
+  const { showConfetti } = useConfettiStore()
 
   return (
     <div className="z-[9999]  absolute top-0">
