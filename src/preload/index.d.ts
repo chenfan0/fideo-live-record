@@ -14,6 +14,11 @@ declare global {
         proxy?: string
         cookie?: string
       }) => Promise<{ code: number; liveUrls: string[] }>
+      getRoomInfo: (info: {
+        roomUrl: string
+        proxy?: string
+        cookie?: string
+      }) => Promise<{ code: number; roomInfo: IRoomInfo }>
       navByDefaultBrowser: (url: string) => void
       startStreamRecord: (streamConfig: string) => Promise<{ code: number }>
       stopStreamRecord: (title: string) => Promise<{ code: number }>

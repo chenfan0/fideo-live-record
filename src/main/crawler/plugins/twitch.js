@@ -106,4 +106,10 @@ async function baseGetTwitchLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetTwitchRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getTwitchLiveUrlsPlugin = captureError(baseGetTwitchLiveUrlsPlugin)
+export const getTwitchRoomInfoPlugin = captureError(baseGetTwitchRoomInfoPlugin)

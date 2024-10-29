@@ -14,20 +14,14 @@ export function captureError(fn) {
     const realArgs = args.slice(0, args.length - 1)
     try {
       const res = await fn.apply(this, realArgs)
-      writeLog(`Fetch Live Res: ${JSON.stringify(res, null, 2)}`)
+      writeLog(`Fetch Res: ${JSON.stringify(res, null, 2)}`)
       return res
     } catch (e) {
       const message = e.message
 
-      writeLog(`Fetch Live Error: ${message}`)
+      writeLog(`Fetch Error: ${message}`)
 
       log('error:', message)
-
-      // if (message.includes('timeout')) {
-      //   return {
-      //     code: CRAWLER_ERROR_CODE.TIMEOUT
-      //   }
-      // }
 
       if (message === ERROR_MESSAGE.INVALID_PROXY) {
         return {

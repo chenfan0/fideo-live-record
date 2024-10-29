@@ -99,4 +99,10 @@ async function baseGetYYLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetYYRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getYYLiveUrlsPlugin = captureError(baseGetYYLiveUrlsPlugin)
+export const getYYRoomInfoPlugin = captureError(baseGetYYRoomInfoPlugin)
