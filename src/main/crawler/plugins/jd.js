@@ -55,4 +55,36 @@ async function baseGetJDLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetJDRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+
+  const body = {
+    liveId: roomId,
+    pageId: 'Mlive_LiveRoom'
+  }
+
+  const json = (
+    await request(
+      `https://api.m.jd.com/api?appid=h5-live&functionId=liveDetailToM&body=${encodeURIComponent(JSON.stringify(body))}`,
+      {
+        proxy,
+        headers: {
+          cookie,
+          'User-Agent': MOBILE_USER_AGENT,
+          Referer: `https://lives.jd.com/`
+        }
+      }
+    )
+  ).data
+
+  const { name } = json.data.author
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getJDLiveUrlsPlugin = captureError(baseGetJDLiveUrlsPlugin)
+export const getJDRoomInfoPlugin = captureError(baseGetJDRoomInfoPlugin)

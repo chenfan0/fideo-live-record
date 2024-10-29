@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { request, DESKTOP_USER_AGENT } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -69,4 +69,29 @@ async function baseGetBilibiliLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetBilibiliRoomInfoPlugin(roomUrl, others = {}) {
+  const { proxy, cookie } = others
+
+  const html = (
+    await request(roomUrl, {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      },
+      proxy
+    })
+  ).data
+
+  const flag = 'uname":"'
+  const startIndex = html.indexOf(flag) + flag.length
+  const endIndex = html.indexOf('","', startIndex)
+  const name = html.slice(startIndex, endIndex)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getBilibiliLiveUrlsPlugin = captureError(baseGetBilibiliLiveUrlsPlugin)
+export const getBilibiliRoomInfoPlugin = captureError(baseGetBilibiliRoomInfoPlugin)

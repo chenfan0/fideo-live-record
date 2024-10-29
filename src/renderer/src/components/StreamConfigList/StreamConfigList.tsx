@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useMount } from 'react-use'
 import { useTranslation } from 'react-i18next'
 
-import Dialog from '@/components/Dialog'
 import StreamConfigCard from './components/StreamConfigCard'
 
 import {
@@ -18,7 +17,6 @@ import { useStreamConfigStore } from '@/store/useStreamConfigStore'
 import { useDefaultSettingsStore } from '@renderer/store/useDefaultSettingsStore'
 import { useNavSelectedStatusStore } from '@renderer/store/useNavSelectedStatusStore'
 import { useFfmpegProgressInfoStore } from '@/store/useFfmpegProgressInfoStore'
-import { useDownloadDepInfoStore } from '@/store/useDownloadDepStore'
 import { StreamStatus, useXizhiToPushNotification } from '@renderer/lib/utils'
 import { useToast } from '@renderer/hooks/useToast'
 
@@ -28,21 +26,17 @@ const maxRetryTimes = 3
 const alreadyCallbackOneTimeSet = new Set()
 
 export default function StreamConfigList() {
-  const [closeWindowDialogOpen, setCloseWindowDialogOpen] = useState(false)
-  const [closeWindowText, setCloseWindowText] = useState('stream_config.confirm_force_close_window')
-
   const navSelectedStatus = useNavSelectedStatusStore((state) => state.navSelectedStatus)
-  const { streamConfigList, updateStreamConfig } = useStreamConfigStore((state) => ({
-    streamConfigList: state.streamConfigList,
-    updateStreamConfig: state.updateStreamConfig
+  const { streamConfigList } = useStreamConfigStore((state) => ({
+    streamConfigList: state.streamConfigList
   }))
-  const selectedStreamConfigTitleList = useMemo(() => {
+  const selectedStreamConfigIdList = useMemo(() => {
     if (navSelectedStatus === '-1') {
-      return streamConfigList.map((stream) => stream.title)
+      return streamConfigList.map((stream) => stream.id)
     }
     return streamConfigList
       .filter((streamConfig) => streamConfig.status === Number(navSelectedStatus))
-      .map((stream) => stream.title)
+      .map((stream) => stream.id)
   }, [streamConfigList, navSelectedStatus])
 
   const { updateFfmpegProgressInfo } = useFfmpegProgressInfoStore((state) => state)
@@ -50,32 +44,15 @@ export default function StreamConfigList() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  const handleForceCloseWindow = async () => {
-    setCloseWindowDialogOpen(false)
-
-    for (const streamConfig of streamConfigList) {
-      if (streamConfig.status !== StreamStatus.NOT_STARTED) {
-        await updateStreamConfig(
-          { ...streamConfig, status: StreamStatus.NOT_STARTED },
-          streamConfig.title
-        )
-      }
-    }
-
-    window.api.forceCloseWindow()
-  }
-
   useMount(() => {
     window.api.onFFmpegProgressInfo((progressInfo) => {
       updateFfmpegProgressInfo(progressInfo)
     })
 
-    window.api.onStreamRecordEnd(async (title, code, errMsg) => {
+    window.api.onStreamRecordEnd(async (id, code, errMsg) => {
       const { streamConfigList, updateStreamConfig } = useStreamConfigStore.getState()
       const xiZhiKey = useDefaultSettingsStore.getState().defaultSettingsConfig.xizhiKey
-      const index = streamConfigList.findIndex((streamConfig) => streamConfig.title === title)
-
-      console.log('onStreamRecordEnd:', title, code, errMsg)
+      const index = streamConfigList.findIndex((streamConfig) => streamConfig.id === id)
 
       if (index === -1) {
         return
@@ -106,7 +83,7 @@ export default function StreamConfigList() {
       ) {
         await updateStreamConfig(
           { ...streamConfig, status: StreamStatus.NOT_STARTED },
-          streamConfig.title
+          streamConfig.id
         )
 
         toast({
@@ -121,24 +98,24 @@ export default function StreamConfigList() {
        * 会回调两次该函数，第一次是开始转换为mp4文件之前，第二次是转换后
        */
 
-      if (!alreadyCallbackOneTimeSet.has(title)) {
-        alreadyCallbackOneTimeSet.add(title)
+      if (!alreadyCallbackOneTimeSet.has(id)) {
+        alreadyCallbackOneTimeSet.add(id)
 
         // 第一次回调，除了当前状态是录制中并且需要转换为mp4文件的情况需要进行处理，其他情况都不需要处理
         if (streamConfig.status === StreamStatus.RECORDING && streamConfig.convertToMP4) {
           await updateStreamConfig(
             { ...streamConfig, status: StreamStatus.VIDEO_FORMAT_CONVERSION },
-            streamConfig.title
+            streamConfig.id
           )
         }
         return
       }
 
       // 第二次回调，删除当前title
-      alreadyCallbackOneTimeSet.delete(title)
+      alreadyCallbackOneTimeSet.delete(id)
 
-      unknownErrorRetryTimesMap[title] = unknownErrorRetryTimesMap[title] || 0
-      unknownErrorRetryTimesMap[title] += 1
+      unknownErrorRetryTimesMap[id] = unknownErrorRetryTimesMap[id] || 0
+      unknownErrorRetryTimesMap[id] += 1
 
       if (!message) {
         message = errorCodeToI18nMessage(code, 'error.stop_record.')
@@ -158,39 +135,19 @@ export default function StreamConfigList() {
 
       await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.NOT_STARTED },
-        streamConfig.title
+        streamConfig.id
       )
 
-      if (isStopByUser || unknownErrorRetryTimesMap[title] >= maxRetryTimes) {
-        unknownErrorRetryTimesMap[title] = 0
+      if (isStopByUser || unknownErrorRetryTimesMap[id] >= maxRetryTimes) {
+        unknownErrorRetryTimesMap[id] = 0
         return
       }
 
       if (isStopByResolutionChange || isStopByStreamEnd) {
-        unknownErrorRetryTimesMap[title] = 0
+        unknownErrorRetryTimesMap[id] = 0
       }
 
-      emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.title)
-    })
-
-    window.api.onUserCloseWindow(() => {
-      const { streamConfigList } = useStreamConfigStore.getState()
-      const { downloadDepProgressInfo } = useDownloadDepInfoStore.getState()
-
-      const stillWorkStream = streamConfigList.find(
-        (streamConfig) => streamConfig.status !== StreamStatus.NOT_STARTED
-      )
-      const stillDownloadDep = downloadDepProgressInfo.downloading
-
-      if (!stillWorkStream && !stillDownloadDep) {
-        window.api.forceCloseWindow()
-        return
-      }
-      if (stillDownloadDep) {
-        setCloseWindowText('downloading_dep.confirm_force_close_window_with_downloading_dep')
-      }
-
-      setCloseWindowDialogOpen(true)
+      emitter.emit(RECORD_END_NOT_USER_STOP, streamConfig.id)
     })
   })
 
@@ -200,22 +157,14 @@ export default function StreamConfigList() {
         <div className="show-scrollbar flex flex-col gap-[12px] p-[24px] overflow-y-auto h-[calc(100vh-80px)]">
           {streamConfigList.map((streamConfig) => (
             <div
-              key={streamConfig.title}
-              className={selectedStreamConfigTitleList.includes(streamConfig.title) ? '' : 'hidden'}
+              key={streamConfig.id}
+              className={selectedStreamConfigIdList.includes(streamConfig.id) ? '' : 'hidden'}
             >
               <StreamConfigCard streamConfig={streamConfig} />
             </div>
           ))}
         </div>
       }
-      <Dialog
-        title={t(closeWindowText)}
-        btnText={t('stream_config.confirm')}
-        dialogOpen={closeWindowDialogOpen}
-        onOpenChange={setCloseWindowDialogOpen}
-        variant="default"
-        handleBtnClick={handleForceCloseWindow}
-      />
     </>
   )
 }

@@ -56,4 +56,10 @@ async function baseGetMomoLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetMomoRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getMomoLiveUrlsPlugin = captureError(baseGetMomoLiveUrlsPlugin)
+export const getMomoRoomInfoPlugin = captureError(baseGetMomoRoomInfoPlugin)

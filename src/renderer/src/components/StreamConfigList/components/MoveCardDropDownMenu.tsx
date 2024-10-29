@@ -19,12 +19,12 @@ import lightDot from '@/assets/images/light/dot.svg'
 export function MoveCardDropdownMenu({ streamConfig }: { streamConfig: IStreamConfig }) {
   const { t } = useTranslation()
 
-  const { streamConfigList, replaceStreamConfig } = useStreamConfigStore((state) => ({
+  const { streamConfigList, replaceStreamConfigList } = useStreamConfigStore((state) => ({
     streamConfigList: state.streamConfigList,
-    replaceStreamConfig: state.replaceStreamConfig
+    replaceStreamConfigList: state.replaceStreamConfigList
   }))
 
-  const index = streamConfigList.findIndex((stream) => stream.title === streamConfig.title)
+  const index = streamConfigList.findIndex((stream) => stream.id === streamConfig.id)
 
   const handleMoveToTop = () => {
     const newStreamConfigList = [
@@ -32,7 +32,7 @@ export function MoveCardDropdownMenu({ streamConfig }: { streamConfig: IStreamCo
       ...streamConfigList.slice(0, index),
       ...streamConfigList.slice(index + 1)
     ]
-    replaceStreamConfig(newStreamConfigList)
+    replaceStreamConfigList(newStreamConfigList)
   }
   const handleMoveUp = () => {
     const newStreamConfigList = [
@@ -41,7 +41,7 @@ export function MoveCardDropdownMenu({ streamConfig }: { streamConfig: IStreamCo
       streamConfigList[index - 1],
       ...streamConfigList.slice(index + 1)
     ]
-    replaceStreamConfig(newStreamConfigList)
+    replaceStreamConfigList(newStreamConfigList)
   }
   const handleMoveDown = () => {
     const newStreamConfigList = [
@@ -50,7 +50,7 @@ export function MoveCardDropdownMenu({ streamConfig }: { streamConfig: IStreamCo
       streamConfigList[index],
       ...streamConfigList.slice(index + 2)
     ]
-    replaceStreamConfig(newStreamConfigList)
+    replaceStreamConfigList(newStreamConfigList)
   }
 
   return (

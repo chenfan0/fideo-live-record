@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request, MOBILE_USER_AGENT } from '../base-request.js'
+import { request, MOBILE_USER_AGENT, DESKTOP_USER_AGENT } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -87,4 +87,30 @@ async function baseGetChangLiaoLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetChangLiaoRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+
+  const res = (
+    await request(
+      `https://www.tlclw.com/ashx/UI/room/base.ashx?v=1.0.1&giftNum=9&roomid=${roomId}`,
+      {
+        headers: {
+          cookie,
+          'User-Agent': DESKTOP_USER_AGENT
+        },
+        proxy
+      }
+    )
+  ).data
+
+  const name = res.roomname
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getChangLiaoLiveUrlsPlugin = captureError(baseGetChangLiaoLiveUrlsPlugin)
+export const getChangLiaoRoomInfoPlugin = captureError(baseGetChangLiaoRoomInfoPlugin)

@@ -113,4 +113,33 @@ async function baseGetHuyaLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetHuyaRoomInfoPlugin(roomUrl, others = {}) {
+
+  const { proxy, cookie } = others
+
+  const htmlContent = (
+    await request(roomUrl, {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      },
+      proxy
+    })
+  ).data
+
+  const startFlag = '">'
+  const hostNameIndex = htmlContent.indexOf('host-name')
+
+  const startIndex = htmlContent.indexOf(startFlag, hostNameIndex) + startFlag.length
+  const endIndex = htmlContent.indexOf('</h3>', startIndex)
+
+  const name = htmlContent.slice(startIndex, endIndex)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getHuyaLiveUrlsPlugin = captureError(baseGetHuyaLiveUrlsPlugin)
+export const getHuyaRoomInfoPlugin = captureError(baseGetHuyaRoomInfoPlugin)

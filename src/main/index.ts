@@ -21,6 +21,7 @@ import {
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
   GET_LIVE_URLS,
+  GET_ROOM_INFO,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -30,12 +31,14 @@ import {
   SELECT_DIR,
   SHOW_NOTIFICATION,
   SHOW_UPDATE_DIALOG,
+  START_FRPC_PROCESS,
   START_STREAM_RECORD,
+  STOP_FRPC_PROCESS,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
   USER_CLOSE_WINDOW
 } from '../const'
-import { getLiveUrls } from './crawler/index'
+import { getLiveUrls, getRoomInfo } from './crawler/index'
 import { FFMPEG_ERROR_CODE, SUCCESS_CODE } from '../code'
 import {
   recordStream,
@@ -44,15 +47,18 @@ import {
   killRecordStreamFfmpegProcess,
   setRecordStreamFfmpegProcessMap
 } from './ffmpeg/record'
+import { setFfmpegAndFfprobePath } from './ffmpeg'
 import {
-  makeSureDependenciesExist,
-  downloadDepProgressInfo,
   checkFfmpegExist,
   checkFfprobeExist,
+  checkFrpcExist,
+  downloadDepProgressInfo,
+  makeSureDependenciesExist,
   downloadReq
-} from './ffmpeg'
+} from './download-dep'
 
 import { writeLogWrapper } from './log/index'
+import { startFrpcProcess, stopFrpc, frpcObj } from './frpc'
 
 export const writeLog = writeLogWrapper(app.getPath('userData'))
 
@@ -196,7 +202,7 @@ async function createTray() {
     {
       label: isChinese ? '退出' : 'Quit',
       click: () => {
-        if (!isAllFfmpegProcessEnd()) {
+        if (!isAllFfmpegProcessEnd() || frpcObj !== null) {
           win?.show()
         }
         win?.webContents.send(USER_CLOSE_WINDOW)
@@ -222,16 +228,19 @@ function showNotification(title: string, body: string) {
 
 async function handleMakeSureDependenciesExist() {
   const userDataPath = app.getPath('userData')
-  const [isFFmpegExist, isFfprobeExist] = await Promise.all([
+  const [isFFmpegExist, isFfprobeExist, isFrpcExist] = await Promise.all([
     checkFfmpegExist(userDataPath),
-    checkFfprobeExist(userDataPath)
+    checkFfprobeExist(userDataPath),
+    checkFrpcExist(userDataPath)
   ])
 
-  if (!isFFmpegExist || !isFfprobeExist) {
+  if (!isFFmpegExist || !isFfprobeExist || !isFrpcExist) {
     startDownloadDepTimerWhenFirstDownloadDepStart()
   }
-  makeSureDependenciesExist(userDataPath, isFFmpegExist, isFfprobeExist)
+
+  makeSureDependenciesExist(userDataPath)
     .then(() => {
+      setFfmpegAndFfprobePath(userDataPath)
       stopDownloadDepTimerWhenAllDownloadDepEnd()
     })
     .catch(() => {
@@ -243,6 +252,11 @@ async function handleMakeSureDependenciesExist() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+  if (app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: true
+    })
+  }
   // Set app user model id for windows
   electronApp.setAppUserModelId('site.fideo.app')
 
@@ -268,13 +282,21 @@ app.whenReady().then(async () => {
     }
   )
 
+  ipcMain.handle(
+    GET_ROOM_INFO,
+    async (_, info: { roomUrl: string; proxy?: string; cookie?: string }) => {
+      const { roomUrl, proxy, cookie } = info
+      return getRoomInfo({ roomUrl, proxy, cookie }, writeLog.bind(null, 'Get Room Info'))
+    }
+  )
+
   ipcMain.handle(NAV_BY_DEFAULT_BROWSER, (_, url: string) => {
     shell.openExternal(url)
   })
 
   ipcMain.handle(START_STREAM_RECORD, async (_, streamConfigStr: string) => {
     const streamConfig = JSON.parse(streamConfigStr) as IStreamConfig
-    const { roomUrl, proxy, cookie, title } = streamConfig
+    const { roomUrl, proxy, cookie, title, id } = streamConfig
 
     /**
      * When requesting the live stream address,
@@ -283,7 +305,7 @@ app.whenReady().then(async () => {
      * Prevent clicking the stop recording button while requesting the live stream address,
      * causing the page to display that the recording has stopped, but the ffmpeg process is still running
      */
-    setRecordStreamFfmpegProcessMap(title, RECORD_DUMMY_PROCESS)
+    setRecordStreamFfmpegProcessMap(id, RECORD_DUMMY_PROCESS)
 
     const { code: liveUrlsCode, liveUrls } = await getLiveUrls(
       { roomUrl, proxy, cookie },
@@ -301,7 +323,7 @@ app.whenReady().then(async () => {
       streamConfig,
       writeLog,
       (code: number, errMsg?: string) => {
-        win?.webContents.send(STREAM_RECORD_END, title, code, errMsg)
+        win?.webContents.send(STREAM_RECORD_END, id, code, errMsg)
         clearTimerWhenAllFfmpegProcessEnd()
       }
     )
@@ -313,7 +335,7 @@ app.whenReady().then(async () => {
     }
   })
 
-  ipcMain.handle(STOP_STREAM_RECORD, async (_, title: string) => {
+  ipcMain.handle(STOP_STREAM_RECORD, async (_, id: string) => {
     /**
      * If the ffmpeg process is RECORD_DUMMY_PROCESS when stopping recording,
      * need to send the STREAM_RECORD_END event to display the information that the recording has stopped on the page.
@@ -322,9 +344,8 @@ app.whenReady().then(async () => {
      * At this time, you do not need to send the STREAM_RECORD_END event,
      * because the ffmpeg process will send the STREAM_RECORD_END event when it is finished running.
      */
-    const shouldSend = killRecordStreamFfmpegProcess(title)
-    shouldSend &&
-      win?.webContents.send(STREAM_RECORD_END, title, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
+    const shouldSend = killRecordStreamFfmpegProcess(id)
+    shouldSend && win?.webContents.send(STREAM_RECORD_END, id, FFMPEG_ERROR_CODE.USER_KILL_PROCESS)
     clearTimerWhenAllFfmpegProcessEnd()
 
     return {
@@ -366,10 +387,25 @@ app.whenReady().then(async () => {
     stillRecordStreamKeys.forEach((key) => {
       killRecordStreamFfmpegProcess(key)
     })
+
     downloadReq.destroy()
     clearTimerWhenAllFfmpegProcessEnd()
     stopDownloadDepTimerWhenAllDownloadDepEnd()
+
+    stopFrpc()
+
     win?.destroy()
+  })
+
+  ipcMain.handle(START_FRPC_PROCESS, async (_, code: string) => {
+    if (frpcObj) {
+      return false
+    }
+    return await startFrpcProcess(code, writeLog, win!)
+  })
+
+  ipcMain.handle(STOP_FRPC_PROCESS, async () => {
+    stopFrpc()
   })
 
   await createWindow()

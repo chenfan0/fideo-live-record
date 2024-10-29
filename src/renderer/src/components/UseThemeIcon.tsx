@@ -8,11 +8,12 @@ interface UseThemeIconProps {
   light: string
   handleClick?: () => void
   className?: string
+  id?: string
   tooltipContent?: string
 }
 
 export default function UseThemeIcon(props: UseThemeIconProps) {
-  const { dark, light, handleClick, className = '', tooltipContent } = props
+  const { dark, light, handleClick, className = '', tooltipContent, id } = props
 
   const [localTheme] = useLocalStorage('theme', 'light')
   const theme = useThemeStore((state) => state.theme || (localTheme as 'dark' | 'light'))
@@ -24,6 +25,7 @@ export default function UseThemeIcon(props: UseThemeIconProps) {
           <img
             src={theme === 'dark' ? dark : light}
             className={className ? className : 'w-[24px] h-[24px] cursor-pointer select-none'}
+            id={id}
             onClick={handleClick}
           />
         </TooltipTrigger>
@@ -35,6 +37,7 @@ export default function UseThemeIcon(props: UseThemeIconProps) {
       src={theme === 'dark' ? dark : light}
       className={className ? className : 'w-[24px] h-[24px] cursor-pointer select-none'}
       onClick={handleClick}
+      id={id}
     />
   )
 }

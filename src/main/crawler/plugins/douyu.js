@@ -96,4 +96,27 @@ async function baseGetDouyuLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetDouyuRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+
+  const data = (
+    await request(`https://www.douyu.com/betard/${roomId}`, {
+      proxy,
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      }
+    })
+  ).data
+
+  const name = data.room.nickname
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getDouyuLiveUrlsPlugin = captureError(baseGetDouyuLiveUrlsPlugin)
+export const getDouyuRoomInfoPlugin = captureError(baseGetDouyuRoomInfoPlugin)

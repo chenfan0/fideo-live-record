@@ -1,4 +1,5 @@
 interface IStreamConfig {
+  id: string
   title: string
   roomUrl: string
   filename: string
@@ -23,17 +24,20 @@ interface IDefaultDefaultSettingsConfig {
 type IFfmpegProgressInfo = Record<
   string,
   {
-    frames: number
-    currentFps: number
-    currentKbps: number
     targetSize: number
     timemark: string
-    percent?: number
   }
 >
 
 interface IDownloadDepProgressInfo {
+  title: string
   showRetry: boolean
   downloading: boolean
   progress: number
+}
+
+interface IWebControlSetting {
+  webControlPath: string
+  enableWebControl: boolean
+  email: string
 }

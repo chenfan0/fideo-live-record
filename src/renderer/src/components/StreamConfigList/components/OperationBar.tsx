@@ -52,7 +52,7 @@ export default function OperationBar(props: OperationBarProps) {
   }))
 
   const handleConfirmDelete = async () => {
-    await removeStreamConfig(streamConfig.title)
+    await removeStreamConfig(streamConfig.id)
     setDeleteDialogOpen(false)
   }
 
@@ -60,7 +60,7 @@ export default function OperationBar(props: OperationBarProps) {
     isFirst &&
       (await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.PREPARING_TO_RECORD },
-        streamConfig.title
+        streamConfig.id
       ))
 
     const { code } = await window.api.startStreamRecord(JSON.stringify(streamConfig)).catch(() => {
@@ -69,18 +69,13 @@ export default function OperationBar(props: OperationBarProps) {
 
     const currentStatus = useStreamConfigStore
       .getState()
-      .streamConfigList.find((item) => item.title === streamConfig.title)?.status
+      .streamConfigList.find((item) => item.id === streamConfig.id)?.status
     if (currentStatus === StreamStatus.NOT_STARTED) {
       return
     }
 
-    console.log('handleStartRecord code:', code)
-
     if (code === SUCCESS_CODE) {
-      await updateStreamConfig(
-        { ...streamConfig, status: StreamStatus.RECORDING },
-        streamConfig.title
-      )
+      await updateStreamConfig({ ...streamConfig, status: StreamStatus.RECORDING }, streamConfig.id)
       toast({
         title: streamConfig.title,
         description: t('start_record')
@@ -115,7 +110,7 @@ export default function OperationBar(props: OperationBarProps) {
       }
       await updateStreamConfig(
         { ...streamConfig, status: StreamStatus.MONITORING },
-        streamConfig.title
+        streamConfig.id
       )
       return
     }
@@ -127,10 +122,7 @@ export default function OperationBar(props: OperationBarProps) {
 
     const errMessage = crawlerErrorCodeToI18nMessage(code, 'error.start_record.')
 
-    await updateStreamConfig(
-      { ...streamConfig, status: StreamStatus.NOT_STARTED },
-      streamConfig.title
-    )
+    await updateStreamConfig({ ...streamConfig, status: StreamStatus.NOT_STARTED }, streamConfig.id)
     toast({
       title: streamConfig.title,
       description: t(errMessage),
@@ -149,7 +141,7 @@ export default function OperationBar(props: OperationBarProps) {
   }
 
   const handlePauseClick = async () => {
-    await window.api.stopStreamRecord(streamConfig.title)
+    await window.api.stopStreamRecord(streamConfig.id)
     clearTimeout(timer.current)
   }
 
@@ -178,8 +170,8 @@ export default function OperationBar(props: OperationBarProps) {
   }
 
   useEffect(() => {
-    const handleRecordEndNotUserStop = async (title: string) => {
-      if (title !== streamConfig.title) return
+    const handleRecordEndNotUserStop = async (id: string) => {
+      if (id !== streamConfig.id) return
       if (timer.current) {
         clearTimeout(timer.current)
       }
@@ -220,6 +212,7 @@ export default function OperationBar(props: OperationBarProps) {
             dark={darkPlayIcon}
             light={lightPlayIcon}
             handleClick={handlePlayClick}
+            id={streamConfig.id + '_play'}
           />
         ) : (
           <UseThemeIcon
@@ -227,6 +220,7 @@ export default function OperationBar(props: OperationBarProps) {
             dark={darkPauseIcon}
             light={lightPauseIcon}
             handleClick={handlePauseClick}
+            id={streamConfig.id + '_pause'}
           />
         )}
         <UseThemeIcon

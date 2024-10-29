@@ -87,4 +87,10 @@ async function baseGetShiGuangLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetShiGuangRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getShiGuangLiveUrlsPlugin = captureError(baseGetShiGuangLiveUrlsPlugin)
+export const getShiGuangRoomInfoPlugin = captureError(baseGetShiGuangRoomInfoPlugin)

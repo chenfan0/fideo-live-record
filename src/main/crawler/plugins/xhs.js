@@ -61,4 +61,10 @@ async function baseGetXhsUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetXhsRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getXhsUrlsPlugin = captureError(baseGetXhsUrlsPlugin)
+export const getXhsRoomInfoPlugin = captureError(baseGetXhsRoomInfoPlugin)

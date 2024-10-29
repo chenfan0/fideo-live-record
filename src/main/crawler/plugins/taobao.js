@@ -336,4 +336,10 @@ async function baseGetTaobaoLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetTaobaoRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getTaobaoLiveUrlsPlugin = captureError(baseGetTaobaoLiveUrlsPlugin)
+export const getTaobaoRoomInfoPlugin = captureError(baseGetTaobaoRoomInfoPlugin)

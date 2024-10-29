@@ -2,6 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 
 declare global {
   interface Window {
+    socket: WebSocket
     electron: ElectronAPI
     api: {
       isDarwin: boolean
@@ -13,6 +14,11 @@ declare global {
         proxy?: string
         cookie?: string
       }) => Promise<{ code: number; liveUrls: string[] }>
+      getRoomInfo: (info: {
+        roomUrl: string
+        proxy?: string
+        cookie?: string
+      }) => Promise<{ code: number; roomInfo: IRoomInfo }>
       navByDefaultBrowser: (url: string) => void
       startStreamRecord: (streamConfig: string) => Promise<{ code: number }>
       stopStreamRecord: (title: string) => Promise<{ code: number }>
@@ -23,11 +29,15 @@ declare global {
       forceCloseWindow: () => void
       retryDownloadDep: () => void
 
-      onStreamRecordEnd: (callback: (title: string, code: number, errMsg?: string) => void) => void
+      startFrpcProcess: (code: string) => Promise<{ status: boolean; code?: string; port?: number }>
+      stopFrpcProcess: () => void
+
+      onStreamRecordEnd: (callback: (id: string, code: number, errMsg?: string) => void) => void
       onFFmpegProgressInfo: (callback: (info: IFfmpegProgressInfo) => void) => void
       onDownloadDepProgressInfo: (callback: (info: IDownloadDepProgressInfo) => void) => void
       onUserCloseWindow: (callback: () => void) => void
       onAppUpdate: (callback: () => void) => void
+      onFrpcProcessError: (callback: (err: string) => void) => void
     }
   }
 }

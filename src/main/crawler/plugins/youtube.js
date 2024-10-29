@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-import { request } from '../base-request.js'
+import { DESKTOP_USER_AGENT, request } from '../base-request.js'
 import { captureError } from '../capture-error.js'
 
 import { CRAWLER_ERROR_CODE, SUCCESS_CODE } from '../../../code'
@@ -22,8 +22,7 @@ async function baseGetYoutubeLiveUrlsPlugin(roomUrl, others = {}) {
       proxy,
       headers: {
         cookie,
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+        'User-Agent': DESKTOP_USER_AGENT
       }
     })
   ).data
@@ -58,4 +57,30 @@ async function baseGetYoutubeLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetYoutubeRoomInfoPlugin(roomUrl, others = {}) {
+  const { cookie, proxy } = others
+
+  const html = (
+    await request(roomUrl, {
+      headers: {
+        cookie,
+        'User-Agent': DESKTOP_USER_AGENT
+      },
+      proxy
+    })
+  ).data
+
+  const flag = '<link itemprop="name" content="'
+  const itemPropAuthorIndex = html.indexOf(flag)
+  const startIndex = itemPropAuthorIndex + flag.length
+  const endIndex = html.indexOf('"></span>', startIndex)
+  const name = html.slice(startIndex, endIndex)
+
+  return {
+    code: SUCCESS_CODE,
+    roomInfo: { name }
+  }
+}
+
 export const getYoutubeLiveUrlsPlugin = captureError(baseGetYoutubeLiveUrlsPlugin)
+export const getYoutubeRoomInfoPlugin = captureError(baseGetYoutubeRoomInfoPlugin)
