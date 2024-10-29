@@ -43,4 +43,10 @@ async function baseGetVvLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetVvRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getVvLiveUrlsPlugin = captureError(baseGetVvLiveUrlsPlugin)
+export const getVvRoomInfoPlugin = captureError(baseGetVvRoomInfoPlugin)

@@ -72,7 +72,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   useEffect(() => {
     async function handleStartWebControl(webControlPath: string, timeout = 1000 * 10) {
       setWebControlSetting({ ...form.getValues(), enableWebControl: true })
-      const isSuccess = await startFrpc(webControlPath)
+      const isSuccess = await startFrpc(webControlPath).catch(() => false)
       if (!isSuccess) {
         setWebControlSetting({ ...form.getValues(), enableWebControl: false })
 
@@ -82,7 +82,10 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
           variant: 'destructive'
         })
         setTimeout(() => {
-          handleStartWebControl(webControlPath, timeout + 1000 * 10)
+          const currentEnableWebControl = useWebControlSettingStore.getState().webControlSetting.enableWebControl
+          if (!currentEnableWebControl) {
+            handleStartWebControl(webControlPath, timeout + 1000 * 10)
+          }
         }, timeout)
       }
     }

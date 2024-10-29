@@ -21,6 +21,7 @@ import {
   FFMPEG_PROGRESS_INFO,
   FORCE_CLOSE_WINDOW,
   GET_LIVE_URLS,
+  GET_ROOM_INFO,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -37,7 +38,7 @@ import {
   STREAM_RECORD_END,
   USER_CLOSE_WINDOW
 } from '../const'
-import { getLiveUrls } from './crawler/index'
+import { getLiveUrls, getRoomInfo } from './crawler/index'
 import { FFMPEG_ERROR_CODE, SUCCESS_CODE } from '../code'
 import {
   recordStream,
@@ -251,6 +252,11 @@ async function handleMakeSureDependenciesExist() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+  if (app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: true
+    })
+  }
   // Set app user model id for windows
   electronApp.setAppUserModelId('site.fideo.app')
 
@@ -273,6 +279,14 @@ app.whenReady().then(async () => {
     async (_, info: { roomUrl: string; proxy?: string; cookie?: string; title: string }) => {
       const { roomUrl, proxy, cookie, title } = info
       return getLiveUrls({ roomUrl, proxy, cookie }, writeLog.bind(null, title))
+    }
+  )
+
+  ipcMain.handle(
+    GET_ROOM_INFO,
+    async (_, info: { roomUrl: string; proxy?: string; cookie?: string }) => {
+      const { roomUrl, proxy, cookie } = info
+      return getRoomInfo({ roomUrl, proxy, cookie }, writeLog.bind(null, 'Get Room Info'))
     }
   )
 

@@ -10,8 +10,13 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
-    optimizeDeps: {
-      force: true
+    build: {
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true
+        }
+      }
     },
     resolve: {
       alias: {

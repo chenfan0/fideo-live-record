@@ -87,4 +87,10 @@ async function baseGetTiktokLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetTiktokRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getTiktokLiveUrlsPlugin = captureError(baseGetTiktokLiveUrlsPlugin)
+export const getTiktokRoomInfoPlugin = captureError(baseGetTiktokRoomInfoPlugin)

@@ -86,4 +86,10 @@ async function baseGetKuaishouLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetKuaishouRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getKuaishouLiveUrlsPlugin = captureError(baseGetKuaishouLiveUrlsPlugin)
+export const getKuaishouRoomInfoPlugin = captureError(baseGetKuaishouRoomInfoPlugin)

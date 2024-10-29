@@ -7,6 +7,7 @@ import {
   FORCE_CLOSE_WINDOW,
   FRPC_PROCESS_ERROR,
   GET_LIVE_URLS,
+  GET_ROOM_INFO,
   MAXIMIZE_RESTORE_WINDOW,
   MINIMIZE_WINDOW,
   NAV_BY_DEFAULT_BROWSER,
@@ -30,6 +31,8 @@ const api = {
   openLogsDir: () => ipcRenderer.invoke(OPEN_LOGS_DIR),
   getLiveUrls: (info: { roomUrl: string; proxy?: string; cookie?: string; title: string }) =>
     ipcRenderer.invoke(GET_LIVE_URLS, info),
+  getRoomInfo: (info: { roomUrl: string; proxy?: string; cookie?: string }) =>
+    ipcRenderer.invoke(GET_ROOM_INFO, info),
   navByDefaultBrowser: (url: string) => ipcRenderer.invoke(NAV_BY_DEFAULT_BROWSER, url),
   startStreamRecord: (streamConfig: string) =>
     ipcRenderer.invoke(START_STREAM_RECORD, streamConfig),

@@ -57,4 +57,10 @@ async function baseGetWeiboLiveUrlsPlugin(roomUrl, others = {}) {
   }
 }
 
+async function baseGetWeiboRoomInfoPlugin(roomUrl, others = {}) {
+  const roomId = getRoomIdByUrl(roomUrl)
+  const { proxy, cookie } = others
+}
+
 export const getWeiboLiveUrlsPlugin = captureError(baseGetWeiboLiveUrlsPlugin)
+export const getWeiboRoomInfoPlugin = captureError(baseGetWeiboRoomInfoPlugin)
