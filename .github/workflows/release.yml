@@ -18,11 +18,8 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install PNPM
-      run: npm install -g pnpm
-
     - name: Install dependencies
-      run: pnpm install
+      run: npm install
 
     - name: Get version from package.json
       id: get_version
@@ -32,9 +29,9 @@ jobs:
     - name: Build Electron App
       run: |
         if [ "${{ runner.os }}" == "Windows" ]; then
-          pnpm build:win
+          npm run build:win
         elif [ "${{ runner.os }}" == "macOS" ]; then
-          pnpm build:mac
+          npm run build:mac
         fi
       shell: bash
 
