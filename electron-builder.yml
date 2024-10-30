@@ -10,8 +10,7 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
-  - ./resources/iconTemplate.png
-  - ./resources/index.html
+  - ./resources/*
 win:
   target:
     - target: "nsis"
@@ -23,6 +22,8 @@ win:
     - from: "./resources/iconTemplate.png"
       to: "Resources"
     - from: "./resources/index.html"
+      to: "Resources"
+    - from: "./resources/frpc/win/${arch}/frpc.exe"
       to: "Resources"
 nsis:
   oneClick: false
@@ -49,6 +50,8 @@ mac:
     - from: "./resources/iconTemplate.png"
       to: "Resources"
     - from: "./resources/index.html"
+      to: "Resources"
+    - from: "./resources/frpc/mac/${arch}/frpc"
       to: "Resources"
 dmg:
   artifactName: ${name}-${version}-${arch}.${ext}

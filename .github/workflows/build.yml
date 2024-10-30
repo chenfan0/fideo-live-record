@@ -1,0 +1,65 @@
+name: Build and Release fideo
+
+on:
+  push:
+    branches:
+      - beta
+      - main
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Get version from package.json
+      id: get_version
+      run: echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Build Electron App
+      run: |
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          npm run build:win
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          npm run build:mac
+        fi
+      shell: bash
+
+    - name: Upload Windows build artifact (x64)
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-win-${{ env.VERSION }}-x64-beta
+        path: dist/fideo-${{ env.VERSION }}-x64.exe
+
+    - name: Upload Windows build artifact (arm64)
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-win-${{ env.VERSION }}-arm64-beta
+        path: dist/fideo-${{ env.VERSION }}-arm64.exe
+
+    - name: Upload macOS build artifacts (x64)
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-mac-x64-${{ env.VERSION }}-beta
+        path: dist/fideo-${{ env.VERSION }}-x64.dmg
+
+    - name: Upload macOS build artifacts (arm)
+      if: ${{ runner.os == 'macOS' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-mac-arm-${{ env.VERSION }}-beta
+        path: dist/fideo-${{ env.VERSION }}-arm64.dmg
