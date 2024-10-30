@@ -53,7 +53,6 @@ import { setFfmpegAndFfprobePath } from './ffmpeg'
 import {
   checkFfmpegExist,
   checkFfprobeExist,
-  checkFrpcExist,
   downloadDepProgressInfo,
   makeSureDependenciesExist,
   downloadReq
@@ -228,13 +227,12 @@ function showNotification(title: string, body: string) {
 
 async function handleMakeSureDependenciesExist() {
   const userDataPath = app.getPath('userData')
-  const [isFFmpegExist, isFfprobeExist, isFrpcExist] = await Promise.all([
+  const [isFFmpegExist, isFfprobeExist] = await Promise.all([
     checkFfmpegExist(userDataPath),
-    checkFfprobeExist(userDataPath),
-    checkFrpcExist(userDataPath)
+    checkFfprobeExist(userDataPath)
   ])
 
-  if (!isFFmpegExist || !isFfprobeExist || !isFrpcExist) {
+  if (!isFFmpegExist || !isFfprobeExist) {
     startDownloadDepTimerWhenFirstDownloadDepStart()
   }
 
