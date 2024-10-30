@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/useToast'
 
 import { closeWebSocket, createWebSocket, sendMessage } from '@/lib/websocket'
 import emitter from '@/lib/bus'
-import { START_WEB_CONTROL, WEBSOCKET_MESSAGE_TYPE } from '../../../../../const'
+import { START_WEB_CONTROL, WEBSOCKET_MESSAGE_TYPE, API_DOMAIN } from '../../../../../const'
 import { errorCodeToI18nMessage, SUCCESS_CODE } from '../../../../../code'
 
 const formSchema = z.object({
@@ -137,7 +137,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   }
 
   function intervalCheckOrderStatus(orderId: number) {
-    fetch('https://api-web-control.fideo.site/api/pay/check', {
+    fetch(`https://${API_DOMAIN}/api/pay/check`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -196,7 +196,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     setLoading(true)
 
     try {
-      const res = await fetch('https://api-web-control.fideo.site/api/pay/wx', {
+      const res = await fetch(`https://${API_DOMAIN}/api/pay/wx`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

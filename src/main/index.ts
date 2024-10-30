@@ -36,7 +36,9 @@ import {
   STOP_FRPC_PROCESS,
   STOP_STREAM_RECORD,
   STREAM_RECORD_END,
-  USER_CLOSE_WINDOW
+  USER_CLOSE_WINDOW,
+
+  API_DOMAIN
 } from '../const'
 import { getLiveUrls, getRoomInfo } from './crawler/index'
 import { FFMPEG_ERROR_CODE, SUCCESS_CODE } from '../code'
@@ -64,9 +66,7 @@ export const writeLog = writeLogWrapper(app.getPath('userData'))
 
 async function checkUpdate() {
   try {
-    const json = await fetch(
-      'https://api.github.com/repos/chenfan0/fideo-live-record/releases/latest'
-    )
+    const json = await fetch(`https://${API_DOMAIN}/api/release`)
     const { tag_name } = await json.json()
     if (lt(pkg.version, tag_name)) {
       win?.webContents.send(SHOW_UPDATE_DIALOG)
@@ -403,7 +403,6 @@ app.whenReady().then(async () => {
     }
     return await startFrpcProcess(code, writeLog, win!)
   })
-
   ipcMain.handle(STOP_FRPC_PROCESS, async () => {
     stopFrpc()
   })
