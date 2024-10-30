@@ -6,9 +6,13 @@ files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md,README-CN.md,tailwind.config.js,postcss.config.js,type.d.ts,.gitignore}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml,package-lock.json,package.json}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json,components.json}'
+  - '!{electron-builder.yml,electron-builder.config.js}'
+  - '!.github/*'
+  - '!resources/*'
+
 asarUnpack:
   - ./resources/*
 win:
