@@ -195,13 +195,17 @@ export async function startFrpcProcess(
 
     writeLog('frpc', 'frpcConfigPath: ' + frpcConfigPath)
 
+    const resourcePath = is.dev
+      ? join(__dirname, '../../../resources/')
+      : process.resourcesPath
+
     const frpcPath = isMac
       ? isArm
-        ? join(userPath, 'frp-mac-arm64/frpc')
-        : join(userPath, 'frp-mac-amd64/frpc')
+        ? join(resourcePath, 'frp-mac-arm64/frpc')
+        : join(resourcePath, 'frp-mac-amd64/frpc')
       : isArm
-        ? join(userPath, 'frp-win-arm64/frpc.exe')
-        : join(userPath, 'frp-win-amd64/frpc.exe')
+        ? join(resourcePath, 'frpc.exe')
+        : join(resourcePath, 'frpc.exe')
 
     const frpcProcess = spawn(frpcPath, ['-c', frpcConfigPath])
 

@@ -169,5 +169,5 @@ async function makeSureFrpDependenciesExist(dirname: string) {
 
 export async function makeSureDependenciesExist(dirname: string) {
   await makeSureFfmpegDependenciesExist(dirname)
-  await makeSureFrpDependenciesExist(dirname)
+  // await makeSureFrpDependenciesExist(dirname)
 }
