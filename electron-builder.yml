@@ -10,7 +10,9 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
-  - ./resources/*
+  - ./resources/frpc.exe
+  - ./resources/iconTemplate.png
+  - ./resources/index.html
 win:
   target:
     - target: "nsis"
@@ -19,7 +21,11 @@ win:
         - "arm64"
   executableName: fideo
   extraFiles:
-    - from: "./resources/*"
+    - from: "./resources/frpc.exe"
+      to: "Resources"
+    - from: "./resources/iconTemplate.png"
+      to: "Resources"
+    - from: "./resources/index.html"
       to: "Resources"
 nsis:
   oneClick: false
