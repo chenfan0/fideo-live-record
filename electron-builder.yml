@@ -21,11 +21,7 @@ win:
         - "arm64"
   executableName: fideo
   extraFiles:
-    - from: "./resources/frpc.exe"
-      to: "Resources"
-    - from: "./resources/iconTemplate.png"
-      to: "Resources"
-    - from: "./resources/index.html"
+    - from: "./resources"
       to: "Resources"
 nsis:
   oneClick: false
@@ -49,9 +45,7 @@ mac:
   notarize: false
   identity: null
   extraFiles:
-    - from: "./resources/iconTemplate.png"
-      to: "Resources"
-    - from: "./resources/index.html"
+    - from: "./resources"
       to: "Resources"
 dmg:
   artifactName: ${name}-${version}-${arch}.${ext}
