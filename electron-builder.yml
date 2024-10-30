@@ -11,6 +11,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - ./resources/iconTemplate.png
+  - ./resources/index.html
 win:
   target:
     - target: "nsis"
@@ -20,6 +21,8 @@ win:
   executableName: fideo
   extraFiles:
     - from: "./resources/iconTemplate.png"
+      to: "Resources"
+    - from: "./resources/index.html"
       to: "Resources"
 nsis:
   oneClick: false
@@ -44,6 +47,8 @@ mac:
   identity: null
   extraFiles:
     - from: "./resources/iconTemplate.png"
+      to: "Resources"
+    - from: "./resources/index.html"
       to: "Resources"
 dmg:
   artifactName: ${name}-${version}-${arch}.${ext}
