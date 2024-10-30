@@ -19,10 +19,6 @@ win:
         - "arm64"
   executableName: fideo
   extraFiles:
-    - from: "./resources/iconTemplate.png"
-      to: "Resources"
-    - from: "./resources/index.html"
-      to: "Resources"
     - from: "./resources/*"
       to: "Resources"
 nsis:
