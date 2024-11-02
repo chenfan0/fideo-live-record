@@ -7,7 +7,8 @@ export default {
         toggle_theme: 'Toggle Theme',
         qq: 'Join QQ Group',
         discord: 'Join Discord',
-        go_to_website: 'Go to Website'
+        go_to_website: 'Go to Website',
+        web_control: 'Web Control'
       },
       default_settings: {
         title: 'Default Settings',
@@ -21,18 +22,35 @@ export default {
         logs_dir_placeholder: 'Open Logs Directory'
       },
       web_control_setting: {
-        title: 'Web Control Setting',
+        title: 'Web Control Settings',
         web_control_path: 'Activation Code',
         web_control_path_required: 'Activation Code cannot be empty',
-        web_control_path_placeholder: 'Can be obtained by clicking the get button',
+        web_control_path_placeholder: 'Can be obtained by clicking the Get button',
         get_web_control_path: 'Get',
         email: 'Email',
-        email_placeholder: 'Please enter the email (for receiving activation code)',
+        email_placeholder: 'Please enter the email (for receiving the activation code)',
         email_required: 'Email cannot be empty',
         email_invalid: 'Email is invalid',
         enable_web_control: 'Enable Web Control',
+        enable_web_control_tooltip: 'Enable to control recording via mobile phone',
+        get_web_control_path_success: 'Get activation code successfully',
+        get_web_control_path_success_desc:
+          'The activation code has been sent to the email, please check it',
+        get_web_control_path_failed: 'Failed to get activation code',
+        get_web_control_path_failed_desc: 'Please try again later',
+        start_web_control_success: 'Web control is enabled',
+        start_web_control_success_desc:
+          'You can use a browser to access the corresponding address to operate',
+        start_web_control_failed: 'Failed to enable web control',
+        start_web_control_failed_desc: 'Please try again later',
+        frpc_process_error: 'frpc process error',
+        stop_web_control_success: 'Web control is disabled',
+        stop_web_control_success_desc: 'You can click the Enable button again to enable it',
+        stop_web_control_failed: 'Failed to enable web control',
+        web_control_address: 'Web Control Address',
         confirm_force_close_window_with_web_control:
-          'Web control is running, do you want to force close the window?'
+          'Web control is running, do you want to force close the window?',
+        will_retry: 'Will retry in {{time}} seconds'
       },
       stream_config: {
         confirm: 'Confirm',

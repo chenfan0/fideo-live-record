@@ -491,12 +491,13 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
           <ShadcnDialogHeader>
             <ShadcnDialogTitle className="mt-[20px] text-center">
               <p>{title}</p>
-              <p className="mt-3">{`￥${money}`}</p>
+              <p className="mt-3">关注 公众号 “Fideo” 获取3天试用的激活码</p>
             </ShadcnDialogTitle>
           </ShadcnDialogHeader>
           <div className="flex justify-center h-[280px]">
             {qrcode && <img className="h-[280px]" src={qrcode}></img>}
           </div>
+          <p className="mt-3 text-center">{`￥${money}`}</p>
         </ShadcnDialogContent>
       </ShadcnDialog>
     </>

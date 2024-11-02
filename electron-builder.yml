@@ -25,10 +25,12 @@ win:
   extraFiles:
     - from: "./resources/iconTemplate.png"
       to: "Resources"
-    - from: "./resources/dist"
-      to: "Resources"
     - from: "./resources/frpc/win/${arch}/frpc.exe"
       to: "Resources"
+  extraResources:
+    - from: "./resources/dist"
+      to: "dist"
+
 nsis:
   oneClick: false
   artifactName: ${name}-${version}-${arch}.${ext}
