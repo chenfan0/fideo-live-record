@@ -6,6 +6,9 @@ import type { ChildProcess } from 'node:child_process'
 import { app, BrowserWindow } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import Fastify from 'fastify'
+import fastifyStatic from '@fastify/static'
+import fastifyCompress from '@fastify/compress'
+
 import WebSocket from 'ws'
 import spawn from 'cross-spawn'
 import { FRP_DOMAIN, FRPC_PROCESS_ERROR, WEBSOCKET_MESSAGE_TYPE } from '../../const'
@@ -41,18 +44,36 @@ async function startFrpcLocalServer(
 
   const fastify = Fastify()
 
+  fastify.register(fastifyCompress, {
+    global: true
+  })
+
+  fastify.register(fastifyStatic, {
+    root: is.dev ? join(__dirname, '../../resources/dist') : join(process.resourcesPath, 'dist'),
+    prefix: `/${code}/`,
+    // serve: false,
+    setHeaders: (res, path) => {
+      console.log('path: ', path)
+      if (path.endsWith('.js') || path.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+      }
+    }
+  })
+
   fastify.get(`/${code}`, async (_, reply) => {
     const filePath = is.dev
-      ? join(__dirname, '../../resources/index.html')
-      : join(process.resourcesPath, 'index.html')
+      ? join(__dirname, '../../resources/dist/index.html')
+      : join(process.resourcesPath, 'dist/index.html')
 
     try {
       const htmlContent = (await fsp.readFile(filePath, 'utf-8'))
         .toString()
         .replace(
-          '$$WEBSOCKET_URL$$',
-          !is.dev ? `ws://localhost:${port}` : `wss://${FRP_DOMAIN}/${code}`
+          '__WEBSOCKET_URL__',
+          // is.dev ? `ws://localhost:${port}` : `wss://${FRP_DOMAIN}/${code}`
+          `"wss://${FRP_DOMAIN}/${code}"`
         )
+        .replaceAll('__WEB_CONTROL_CODE__', code)
 
       reply.code(200).header('Content-Type', 'text/html').send(htmlContent)
     } catch (err) {
@@ -109,6 +130,9 @@ async function startFrpcLocalServer(
           )
           break
         case WEBSOCKET_MESSAGE_TYPE.ADD_STREAM_CONFIG:
+          if (!data.directory) {
+            data.directory = app.getPath('desktop')
+          }
           streamConfigList.unshift(data as IStreamConfig)
           break
       }
@@ -194,7 +218,11 @@ export async function startFrpcProcess(
 
     writeLog('frpc', 'frpcConfigPath: ' + frpcConfigPath)
 
-    const frpcPath = isMac ? join(process.resourcesPath, 'frpc') : join(process.resourcesPath, 'frpc.exe')
+    const frpcPath = is.dev
+      ? join(__dirname, '../../resources/frpc/mac/arm64/frpc')
+      : isMac
+        ? join(process.resourcesPath, 'frpc')
+        : join(process.resourcesPath, 'frpc.exe')
 
     const frpcProcess = spawn(frpcPath, ['-c', frpcConfigPath])
 
@@ -232,7 +260,7 @@ export async function startFrpcProcess(
         stopFrpcLocalServer()
         clearInterval(frpcProcessTimer)
       }
-    }, 3000)
+    }, 5000)
 
     frpcObj = {
       frpcProcess,

@@ -70,21 +70,24 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   })
 
   useEffect(() => {
-    async function handleStartWebControl(webControlPath: string, timeout = 1000 * 10) {
-      setWebControlSetting({ ...form.getValues(), enableWebControl: true })
+    async function handleStartWebControl(timeout = 0) {
+      const currentWebControlSetting = useWebControlSettingStore.getState().webControlSetting
+      await setWebControlSetting({ ...currentWebControlSetting, enableWebControl: true })
+      const webControlPath = currentWebControlSetting.webControlPath
       const isSuccess = await startFrpc(webControlPath).catch(() => false)
       if (!isSuccess) {
-        setWebControlSetting({ ...form.getValues(), enableWebControl: false })
+        await setWebControlSetting({ ...currentWebControlSetting, enableWebControl: false })
 
         toast({
           title: t('web_control_setting.start_web_control_failed'),
-          description: t('web_control_setting.will_retry', { time: timeout / 1000 }),
+          description: t('web_control_setting.will_retry', { time: (timeout + 1000 * 10) / 1000 }),
           variant: 'destructive'
         })
         setTimeout(() => {
-          const currentEnableWebControl = useWebControlSettingStore.getState().webControlSetting.enableWebControl
-          if (!currentEnableWebControl) {
-            handleStartWebControl(webControlPath, timeout + 1000 * 10)
+          const { enableWebControl, webControlPath } =
+            useWebControlSettingStore.getState().webControlSetting
+          if (!enableWebControl && webControlPath) {
+            handleStartWebControl(timeout + 1000 * 10)
           }
         }, timeout)
       }
@@ -94,20 +97,21 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     return () => {
       emitter.off(START_WEB_CONTROL, handleStartWebControl as any)
     }
-  }, [])
+  }, [useWebControlSettingStore])
 
   useEffect(() => {
     form.reset({ ...webControlSetting })
   }, [webControlSetting])
 
   useEffect(() => {
-    window.api.onFrpcProcessError((err) => {
+    window.api.onFrpcProcessError(async (err) => {
+      const currentWebControlSetting = useWebControlSettingStore.getState().webControlSetting
       toast({
         title: t('web_control_setting.frpc_process_error'),
         description: err,
         variant: 'destructive'
       })
-      setWebControlSetting({ ...form.getValues(), enableWebControl: false })
+      await setWebControlSetting({ ...currentWebControlSetting, enableWebControl: false })
       closeWebSocket()
     })
   }, [])
@@ -115,7 +119,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
   const handleSetSheetOpen = async (status: boolean, trigger = false) => {
     const formValues = form.getValues() as IWebControlSetting
     if (trigger) {
-      setWebControlSetting(formValues)
+      await setWebControlSetting(formValues)
     }
 
     setQrcode('')
@@ -148,10 +152,10 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     }).then((res) => {
       res
         .json()
-        .then(({ code, data: webControlPath }) => {
+        .then(async ({ code, data: webControlPath }) => {
           if (code === 200) {
             form.setValue('webControlPath', webControlPath)
-            setWebControlSetting(form.getValues())
+            await setWebControlSetting(form.getValues())
             setDialogOpen(false)
             setShowConfetti(true)
             toast({
@@ -345,6 +349,7 @@ export default function WebControlSettingSheet(props: StreamConfigSheetProps) {
     window.api.stopFrpcProcess()
     closeWebSocket()
     field.onChange(status)
+    setWebControlSetting({ ...form.getValues() })
 
     toast({
       title: t('web_control_setting.stop_web_control_success'),

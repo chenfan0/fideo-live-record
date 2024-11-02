@@ -20,11 +20,11 @@ export const useWebControlSettingStore = create<IWebControlSettingStore>((set) =
     const webControlSetting = await localForage.getItem<IWebControlSetting>('webControlSetting')
 
     if (webControlSetting) {
+      set(() => ({ webControlSetting }))
       const { enableWebControl, webControlPath } = webControlSetting
       if (enableWebControl && webControlPath) {
-        emitter.emit(START_WEB_CONTROL, webControlPath)
+        emitter.emit(START_WEB_CONTROL)
       }
-      set(() => ({ webControlSetting }))
     }
   },
   setWebControlSetting: async (setting: IWebControlSetting) => {

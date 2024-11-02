@@ -25,7 +25,7 @@ win:
   extraFiles:
     - from: "./resources/iconTemplate.png"
       to: "Resources"
-    - from: "./resources/index.html"
+    - from: "./resources/dist"
       to: "Resources"
     - from: "./resources/frpc/win/${arch}/frpc.exe"
       to: "Resources"
@@ -53,10 +53,11 @@ mac:
   extraFiles:
     - from: "./resources/iconTemplate.png"
       to: "Resources"
-    - from: "./resources/index.html"
-      to: "Resources"
     - from: "./resources/frpc/mac/${arch}/frpc"
       to: "Resources"
+  extraResources:
+    - from: "./resources/dist"
+      to: "dist"
 dmg:
   artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false

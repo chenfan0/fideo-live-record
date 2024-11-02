@@ -8,7 +8,7 @@ interface IDefaultSettingsStore {
 }
 
 export const useDefaultSettingsStore = create<IDefaultSettingsStore>((set) => ({
-  defaultSettingsConfig: { directory: '', lang: 'en', xizhiKey: '' },
+  defaultSettingsConfig: { directory: '', lang: 'cn', xizhiKey: '' },
   initData: async () => {
     const defaultSettingsConfig =
       await localForage.getItem<IDefaultDefaultSettingsConfig>('defaultSettingsConfig')

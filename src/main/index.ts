@@ -264,7 +264,6 @@ app.whenReady().then(async () => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
   ipcMain.handle(SELECT_DIR, async () => {
     const dir = await dialog.showOpenDialog({
       properties: ['openDirectory']

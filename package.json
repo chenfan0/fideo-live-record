@@ -25,6 +25,8 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@fastify/compress": "^8.0.1",
+    "@fastify/static": "^8.0.2",
     "@hookform/resolvers": "^3.4.2",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
