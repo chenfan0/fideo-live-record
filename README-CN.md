@@ -3,7 +3,7 @@
 </div>
 
 ## ✋🏻 简介
-这是一个基于`React` `Ffmpeg` `Electron` `Shadcn`的**直播录制软件**。支持监控直播，可以帮助用户简单便捷的对直播进行录制并保存为MP4格式的视频。
+这是一个基于`React` `Ffmpeg` `Electron` `Shadcn`, `FRP` 的**直播录制软件**。支持监控直播，可以帮助用户简单便捷的对直播进行录制并保存为MP4格式的视频。
 
 Fideo 官方网站：[https://www.fideo.site/cn](https://www.fideo.site/cn)
 
@@ -25,6 +25,12 @@ Fideo 官方网站：[https://www.fideo.site/cn](https://www.fideo.site/cn)
 - [x] [京东](https://lives.jd.com/?gx=RnAomTM2bDTeycsRqY1xDB5XAqGk-_s&gxd=RnAowmELOTLbyMkU_td0X9meMe1XxD0&ad_od=share&utm_source=androidapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=Wxfriends#/26510406?origin=2&appid=jdzb&sharer=jd_69imfpj372dqx7&user=zO8hBVAu84FG84VVLu%2BpjzHlo69Mkg6%2B)
 - [x] [时光](https://www.rengzu.com/)
 - [x] [陌陌](https://web.immomo.com/player/liveBroadcast.html#/liveBroadcast?roomid=14799927435342&src=m71000-rcmdtype999-linkmode1-seat1-modeid0-mid96765286)
+- [x] [17LIVE](https://17.live/en/live)
+- [x] [小红书](https://www.xiaohongshu.com/)
+- [x] [AcFun](https://live.acfun.cn/)
+- [x] [畅聊](https://www.tlclw.com/)
+- [x] [vv直播](https://h5webcdn-pro.vvxqiu.com/)
+- [x] [克拉克拉](https://live.kilakila.cn/)
 
 
 ## 📚 使用说明
@@ -47,6 +53,9 @@ sudo xattr -r -d com.apple.quarantine /Applications/Fideo.app
 #### 🛰 如何微信推送
 - 微信推送的功能使用的是 [息知](https://xz.qqoq.net/) 的API，需要自行注册账号并获取API Key。
 - 在默认设置中填入 **息知** 的API Key即可。
+
+#### 📱 网页操作
+- 获取激活并输入激活码，然后启动该功能即可在手机访问网页进行软件操作。
 
 ## ❓ 如何在本地运行？
 ```shell
